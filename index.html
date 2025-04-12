@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XEMTV.VN | Xem TV Online</title>
+    <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Dark Mode Variables */
+            --primary-color: #ffffff;
+            --primary-dark: #cccccc;
+            --secondary-color: #ff3d00;
+            --dark-bg: #121212;
+            --darker-bg: #0a0a0a;
+            --card-bg: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --hover-effect: rgba(255, 255, 255, 0.1);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --border-radius: 12px;
+            --transition: all 0.3s ease;
+            --nav-bg: #1a1a1a;
+            --menu-item-hover: rgba(255, 61, 0, 0.1);
+        }
+
+        /* Light Mode Variables */
+        [data-theme="light"] {
+            --primary-color: #333333;
+            --primary-dark: #555555;
+            --secondary-color: #ff3d00;
+            --dark-bg: #f5f5f5;
+            --darker-bg: #e0e0e0;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --hover-effect: rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --nav-bg: #ffffff;
+            --menu-item-hover: rgba(255, 61, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 100px;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: var(--nav-bg);
+            padding: 0;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: background-color 0.3s ease;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0.5rem 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-decoration: none;
+            transition: color 0.3s ease, opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--secondary-color);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            justify-content: flex-end;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1rem;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-link:hover {
+            background-color: var(--menu-item-hover);
+            color: var(--secondary-color);
+        }
+
+        .nav-link i {
+            font-size: 1.2rem;
+        }
+
+        .nav-text {
+            display: inline;
+        }
+
+        .nav-link::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--darker-bg);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-link:hover::before {
+            opacity: 1;
+        }
+
+        .active {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--hover-effect);
+            transform: rotate(30deg);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Mobile Search Icon */
+        .mobile-search-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Search Section */
+        .search-section {
+            padding: 0;
+            background-color: transparent;
+            border-bottom: none;
+            position: static;
+            transition: none;
+            flex: 1;
+            max-width: 600px;
+            margin: 0 1rem;
+        }
+
+        [data-theme="light"] .search-section {
+            border-bottom: none;
+        }
+
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 3rem;
+            border-radius: var(--border-radius);
+            border: none;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        #search-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--secondary-color);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-back-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .suggestions {
+            position: absolute;
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 0 0 var(--border-radius) var(--border-radius);
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: var(--shadow);
+            display: none;
+            border: 1px solid var(--hover-effect);
+        }
+
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--hover-effect);
+            transition: var(--transition);
+        }
+
+        .suggestion-item:hover {
+            background-color: var(--hover-effect);
+        }
+
+        .suggestion-item img {
+            width: 35px;
+            height: 35px;
+            object-fit: contain;
+            margin-right: 1rem;
+            border-radius: 6px;
+        }
+
+        .suggestion-item span {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        /* Player Section */
+        .player-section {
+            padding: 1.5rem 0;
+            background-color: var(--darker-bg);
+            margin-bottom: 1.5rem;
+            scroll-margin-top: 100px;
+            transition: background-color 0.3s ease;
+        }
+
+        .player-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            position: relative;
+        }
+
+        #jwplayer {
+            width: 100%;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .player-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 300px;
+            background-color: var(--darker-bg);
+            border-radius: var(--border-radius);
+        }
+
+        .player-loading .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.2);
+            border-top: 5px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        [data-theme="light"] .player-loading .spinner {
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-top: 5px solid var(--secondary-color);
+        }
+
+        .player-loading p {
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .refresh-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            border-radius: var(--border-radius);
+            z-index: 10;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.3s ease;
+        }
+
+        .refresh-message p {
+            margin: 0;
+        }
+
+        /* Channels Section */
+        .section {
+            margin-bottom: 2rem;
+            padding: 0 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--hover-effect);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .section-title i {
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+        }
+
+        .channel-count {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            background-color: var(--hover-effect);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        .channel-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .channel-item {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--hover-effect);
+        }
+
+        .channel-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .channel-image {
+            position: relative;
+            padding-top: 100%;
+            overflow: hidden;
+        }
+
+        .channel-item img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 1rem;
+            background-color: var(--darker-bg);
+        }
+
+        .channel-info {
+            padding: 0.8rem;
+            text-align: center;
+        }
+
+        .channel-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .fav-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--darker-bg);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 2;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .fav-btn:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.1);
+        }
+
+        .fav-btn:hover i {
+            color: white;
+        }
+
+        .fav-btn::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--darker-bg);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            box-shadow: var(--shadow);
+        }
+
+        .fav-btn:hover::before {
+            opacity: 1;
+        }
+
+        .fav-btn i {
+            color: var(--primary-color);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .fav-btn.favorited i {
+            color: var(--secondary-color);
+        }
+
+        /* Animation khi click */
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .heart-beat {
+            animation: heartBeat 0.5s;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top: 4px solid var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        [data-theme="light"] .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid var(--secondary-color);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--darker-bg);
+            padding: 1.5rem 0;
+            text-align: center;
+            margin-top: auto;
+            border-top: 1px solid var(--hover-effect);
+            transition: background-color 0.3s ease;
+        }
+
+        .footer-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--secondary-color);
+        }
+
+        footer p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* About Page */
+        .about-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .about-section {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .about-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary-color);
+        }
+
+        .about-text {
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Responsive */
+        @media (min-width: 769px) {
+            .header-container {
+                flex-wrap: nowrap;
+            }
+
+            .nav-container {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 1rem;
+            }
+
+            .search-section {
+                flex: 1;
+                max-width: 400px;
+                margin: 0 1rem;
+            }
+
+            .nav-menu {
+                display: flex;
+                gap: 0.5rem;
+            }
+
+            .nav-link {
+                padding: 0.5rem;
+            }
+
+            .nav-text {
+                display: none;
+            }
+
+            .mobile-menu-btn,
+            .mobile-search-btn {
+                display: none;
+            }
+        }
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .header-container {
+                padding: 0.5rem 1rem;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+                margin-right: 0.5rem;
+            }
+
+            .nav-container {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 0.5rem;
+            }
+
+            .search-section {
+                max-width: none;
+                width: 100%;
+                margin: 0 0.5rem 0 0;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            #search-input {
+                width: 100%;
+            }
+
+            .nav-menu {
+                gap: 0.3rem;
+            }
+
+            .nav-link i {
+                font-size: 1.1rem;
+            }
+
+            .theme-toggle {
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .header-container {
+                padding: 0.5rem 1.5rem;
+            }
+
+            .logo {
+                margin-right: 1rem;
+            }
+
+            .search-section {
+                max-width: 500px;
+                margin: 0 1rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            html {
+                scroll-padding-top: 120px;
+            }
+            
+            .player-section {
+                scroll-margin-top: 120px;
+            }
+            
+            .header-container {
+                padding: 0.5rem;
+                flex-direction: row;
+                align-items: center;
+                width: 100%;
+            }
+
+            .logo {
+                margin-right: 0;
+            }
+
+            .nav-container {
+                width: auto;
+                justify-content: flex-end;
+                padding-right: 0;
+            }
+
+            .search-section {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 0.5rem;
+                margin: 0;
+                background-color: var(--nav-bg);
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+                z-index: 100;
+            }
+
+            .search-section.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .search-back-btn {
+                display: block;
+            }
+
+            .mobile-search-btn {
+                display: block;
+            }
+
+            .nav-menu {
+                display: none;
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background-color: var(--nav-bg);
+                flex-direction: column;
+                padding: 1rem;
+                box-shadow: var(--shadow);
+                z-index: 90;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .nav-menu.active-with-search {
+                top: 120px;
+            }
+
+            .nav-item {
+                margin-bottom: 0.5rem;
+            }
+
+            .nav-text {
+                display: inline;
+            }
+
+            .nav-link::before {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .channel-list {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .section {
+                padding: 0 1rem;
+            }
+
+            .player-container {
+                padding: 0;
+            }
+
+            .player-loading {
+                height: 200px;
+            }
+
+            .logo.hidden {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+            .player-section {
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .player-container {
+                padding: 0 !important;
+                border-radius: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+            }
+
+            #jwplayer {
+                border-radius: 0 !important;
+                height: 56.25vw !important;
+                min-height: 200px !important;
+                width: 100% !important;
+            }
+
+            .jw-wrapper,
+            .jw-media,
+            .jw-video {
+                border-radius: 0 !important;
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .channel-list {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+                gap: 0.8rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+
+            .search-section {
+                padding: 0.5rem;
+            }
+        }
+
+        /* JW Player Customizations */
+        .jw-flag-small-player .jw-nextup-container,
+        .jw-flag-small-player .jw-nextup-container .jw-nextup,
+        .jw-icon-cc,
+        .jw-icon.jw-icon-inline.jw-button-color.jw-reset.jw-icon-pip,
+        .jw-icon.jw-icon-inline.jw-button-color.jw-reset.jw-icon.jw-icon-inline.jw-button-color.jw-reset.jw-icon-next,
+        .jw-rightclick {
+            display: none !important;
+        }
+
+        #my-player {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo" id="home-link">
+                <i class="fas fa-tv"></i>
+                <span>XEMTV.VN</span>
+            </a>
+             <ul class="nav-menu" id="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" id="home-nav-link" data-tooltip="Trang chủ">
+                            <i class="fas fa-home"></i>
+                            <span class="nav-text">Trang chủ</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#channels" class="nav-link" data-tooltip="Danh sách kênh">
+                            <i class="fas fa-list"></i>
+                            <span class="nav-text">Danh sách kênh</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#favorites" class="nav-link" data-tooltip="Kênh yêu thích">
+                            <i class="fas fa-heart"></i>
+                            <span class="nav-text">Kênh yêu thích</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#about" class="nav-link" id="about-nav-link" data-tooltip="Giới thiệu">
+                            <i class="fas fa-info-circle"></i>
+                            <span class="nav-text">Giới thiệu</span>
+                        </a>
+                    </li>
+                </ul>
+            <div class="nav-container">
+                <section class="search-section" id="search-section">
+                    <div class="container">
+                        <div class="search-container">
+                            <div class="search-box">
+                                <i class="fas fa-search search-icon"></i>
+                                <input type="text" id="search-input" placeholder="Tìm kiếm kênh..." oninput="filterChannels()">
+                                <div class="suggestions" id="suggestions"></div>
+                            </div>
+                            <button class="search-back-btn" id="search-back-btn">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+                
+               
+                
+                <button class="mobile-search-btn" id="mobile-search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <button class="theme-toggle" id="theme-toggle" title="Chế độ sáng/tối">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="player-section">
+        <div class="container">
+            <div class="player-container" id="player-container">
+                <div id="jwplayer"></div>
+                <div class="refresh-message" id="refresh-message" style="display: none;">
+                    <p>Đang làm mới luồng...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <section class="section" id="favorites">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-heart"></i>
+                    <span>Kênh yêu thích</span>
+                </h2>
+                <div class="channel-count" id="favorite-count">0 kênh</div>
+            </div>
+            <div class="channel-list" id="favorite-list"></div>
+        </section>
+        <section class="section" id="channels">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    <span>Tất cả kênh</span>
+                </h2>
+                <div class="channel-count" id="all-count">Đang tải...</div>
+            </div>
+            <div class="channel-list" id="channel-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-container" id="about">
+            <div class="about-section">
+                <h2 class="about-title">Giới thiệu về XEMTV.VN</h2>
+                <p class="about-text">
+                    Chào mừng bạn đến với <strong>XEMTV.VN</strong> – nền tảng xem truyền hình trực tuyến hàng đầu tại Việt Nam. 
+                    Chúng tôi cung cấp một trải nghiệm giải trí đỉnh cao với hàng trăm kênh truyền hình trong nước và quốc tế, 
+                    bao gồm các kênh tin tức, thể thao, giải trí, phim truyện, thiếu nhi và nhiều thể loại phong phú khác.
+                </p>
+                <p class="about-text">
+                    Với mong muốn mang đến cho người dùng trải nghiệm xem TV chất lượng nhất, XEMTV.VN được thiết kế với giao diện trực quan, 
+                    dễ dàng thao tác trên mọi thiết bị – từ máy tính, điện thoại di động đến smart TV. Chỉ cần kết nối internet, bạn có thể 
+                    tận hưởng mọi chương trình yêu thích mọi lúc, mọi nơi mà không cần cài đặt phức tạp.
+                </p>
+                <p class="about-text">
+                    Chúng tôi liên tục cập nhật các kênh truyền hình mới và nội dung đặc sắc để đáp ứng nhu cầu giải trí ngày càng cao của người dùng. 
+                    Hệ thống kỹ thuật hiện đại, được tối ưu hóa thường xuyên nhằm đảm bảo đường truyền ổn định, tốc độ cao, 
+                    hình ảnh sắc nét chuẩn HD và âm thanh sống động như thật.
+                </p>
+                <p class="about-text">
+                    Bên cạnh đó, XEMTV.VN còn tích hợp các tính năng tiện ích như lịch phát sóng, nhắc nhở chương trình, tìm kiếm thông minh 
+                    và đề xuất nội dung cá nhân hóa, giúp người dùng dễ dàng khám phá các chương trình phù hợp với sở thích.
+                </p>
+                <p class="about-text">
+                    Đội ngũ kỹ thuật và chăm sóc khách hàng của chúng tôi luôn sẵn sàng hỗ trợ 24/7 để giải đáp mọi thắc mắc và xử lý 
+                    nhanh chóng các vấn đề phát sinh trong quá trình sử dụng. Sự hài lòng của người dùng là ưu tiên hàng đầu của chúng tôi.
+                </p>
+                <p class="about-text">
+                    Nếu bạn có bất kỳ câu hỏi, góp ý hoặc cần hỗ trợ, vui lòng liên hệ với chúng tôi qua địa chỉ email: 
+                    support@xemtv.vn. Rất hân hạnh được phục vụ bạn!
+                </p>
+                <p class="about-text">
+                    Hãy cùng XEMTV.VN tận hưởng thế giới giải trí sống động, không giới hạn – mọi lúc, mọi nơi!
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Trang chủ</a>
+                <a href="#about" class="footer-link">Giới thiệu</a>
+                <a href="#" class="footer-link">Điều khoản sử dụng</a>
+                <a href="#" class="footer-link">Chính sách bảo mật</a>
+                <a href="#" class="footer-link">Liên hệ</a>
+            </div>
+            <p>Copyright 2025 © XEMTV.VN - All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        const jsonURL = "https://server.iof.vn/FPT/m3u8_links.json";
+        const directChannels = ["IOF_TV"];
+        let playerInstance;
+        let allChannels = [];
+        let searchTimer;
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        let currentChannel = null;
+        let refreshInterval = null;
+        const REFRESH_INTERVAL_MINUTES = 30;
+        const MAX_RETRIES = 3;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            setupEventListeners();
+            fetchChannels();
+            setupNavigation();
+        });
+
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const themeToggle = document.getElementById('theme-toggle');
+            if (theme === 'dark') {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+                themeToggle.setAttribute('title', 'Chuyển sang chế độ sáng');
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+                themeToggle.setAttribute('title', 'Chuyển sang chế độ tối');
+            }
+        }
+
+        function setupNavigation() {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const navMenu = document.getElementById('nav-menu');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            mobileMenuBtn.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                mobileMenuBtn.innerHTML = navMenu.classList.contains('active') 
+                    ? '<i class="fas fa-times"></i>' 
+                    : '<i class="fas fa-bars"></i>';
+            });
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                    
+                    if (navMenu.classList.contains('active')) {
+                        navMenu.classList.remove('active');
+                        mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+                    }
+                    
+                    const targetId = link.getAttribute('href');
+                    if (targetId && targetId !== '#') {
+                        const targetSection = document.querySelector(targetId);
+                        if (targetSection) {
+                            targetSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+                    }
+                });
+            });
+            
+            document.getElementById('home-link').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelector('.nav-link.active').classList.remove('active');
+                document.getElementById('home-nav-link').classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        function setupEventListeners() {
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.search-box')) {
+                    document.getElementById('suggestions').style.display = 'none';
+                }
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('suggestions').style.display = 'none';
+                    const searchSection = document.getElementById('search-section');
+                    const logo = document.querySelector('.logo');
+                    const navMenu = document.getElementById('nav-menu');
+                    if (searchSection.classList.contains('active')) {
+                        searchSection.classList.remove('active');
+                        logo.classList.remove('hidden');
+                        if (navMenu.classList.contains('active')) {
+                            navMenu.classList.remove('active-with-search');
+                        }
+                    }
+                }
+            });
+            
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+
+            const mobileSearchBtn = document.getElementById('mobile-search-btn');
+            const searchSection = document.getElementById('search-section');
+            const logo = document.querySelector('.logo');
+            const navMenu = document.getElementById('nav-menu');
+            const searchBackBtn = document.getElementById('search-back-btn');
+
+            mobileSearchBtn.addEventListener('click', () => {
+                searchSection.classList.toggle('active');
+                logo.classList.toggle('hidden');
+                if (navMenu.classList.contains('active')) {
+                    navMenu.classList.toggle('active-with-search');
+                }
+                if (searchSection.classList.contains('active')) {
+                    document.getElementById('search-input').focus();
+                }
+            });
+
+            searchBackBtn.addEventListener('click', () => {
+                searchSection.classList.remove('active');
+                logo.classList.remove('hidden');
+                if (navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active-with-search');
+                }
+                document.getElementById('suggestions').style.display = 'none';
+            });
+        }
+
+        function getFavorites() {
+            try {
+                return JSON.parse(localStorage.getItem("favoriteChannels") || "[]");
+            } catch {
+                return [];
+            }
+        }
+
+        function saveFavorites(favs) {
+            localStorage.setItem("favoriteChannels", JSON.stringify(favs));
+        }
+
+        function isFavorite(name) {
+            const favs = getFavorites();
+            return favs.some(c => c.name === name);
+        }
+
+        function toggleFavorite(event) {
+            event.stopPropagation();
+            const btn = event.currentTarget;
+            const channelItem = btn.closest('.channel-item');
+            const channel = JSON.parse(channelItem.getAttribute('data-channel'));
+            let favs = getFavorites();
+
+            if (isFavorite(channel.name)) {
+                favs = favs.filter(c => c.name !== channel.name);
+                btn.innerHTML = '<i class="fas fa-plus"></i>';
+                btn.classList.remove('favorited');
+                btn.setAttribute('data-tooltip', 'Thêm vào yêu thích');
+
+                const allChannelItem = document.querySelector(`#channel-list .channel-item[data-name="${channel.name}"]`);
+                if (allChannelItem) {
+                    const allChannelBtn = allChannelItem.querySelector('.fav-btn');
+                    if (allChannelBtn) {
+                        allChannelBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                        allChannelBtn.classList.remove('favorited');
+                        allChannelBtn.setAttribute('data-tooltip', 'Thêm vào yêu thích');
+                    }
+                }
+            } else {
+                favs.push(channel);
+                btn.innerHTML = '<i class="fas fa-heart"></i>';
+                btn.classList.add('favorited', 'heart-beat');
+                btn.setAttribute('data-tooltip', 'Xóa khỏi yêu thích');
+                setTimeout(() => btn.classList.remove('heart-beat'), 500);
+
+                const allChannelItem = document.querySelector(`#channel-list .channel-item[data-name="${channel.name}"]`);
+                if (allChannelItem) {
+                    const allChannelBtn = allChannelItem.querySelector('.fav-btn');
+                    if (allChannelBtn) {
+                        allChannelBtn.innerHTML = '<i class="fas fa-heart"></i>';
+                        allChannelBtn.classList.add('favorited');
+                        allChannelBtn.setAttribute('data-tooltip', 'Xóa khỏi yêu thích');
+                    }
+                }
+            }
+
+            saveFavorites(favs);
+            renderFavorites();
+        }
+
+        async function fetchChannels() {
+            try {
+                const res = await fetch(jsonURL + '?t=' + new Date().getTime());
+                const data = await res.json();
+                allChannels = data;
+
+                renderChannels(data);
+                renderFavorites();
+
+                const last = JSON.parse(localStorage.getItem("lastChannel") || "null");
+                if (last) {
+                    selectChannel(last);
+                } else if (data.length > 0) {
+                    selectChannel(data[0]);
+                }
+            } catch (error) {
+                console.error("Không tải được danh sách kênh", error);
+                document.getElementById('channel-list').innerHTML =
+                    '<div class="error-message">Không thể tải danh sách kênh. Vui lòng thử lại sau.</div>';
+            }
+        }
+
+        function renderChannels(channels) {
+            const list = document.getElementById("channel-list");
+            const count = document.getElementById("all-count");
+
+            list.innerHTML = "";
+            count.textContent = `${channels.length} kênh`;
+
+            if (channels.length === 0) {
+                list.innerHTML = '<div class="empty-message">Không tìm thấy kênh nào phù hợp</div>';
+                return;
+            }
+
+            channels.forEach((channel) => {
+                const isFav = isFavorite(channel.name);
+                const item = document.createElement("div");
+                item.className = "channel-item";
+                item.setAttribute('data-channel', JSON.stringify(channel));
+                item.setAttribute('data-name', channel.name);
+                item.innerHTML = `
+                    <div class="channel-image">
+                        <img src="${channel.logo}" alt="${channel.name}" loading="lazy" />
+                    </div>
+                    <div class="channel-info">
+                        <div class="channel-name">${channel.TV || channel.name}</div>
+                    </div>
+                    <button class="fav-btn ${isFav ? 'favorited' : ''}" 
+                            data-tooltip="${isFav ? 'Xóa khỏi yêu thích' : 'Thêm vào yêu thích'}">
+                        <i class="fas ${isFav ? 'fa-heart' : 'fa-plus'}"></i>
+                    </button>
+                `;
+                item.querySelector('.fav-btn').addEventListener('click', (event) => toggleFavorite(event));
+                item.addEventListener('click', (e) => {
+                    if (!e.target.closest('.fav-btn')) {
+                        selectChannel(channel);
+                    }
+                });
+                list.appendChild(item);
+            });
+        }
+
+        function renderFavorites() {
+            const list = document.getElementById("favorite-list");
+            const count = document.getElementById("favorite-count");
+            const favs = getFavorites();
+
+            list.innerHTML = "";
+            count.textContent = `${favs.length} kênh`;
+
+            if (favs.length === 0) {
+                list.innerHTML = '<div class="empty-message">Chưa có</div>';
+                return;
+            }
+
+            favs.forEach((channel) => {
+                const item = document.createElement("div");
+                item.className = "channel-item";
+                item.setAttribute('data-channel', JSON.stringify(channel));
+                item.setAttribute('data-name', channel.name);
+                item.innerHTML = `
+                    <div class="channel-image">
+                        <img src="${channel.logo}" alt="${channel.name}" loading="lazy" />
+                    </div>
+                    <div class="channel-info">
+                        <div class="channel-name">${channel.TV || channel.name}</div>
+                    </div>
+                    <button class="fav-btn favorited" 
+                            data-tooltip="Xóa khỏi yêu thích">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                `;
+                item.querySelector('.fav-btn').addEventListener('click', (event) => toggleFavorite(event));
+                item.addEventListener('click', (e) => {
+                    if (!e.target.closest('.fav-btn')) {
+                        selectChannel(channel);
+                    }
+                });
+                list.appendChild(item);
+            });
+        }
+
+        function selectChannel(channel) {
+            showPlayerLoading();
+            currentChannel = channel;
+            localStorage.setItem("lastChannel", JSON.stringify(channel));
+            playChannelDirect(channel);
+            scrollToPlayer();
+        }
+
+        function scrollToPlayer() {
+            const playerSection = document.querySelector('.player-section');
+            if (playerSection) {
+                playerSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                });
+                
+                if (isMobile) {
+                    setTimeout(() => {
+                        window.scrollBy(0, -20);
+                    }, 500);
+                }
+            }
+        }
+
+        function showPlayerLoading() {
+            const playerContainer = document.getElementById('player-container');
+            if (playerContainer) {
+                playerContainer.innerHTML = `
+                    <div class="player-loading">
+                        <div class="spinner"></div>
+                        <p>Đang tải kênh...</p>
+                    </div>
+                `;
+            }
+        }
+
+        function showRefreshMessage(show) {
+            const refreshMessage = document.getElementById('refresh-message');
+            if (refreshMessage) {
+                refreshMessage.style.display = show ? 'block' : 'none';
+            }
+        }
+
+        function playChannelDirect(channel, retryCount = 0) {
+            if (refreshInterval) {
+                clearInterval(refreshInterval);
+            }
+
+            const videoURL = directChannels.includes(channel.name)
+                ? channel.URL
+                : `https://server.iof.vn/fpt/proxy/iof.php?url=${encodeURIComponent(channel.playlist)}`;
+
+            document.getElementById('player-container').innerHTML = `
+                <div id="jwplayer"></div>
+                <div class="refresh-message" id="refresh-message" style="display: none;">
+                    <p>Đang làm mới luồng...</p>
+                </div>
+            `;
+            
+            playerInstance = jwplayer("jwplayer").setup({
+                file: videoURL,
+                image: channel.logo,
+                type: "hls",
+                mute: false,
+                autostart: true,
+                advertising: {
+                    client: "vast",
+                    tag: "https://server.iof.vn/FPT/QC/qc.xml",
+                    skipoffset: 1
+                },
+                width: "100%",
+                height: "100%",
+                responsive: true,
+                stretching: "fill",
+                aspectratio: "16:9",
+                controls: true,
+                stretching: "uniform",
+                preload: "auto",
+                logo: {
+                    hide: true
+                }
+            });
+
+            playerInstance.on('error', (e) => {
+                console.error('Lỗi phát video:', e);
+                if (retryCount < MAX_RETRIES) {
+                    setTimeout(() => {
+                        console.log(`Thử lại lần ${retryCount + 1}/${MAX_RETRIES}`);
+                        showRefreshMessage(true);
+                        playChannelDirect(channel, retryCount + 1);
+                    }, 3000);
+                } else {
+                    console.error('Hết số lần thử lại, không thể phát kênh.');
+                    document.getElementById('player-container').innerHTML = `
+                        <div class="player-error">
+                            <p>Không thể phát kênh. Vui lòng thử lại sau.</p>
+                        </div>
+                    `;
+                }
+            });
+
+            playerInstance.on('buffer', () => {
+                console.log('Đang buffer...');
+                let bufferTimeout = setTimeout(() => {
+                    if (playerInstance.getState() === 'buffering' && retryCount < MAX_RETRIES) {
+                        console.log('Buffer quá lâu, làm mới luồng...');
+                        showRefreshMessage(true);
+                        playChannelDirect(channel, retryCount + 1);
+                    }
+                }, 15000);
+                playerInstance.on('play', () => clearTimeout(bufferTimeout));
+            });
+
+            playerInstance.on('play', () => {
+                showRefreshMessage(false);
+                refreshInterval = setInterval(() => {
+                    console.log('Làm mới luồng định kỳ...');
+                    showRefreshMessage(true);
+                    playChannelDirect(channel);
+                }, REFRESH_INTERVAL_MINUTES * 60 * 1000);
+            });
+
+            playerInstance.on('pause', () => {
+                if (playerInstance.getPosition() === 0 || playerInstance.getPosition() === playerInstance.getDuration()) {
+                    console.log('Video dừng, tự động phát lại...');
+                    playerInstance.play();
+                }
+            });
+
+            document.title = `${channel.TV} | XEMTV.VN`;
+        }
+
+        function filterChannels() {
+            clearTimeout(searchTimer);
+            const input = document.getElementById("search-input");
+            const suggestions = document.getElementById("suggestions");
+
+            if (input.value.trim() === "") {
+                suggestions.style.display = "none";
+                return;
+            }
+
+            searchTimer = setTimeout(() => {
+                const keyword = input.value
+                    .toLowerCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "");
+
+                const filtered = allChannels.filter(c => {
+                    const name = (c.name || "").toLowerCase();
+                    const tv = (c.TV || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                    return name.includes(keyword) || tv.includes(keyword);
+                });
+
+                renderSuggestions(filtered);
+            }, 300);
+        }
+
+        function renderSuggestions(results) {
+            const container = document.getElementById("suggestions");
+
+            if (results.length === 0) {
+                container.innerHTML = '<div class="suggestion-item">Không tìm thấy kênh</div>';
+                container.style.display = "block";
+                return;
+            }
+
+            container.innerHTML = "";
+            results.slice(0, 8).forEach(channel => {
+                const item = document.createElement("div");
+                item.className = "suggestion-item";
+                item.innerHTML = `
+                    <img src="${channel.logo}" alt="${channel.name}" />
+                    <div class="channel-name">${channel.TV || channel.name}</div>
+                `;
+                item.onclick = () => {
+                    selectChannel(channel);
+                    container.style.display = "none";
+                };
+                container.appendChild(item);
+            });
+
+            container.style.display = "block";
+        }
+    </script>
+</body>
+</html>
