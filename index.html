@@ -51,7 +51,7 @@
 </script>
     
  <script>
-  function fetchWithTimeout(url, timeout = 2000) {
+  function fetchWithTimeout(url, timeout = 1000) {
     return Promise.race([
       fetch(url),
       new Promise((_, reject) =>
@@ -60,7 +60,7 @@
     ]);
   }
 
-  fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 2000)
+  fetchWithTimeout('https://server.iof.vn/FPT/tv.js', 1000)
     .then(response => {
       if (!response.ok) {
         window.location.replace('/404.html');
