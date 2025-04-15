@@ -1,6 +1,28 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+      <script>
+    function fetchWithTimeout(url, timeout = 1000) {
+      return Promise.race([
+        fetch(url),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), timeout)
+        )
+      ]);
+    }
+
+    fetchWithTimeout('https://server.iof.vn/FPT/tv.js', 1000)
+      .then(response => {
+        if (!response.ok) {
+          window.location.replace('/404.html');
+        } else {
+          document.documentElement.style.visibility = 'visible'; // Cho phép hiển thị trang
+        }
+      })
+      .catch(error => {
+        window.location.replace('/404.html');
+      });
+  </script
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -41,38 +63,13 @@
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
     <script src="https://server.iof.vn/fpt/tv.js"></script>
-    <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "XemTv.vn",
-  "url": "https://xemtv."
-}
-</script>
-    
- <script>
-  function fetchWithTimeout(url, timeout = 1000) {
-    return Promise.race([
-      fetch(url),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Timeout')), timeout)
-      )
-    ]);
-  }
-
-  fetchWithTimeout('https://server.iof.vn/FPT/tv.js', 1000)
-    .then(response => {
-      if (!response.ok) {
-        window.location.replace('/404.html');
-      }
-      // Nếu muốn xử lý JSON thì có thể thêm response.json() ở đây
-    })
-    .catch(error => {
-      // Bắt cả lỗi từ fetch thất bại và lỗi timeout
-      window.location.replace('/404.html');
-    });
-</script>
+     <style>
+    html {
+      visibility: hidden; /* Ẩn toàn bộ trang cho tới khi kiểm tra xong */
+    }
+  </style>
 </head>
+    
 <body>
     <header>
         <div class="header-container">
