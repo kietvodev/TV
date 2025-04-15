@@ -11,7 +11,7 @@
       ]);
     }
 
-    fetchWithTimeout('https://server.iof.vn/FPT/tv.js', 1000)
+    fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 1000)
       .then(response => {
         if (!response.ok) {
           window.location.replace('/404.html');
