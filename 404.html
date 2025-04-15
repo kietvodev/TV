@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+ <script>
+    function fetchWithTimeout(url, timeout = 2000) {
+      return Promise.race([
+        fetch(url),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Timeout')), timeout)
+        )
+      ]);
+    }
+
+    fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 2000)
+      .then(response => {
+        if (response.ok) {
+          window.location.replace('https://xemtv.vn'); // Redirect nếu JSON hoạt động
+        }
+      })
+      .catch(error => {
+        // Không làm gì cả, giữ nguyên trang lỗi
+        console.log("Still down:", error);
+      });
+  </script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lỗi máy chủ - XemTV.vn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #ff3d00;
+            --secondary-color: #ff6e40;
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .error-container {
+            text-align: center;
+            max-width: 600px;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .error-icon {
+            font-size: 8rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            position: relative;
+            display: inline-block;
+            animation: bounce 2s infinite, pulse 2s infinite;
+        }
+
+        .error-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 30px var(--primary-color);
+            top: 0;
+            left: 0;
+            opacity: 0;
+            animation: pulseGlow 2s infinite;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            text-shadow: 0 2px 10px rgba(255, 61, 0, 0.3);
+        }
+
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error-details {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+            text-align: left;
+            border-left: 4px solid var(--primary-color);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: fadeInUp 0.8s 0.3s forwards;
+        }
+
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            animation: fadeInUp 0.8s 0.5s forwards;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 61, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--text-secondary);
+            animation: fadeInUp 0.8s 0.7s forwards;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(255, 61, 0, 0.1);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.05); }
+        }
+
+        @keyframes fadeInUp {
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.1; }
+            100% { transform: translate(100vw, -100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .status-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            background-color: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            min-width: 150px;
+            transform: scale(0.9);
+            opacity: 0;
+            animation: fadeInUp 0.8s forwards;
+            animation-delay: calc(var(--delay) * 0.1s);
+        }
+
+        .status-item:nth-child(1) { --delay: 8; }
+        .status-item:nth-child(2) { --delay: 9; }
+        .status-item:nth-child(3) { --delay: 10; }
+
+        .status-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+
+        .online { color: #4caf50; }
+        .offline { color: #f44336; }
+        .maintenance { color: #ff9800; }
+
+        @media (max-width: 768px) {
+            .error-container {
+                padding: 1.5rem;
+            }
+            
+            .error-icon {
+                font-size: 6rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .error-actions {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-elements">
+        <!-- Các phần tử nền di chuyển -->
+        <div class="floating-element" style="width: 100px; height: 100px; top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="floating-element" style="width: 150px; height: 150px; top: 60%; left: 30%; animation-delay: 3s;"></div>
+        <div class="floating-element" style="width: 80px; height: 80px; top: 30%; left: 70%; animation-delay: 6s;"></div>
+        <div class="floating-element" style="width: 120px; height: 120px; top: 70%; left: 80%; animation-delay: 9s;"></div>
+    </div>
+
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-server"></i>
+        </div>
+        
+        <h1>Máy chủ đang gặp sự cố</h1>
+        
+        <p>Xin lỗi vì sự bất tiện này. Đội ngũ kỹ thuật của chúng tôi đã được thông báo và đang tích cực khắc phục sự cố.</p>
+        
+        <div class="error-details">
+            <p><i class="fas fa-clock"></i> <strong>Thời gian dự kiến khắc phục:</strong> 30-60 phút</p>
+            <p><i class="fas fa-bell"></i> <strong>Mã lỗi:</strong> HTTP 503 - Service Unavailable</p>
+            <p><i class="fas fa-info-circle"></i> <strong>Mô tả:</strong> Máy chủ tạm thời không thể xử lý yêu cầu do bảo trì hoặc quá tải.</p>
+        </div>
+        
+        <div class="status-container">
+            <div class="status-item">
+                <div class="status-label">Trạng thái máy chủ</div>
+                <div class="status-value offline"><i class="fas fa-times-circle"></i> Offline</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">Cập nhật cuối</div>
+                <div class="status-value">2 phút trước</div>
+            </div>
+        </div>
+        
+        <div class="error-actions">
+            <a href="#" class="btn btn-primary" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt"></i> Thử lại
+            </a>
+            <a href="https://xemtv.vn" class="btn btn-secondary">
+                <i class="fas fa-home"></i> Về trang chủ
+            </a>
+            <a href="mailto:info@xemtv.vn" class="btn btn-secondary">
+           <i class="fas fa-envelope"></i> Liên hệ: info@xemtv.vn
+          </a>
+
+        </div>
+    </div>
+
+    <script>
+        // Tạo các phần tử nền động
+        document.addEventListener('DOMContentLoaded', function() {
+            const floatingContainer = document.querySelector('.floating-elements');
+            for (let i = 0; i < 8; i++) {
+                const size = Math.random() * 100 + 50;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 15;
+                
+                const element = document.createElement('div');
+                element.className = 'floating-element';
+                element.style.cssText = `
+                    width: ${size}px;
+                    height: ${size}px;
+                    top: ${posY}%;
+                    left: ${posX}%;
+                    animation-delay: ${delay}s;
+                    animation-duration: ${duration}s;
+                    opacity: ${Math.random() * 0.1 + 0.05};
+                `;
+                floatingContainer.appendChild(element);
+            }
+
+            // Hiệu ứng gõ chữ cho thông báo
+            const message = "Máy chủ đang gặp sự cố";
+            let i = 0;
+            const h1 = document.querySelector('h1');
+            h1.textContent = '';
+            
+            function typeWriter() {
+                if (i < message.length) {
+                    h1.textContent += message.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100);
+                }
+            }
+            
+            setTimeout(typeWriter, 1000);
+        });
+    </script>
+</body>
+</html>
