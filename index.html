@@ -2,27 +2,40 @@
 <html lang="vi">
 <head>
       <script>
+    // Hàm fetch có giới hạn thời gian
     function fetchWithTimeout(url, timeout = 1000) {
-      return Promise.race([
-        fetch(url),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), timeout)
-        )
-      ]);
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => {
+          reject(new Error('Timeout'));
+        }, timeout);
+
+        fetch(url)
+          .then(response => {
+            clearTimeout(timer);
+            resolve(response);
+          })
+          .catch(err => {
+            clearTimeout(timer);
+            reject(err);
+          });
+      });
     }
 
-    fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 1000)
-      .then(response => {
-        if (!response.ok) {
-          window.location.replace('/404.html');
-        } else {
-          document.documentElement.style.visibility = 'visible'; // Cho phép hiển thị trang
-        }
-      })
-      .catch(error => {
-        window.location.replace('/404.html');
-      });
-  </script
+    // Kiểm tra ngay khi trang bắt đầu tải
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 1000)
+        .then(response => {
+          if (!response.ok) {
+            window.location.replace('/404.html');
+          } else {
+            document.documentElement.style.visibility = 'visible'; // Hiển thị trang nếu OK
+          }
+        })
+        .catch(error => {
+          window.location.replace('/404.html'); // Nếu timeout hoặc lỗi -> chuyển hướng
+        });
+    });
+  </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
