@@ -210,5 +210,36 @@
 
   gtag('config', 'G-QHCHRWQJFC');
 </script>
+        <script>
+  function fetchWithTimeout(url, timeout = 1000) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('Timeout')), timeout);
+
+      fetch(url, { method: 'HEAD' }) // chỉ gửi HEAD request để kiểm tra server sống
+        .then(response => {
+          clearTimeout(timer);
+          resolve(response);
+        })
+        .catch(err => {
+          clearTimeout(timer);
+          reject(err);
+        });
+    });
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 1000)
+      .then(response => {
+        if (!response.ok) {
+          window.location.replace('/404.html');
+        } else {
+          document.documentElement.style.visibility = 'visible';
+        }
+      })
+      .catch(error => {
+        window.location.replace('/404.html');
+      });
+  });
+</script>
 </body>
 </html>
