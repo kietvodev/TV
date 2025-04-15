@@ -171,6 +171,23 @@
             <p>Copyright 2025 © XEMTV.VN - All Rights Reserved</p>
         </div>
     </footer>
+    <script>
+  fetch('https://server.iof.vn/FPT/m3u8_links.json')
+    .then(response => {
+      if (!response.ok) {
+        window.location.href = '/404.html';
+      } else {
+        return response.json(); // Hoặc xử lý dữ liệu khác nếu cần
+      }
+    })
+    .then(data => {
+      // Xử lý dữ liệu ở đây (nếu fetch thành công)
+      console.log(data); // Ví dụ
+    })
+    .catch(error => {
+      window.location.href = '/404.html'; // Xử lý lỗi fetch()
+    });
+</script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHCHRWQJFC"></script>
 <script>
