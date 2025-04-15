@@ -1,41 +1,38 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-      <script>
-    // Hàm fetch có giới hạn thời gian
-    function fetchWithTimeout(url, timeout = 1000) {
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => {
-          reject(new Error('Timeout'));
-        }, timeout);
+     <script>
+  function fetchWithTimeout(url, timeout = 1000) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => reject(new Error('Timeout')), timeout);
 
-        fetch(url)
-          .then(response => {
-            clearTimeout(timer);
-            resolve(response);
-          })
-          .catch(err => {
-            clearTimeout(timer);
-            reject(err);
-          });
-      });
-    }
-
-    // Kiểm tra ngay khi trang bắt đầu tải
-    window.addEventListener('DOMContentLoaded', () => {
-      fetchWithTimeout('https://server.iof.vn, 1000)
+      fetch(url, { method: 'HEAD' }) // chỉ gửi HEAD request để kiểm tra server sống
         .then(response => {
-          if (!response.ok) {
-            window.location.replace('/404.html');
-          } else {
-            document.documentElement.style.visibility = 'visible'; // Hiển thị trang nếu OK
-          }
+          clearTimeout(timer);
+          resolve(response);
         })
-        .catch(error => {
-          window.location.replace('/404.html'); // Nếu timeout hoặc lỗi -> chuyển hướng
+        .catch(err => {
+          clearTimeout(timer);
+          reject(err);
         });
     });
-  </script>
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    fetchWithTimeout('https://server.iof.vn', 1000)
+      .then(response => {
+        if (!response.ok) {
+          window.location.replace('/404.html');
+        } else {
+          document.documentElement.style.visibility = 'visible';
+        }
+      })
+      .catch(error => {
+        window.location.replace('/404.html');
+      });
+  });
+</script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
