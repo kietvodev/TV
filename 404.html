@@ -11,7 +11,7 @@
       ]);
     }
 
-    fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 2000)
+    fetchWithTimeout('https://server.iof.vn', 2000)
       .then(response => {
         if (response.ok) {
           window.location.replace('https://xemtv.vn'); // Redirect nếu JSON hoạt động
