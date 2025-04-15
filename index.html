@@ -171,18 +171,29 @@
             <p>Copyright 2025 © XEMTV.VN - All Rights Reserved</p>
         </div>
     </footer>
-   <script>
-  fetch('https://server.iof.vn/FPT/m3u8_links.json')
+ <script>
+  function fetchWithTimeout(url, timeout = 2000) {
+    return Promise.race([
+      fetch(url),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Timeout')), timeout)
+      )
+    ]);
+  }
+
+  fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 2000)
     .then(response => {
       if (!response.ok) {
-        window.location.replace('/404.html'); // Sử dụng replace() để thay thế URL hiện tại
-        return; // Dừng thực thi tiếp theo
+        window.location.replace('/404.html');
       }
+      // Nếu muốn xử lý JSON thì có thể thêm response.json() ở đây
     })
     .catch(error => {
-      window.location.replace('/404.html'); // Xử lý lỗi fetch
+      // Bắt cả lỗi từ fetch thất bại và lỗi timeout
+      window.location.replace('/404.html');
     });
 </script>
+
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHCHRWQJFC"></script>
 <script>
