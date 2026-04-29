@@ -19,7 +19,7 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
-    fetchWithTimeout('https://server.iof.vn', 1000)
+    fetchWithTimeout('https://server.xemtv.vn', 1000)
       .then(response => {
         if (!response.ok) {
           window.location.replace('/404.html');
@@ -69,10 +69,10 @@
     <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://server.iof.vn/fpt/tv.css">
+    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/tv.css">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.iof.vn/fpt/tv.js"></script>
+    <script src="https://server.xemtv.vn/fpt/tv.js"></script>
      <style>
     html {
       visibility: hidden; /* Ẩn toàn bộ trang cho tới khi kiểm tra xong */
@@ -228,7 +228,7 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
-    fetchWithTimeout('https://server.iof.vn/FPT/m3u8_links.json', 1000)
+    fetchWithTimeout('https://server.xemtv.vn/FPT/m3u8_links.json', 1000)
       .then(response => {
         if (!response.ok) {
           window.location.replace('/404.html');
