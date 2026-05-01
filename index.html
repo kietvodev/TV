@@ -1,38 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-     <script>
-  function fetchWithTimeout(url, timeout = 1000) {
-    return new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error('Timeout')), timeout);
-
-      fetch(url, { method: 'HEAD' }) // chỉ gửi HEAD request để kiểm tra server sống
-        .then(response => {
-          clearTimeout(timer);
-          resolve(response);
-        })
-        .catch(err => {
-          clearTimeout(timer);
-          reject(err);
-        });
-    });
-  }
-
-  window.addEventListener('DOMContentLoaded', () => {
-    fetchWithTimeout('https://server.xemtv.vn', 1000)
-      .then(response => {
-        if (!response.ok) {
-          window.location.replace('/404.html');
-        } else {
-          document.documentElement.style.visibility = 'visible';
-        }
-      })
-      .catch(error => {
-        window.location.replace('/404.html');
-      });
-  });
-</script>
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -69,10 +37,10 @@
     <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/tv.css">
+    <link rel="stylesheet" href="../TV.css">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/tv.js"></script>
+    <script src="../TV.js"></script>
      <style>
     html {
       visibility: hidden; /* Ẩn toàn bộ trang cho tới khi kiểm tra xong */
@@ -228,6 +196,11 @@
   }
 
   window.addEventListener('DOMContentLoaded', () => {
+    // Bỏ qua redirect khi chạy local
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
+      document.documentElement.style.visibility = 'visible';
+      return;
+    }
     fetchWithTimeout('https://server.xemtv.vn/FPT/m3u8_links.json', 1000)
       .then(response => {
         if (!response.ok) {
