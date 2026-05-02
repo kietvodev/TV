@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>XemTV.vn - Xem truyền hình trực tuyến miễn phí</title>
+    <meta name="description" content="Xem TV trực tuyến miễn phí tại Xemtv.vn. Truyền hình trực tuyến với chất lượng cao, đa dạng kênh.">
+    <meta name="robots" content="index, follow">
+    <link rel="icon" href="https://xemtv.vn/Xemtvico.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <meta property="og:site_name" content="XemTv.vn">
+    <meta property="og:image" content="https://xemtv.vn/XemTv.jpg" />
+    <meta property="og:url" content="https://xemtv.vn/tv.html">
+    <meta property="og:type" content="website">
+
+    <!-- Apple icons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="https://xemtv.vn/Image_APPLE/XEMTV_180X180.png">
+    <!-- Web icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="https://xemtv.vn/Image_WEB/XEMTV_32X32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://xemtv.vn/Image_WEB/XEMTV_192X192.png">
+
+    <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/csstv.css?v=20260502">
+    <script src="https://server.xemtv.vn/fpt/jstv.js?v=20260502"></script>
+
+    <style>
+        html { visibility: hidden; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header overlay trên player -->
+    <header>
+        <a href="#" class="logo" id="home-link">
+            <span>XemTV.vn</span>
+        </a>
+        <div id="current-channel-info"></div>
+        <button class="theme-toggle" id="theme-toggle" title="Chế độ sáng/tối">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+
+    <!-- Player bên trái -->
+    <section class="player-section">
+        <div class="container">
+            <div class="player-container" id="player-container">
+                <div id="jwplayer"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sidebar kênh bên phải -->
+    <main class="container">
+        <section class="section" id="channels">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    <span>Tất cả kênh</span>
+                </h2>
+                <div class="channel-count" id="all-count">Đang tải...</div>
+            </div>
+            <div class="channel-list" id="channel-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Favorites list (ẩn, dùng cho render nội bộ) -->
+    <div id="favorite-list" style="display:none"></div>
+    <div id="favorite-count" style="display:none"></div>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-QHCHRWQJFC"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-QHCHRWQJFC');
+</script>
+
+<!-- Kiểm tra server trước khi hiển thị -->
+<script>
+    (function() {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
+            document.documentElement.style.visibility = 'visible';
+            return;
+        }
+        fetch('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', { method: 'HEAD' })
+            .then(r => {
+                if (!r.ok) window.location.replace('/404.html');
+                else document.documentElement.style.visibility = 'visible';
+            })
+            .catch(() => window.location.replace('/404.html'));
+    })();
+</script>
+
+<!-- Service Worker (PWA / TWA) -->
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    }
+</script>
+
+</body>
+</html>
