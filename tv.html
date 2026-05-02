@@ -26,11 +26,11 @@
     <link rel="icon" type="image/png" sizes="32x32" href="https://xemtv.vn/Image_WEB/XEMTV_32X32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="https://xemtv.vn/Image_WEB/XEMTV_192X192.png">
 
-    <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/csstv.css?v=2026050893">
-    <script src="https://server.xemtv.vn/fpt/jstv.js?v=2026890503"></script>
+    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/csstv.css?v=20260503">
+    <script src="https://server.xemtv.vn/fpt/jstv.js?v=20260503"></script>
 
     <style>
         html { visibility: hidden; }
@@ -43,7 +43,7 @@
     <section class="player-section">
         <div class="container">
             <div class="player-container" id="player-container">
-                <div id="jwplayer"></div>
+                <video id="video-player" autoplay playsinline controls></video>
             </div>
         </div>
     </section>
