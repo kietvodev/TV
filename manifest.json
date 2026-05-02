@@ -1,0 +1,28 @@
+{
+  "name": "XemTV.vn - Xem truyền hình trực tuyến",
+  "short_name": "XemTV",
+  "description": "Xem TV trực tuyến miễn phí - VTV, HTV, THVL và hơn 100 kênh",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "lang": "vi",
+  "categories": ["entertainment"],
+  "icons": [
+    { "src": "/Image_WEB/XEMTV_16X16.png",   "sizes": "16x16",   "type": "image/png" },
+    { "src": "/Image_WEB/XEMTV_32X32.png",   "sizes": "32x32",   "type": "image/png" },
+    { "src": "/Image_WEB/XEMTV_96X96.png",   "sizes": "96x96",   "type": "image/png" },
+    { "src": "/Image_WEB/XEMTV_192X192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "screenshots": [
+    {
+      "src": "/XemTv.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Giao diện xem TV"
+    }
+  ]
+}

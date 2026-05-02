@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "vn.xemtv.app",
+      "sha256_cert_fingerprints": [
+        "THAY_SHA256_FINGERPRINT_CUA_KEYSTORE_O_DAY"
+      ]
+    }
+  }
+]

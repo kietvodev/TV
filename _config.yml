@@ -1,0 +1,4 @@
+# GitHub Pages Jekyll config
+# Bắt buộc để serve thư mục .well-known/ (dùng cho TWA / Digital Asset Links)
+include:
+  - ".well-known"
