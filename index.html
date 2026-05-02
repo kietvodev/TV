@@ -15,6 +15,11 @@
     <meta property="og:image:height" content="630" />
     <meta name="robots" content="index, follow">
     <link rel="icon" href="https://xemtv.vn/Xemtvico.ico" type="image/x-icon">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121212">
     <meta property="og:site_name" content="XemTv.vn">
     <meta name="application-name" content="XemTv.vn">
      <link rel="canonical" href="https://xemtv.vn/" />
@@ -37,10 +42,10 @@
     <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css">
+    <link rel="stylesheet" href="../TV.css">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/TV.js"></script>
+    <script src="../TV.js"></script>
      <style>
     html {
       visibility: hidden; /* Ẩn toàn bộ trang cho tới khi kiểm tra xong */
@@ -54,6 +59,7 @@
             <a href="#" class="logo" id="home-link"
                 <span>XemTV.vn</span>
             </a>
+            <div id="current-channel-info"></div>
              <ul class="nav-menu" id="nav-menu">
                     <li class="nav-item">
                         <a href="#" class="nav-link active" id="home-nav-link" data-tooltip="Trang chủ">
@@ -108,6 +114,10 @@
                 
                 <button class="theme-toggle" id="theme-toggle" title="Chế độ sáng/tối">
                     <i class="fas fa-moon"></i>
+                </button>
+
+                <button id="tv-mode-btn" title="Chế độ TV">
+                    <i class="fas fa-tv"></i>
                 </button>
             </div>
         </div>
@@ -215,5 +225,11 @@
   });
 </script>
      
+<!-- Service Worker (PWA / TWA) -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
 </body>
 </html>
