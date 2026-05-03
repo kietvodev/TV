@@ -40,6 +40,14 @@
     <link rel="icon" type="image/png" sizes="96x96" href="https://xemtv.vn/Image_WEB/XEMTV_96X96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://xemtv.vn/Image_WEB/XEMTV_16X16.png">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
+    <!-- SPA routing: khôi phục URL sau 404 redirect -->
+    <script>
+    (function(){
+      var p = sessionStorage.getItem('spa_redirect');
+      if (p) { sessionStorage.removeItem('spa_redirect'); history.replaceState(null, '', p); }
+      else { var q = new URLSearchParams(location.search).get('p'); if (q) history.replaceState(null, '', q); }
+    })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css?v=71">
