@@ -21,7 +21,7 @@
       ]);
     }
 
-    fetchWithTimeout('https://admin.xemtv.vn', 2000)
+    fetchWithTimeout('https://server.xemtv.vn', 2000)
       .then(response => {
         if (response.ok) {
           window.location.replace('https://xemtv.vn'); // Redirect nếu JSON hoạt động
