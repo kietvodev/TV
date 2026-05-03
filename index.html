@@ -225,7 +225,7 @@
       document.documentElement.style.visibility = 'visible';
       return;
     }
-    fetchWithTimeout('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', 1000)
+    fetchWithTimeout('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', 2500)
       .then(response => {
         if (!response.ok) {
           window.location.replace('/404.html');
