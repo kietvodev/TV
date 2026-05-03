@@ -39,7 +39,7 @@
     <link rel="icon" type="image/png" sizes="192x192" href="https://xemtv.vn/Image_WEB/XEMTV_192X192.png">
     <link rel="icon" type="image/png" sizes="96x96" href="https://xemtv.vn/Image_WEB/XEMTV_96X96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="https://xemtv.vn/Image_WEB/XEMTV_16X16.png">
-    <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css?v=2">
@@ -129,7 +129,7 @@
         </div>
         <div class="container">
             <div class="player-container" id="player-container">
-                <div id="jwplayer"></div>
+                <video id="video-player" autoplay playsinline muted></video>
                 <div class="refresh-message" id="refresh-message" style="display: none;">
                     <p>Đang làm mới luồng...</p>
                 </div>
