@@ -235,6 +235,12 @@
 <script>
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(() => {});
+    // Xóa cache khi đóng tab/thoát web
+    window.addEventListener('beforeunload', () => {
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage('CLEAR_CACHE');
+      }
+    });
   }
 </script>
 </body>

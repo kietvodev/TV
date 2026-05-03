@@ -1,8 +1,7 @@
 // Service Worker - XemTV.vn
-// Không cache JS/CSS/HTML — luôn lấy mới từ mạng
+// Cache JS/CSS trong phiên, xóa khi user thoát web
 
-const CACHE_NAME = 'xemtv-v2';
-// Chỉ cache ảnh icon (ít thay đổi)
+const CACHE_NAME = 'xemtv-session-v1';
 const STATIC_ASSETS = [
   '/Image_WEB/XEMTV_192X192.png',
   '/Image_WEB/XEMTV_96X96.png'
@@ -16,7 +15,7 @@ self.addEventListener('install', e => {
   self.skipWaiting();
 });
 
-// Activate: xóa toàn bộ cache cũ
+// Activate: xóa cache cũ
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -26,24 +25,40 @@ self.addEventListener('activate', e => {
   self.clients.claim();
 });
 
-// Fetch: KHÔNG cache HTML, JS, CSS, JSON — network only
+// Message: xóa toàn bộ cache khi nhận lệnh từ page
+self.addEventListener('message', e => {
+  if (e.data === 'CLEAR_CACHE') {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))));
+  }
+});
+
+// Fetch: cache JS, CSS, ảnh — network first, fallback cache
 self.addEventListener('fetch', e => {
   const url = e.request.url;
+  if (e.request.method !== 'GET') return;
 
-  // Luôn network: HTML, JS, CSS, JSON, PHP, stream
-  const networkOnly = [
-    '.html', '.js', '.css', '.json',
-    '.php', '.m3u8', '.ts',
-    'googletagmanager', 'jwplatform'
-  ];
-  if (networkOnly.some(s => url.includes(s))) {
-    return; // network only, không qua cache
-  }
+  // Không cache: stream, API, PHP
+  const skipCache = ['.m3u8', '.ts', '.php', '.json', 'localhost'];
+  if (skipCache.some(s => url.includes(s))) return;
 
-  // Cache first chỉ cho ảnh icon
-  if (e.request.method === 'GET') {
+  // Cache JS, CSS, ảnh: network first, lưu vào cache
+  const shouldCache = url.match(/\.(js|css|png|jpg|jpeg|gif|webp|ico|woff2?)/);
+  if (shouldCache) {
     e.respondWith(
-      caches.match(e.request).then(cached => cached || fetch(e.request))
+      fetch(e.request).then(resp => {
+        const clone = resp.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(e.request, clone));
+        return resp;
+      }).catch(() => caches.match(e.request))
     );
+    return;
   }
+
+  // HTML: luôn network
+  if (url.includes('.html') || e.request.mode === 'navigate') return;
+
+  // Mọi thứ khác: cache first
+  e.respondWith(
+    caches.match(e.request).then(cached => cached || fetch(e.request))
+  );
 });
