@@ -50,10 +50,10 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css?v=79">
+    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css?v=80">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/TV.js?v=79"></script>
+    <script src="https://server.xemtv.vn/fpt/TV.js?v=80"></script>
      <style>
     html {
       visibility: hidden; /* Ẩn toàn bộ trang cho tới khi kiểm tra xong */
@@ -203,11 +203,11 @@
   gtag('config', 'G-QHCHRWQJFC');
 </script>
         <script>
-  function fetchWithTimeout(url, timeout = 1000) {
+  function fetchWithTimeout(url, timeout = 2500) {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('Timeout')), timeout);
 
-      fetch(url, { method: 'HEAD' }) // chỉ gửi HEAD request để kiểm tra server sống
+      fetch(url)
         .then(response => {
           clearTimeout(timer);
           resolve(response);

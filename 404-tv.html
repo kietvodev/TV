@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Máy chủ đang bảo trì - XemTV.vn</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://xemtv.vn/Xemtvico.ico" type="image/x-icon">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 40px;
+        }
+        .icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+        h1 {
+            font-size: 2.2rem;
+            color: #ff3d00;
+            margin-bottom: 16px;
+            text-shadow: 0 0 20px rgba(255,61,0,0.4);
+        }
+        p {
+            font-size: 1.1rem;
+            color: #888;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .status-box {
+            background: #111;
+            border: 1px solid #222;
+            border-left: 4px solid #ff3d00;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .status-box p {
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            color: #aaa;
+        }
+        .status-box p:last-child { margin-bottom: 0; }
+        .status-box strong { color: #fff; }
+        .check-status {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 14px 36px;
+            background: #ff3d00;
+            color: #fff;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .check-status:hover, .check-status:focus {
+            background: #ff6e40;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255,61,0,0.5);
+            outline: none;
+        }
+        .spinner {
+            display: none;
+            width: 24px; height: 24px;
+            border: 3px solid rgba(255,61,0,0.3);
+            border-top-color: #ff3d00;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 20px auto 0;
+        }
+        .auto-check {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: #555;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📡</div>
+        <h1>Máy chủ đang bảo trì</h1>
+        <p>Hệ thống đang được nâng cấp. Tín hiệu sẽ được khôi phục trong thời gian ngắn.</p>
+
+        <div class="status-box">
+            <p>⚡ <strong>Trạng thái:</strong> <span style="color:#f44336;">Proxy offline</span></p>
+            <p>🔄 <strong>Tự động kiểm tra:</strong> Mỗi 5 giây</p>
+            <p>📺 <strong>Khi khôi phục:</strong> Tự động quay lại xem TV</p>
+        </div>
+
+        <button class="check-status" id="btn-check" onclick="manualCheck()">Kiểm tra ngay</button>
+        <div class="spinner" id="spinner"></div>
+        <div class="auto-check" id="countdown">Tự kiểm tra sau <span id="cd">5</span>s...</div>
+    </div>
+
+    <script>
+        var checkUrl = 'https://server.xemtv.vn/fpt/proxy/xemtv/channels.php';
+        var redirectUrl = '/tv.html';
+        var checking = false;
+        var countdownVal = 5;
+        var cdEl = document.getElementById('cd');
+        var spinEl = document.getElementById('spinner');
+
+        function doCheck() {
+            if (checking) return;
+            checking = true;
+            spinEl.style.display = 'block';
+            fetch(checkUrl, { signal: AbortSignal.timeout(3000) })
+                .then(function(r) {
+                    if (r.ok) {
+                        window.location.replace(redirectUrl);
+                    } else {
+                        checking = false;
+                        spinEl.style.display = 'none';
+                    }
+                })
+                .catch(function() {
+                    checking = false;
+                    spinEl.style.display = 'none';
+                });
+        }
+
+        function manualCheck() {
+            countdownVal = 5;
+            doCheck();
+        }
+
+        // Kiểm tra ngay khi load
+        doCheck();
+
+        // Countdown + auto check mỗi 5s
+        setInterval(function() {
+            countdownVal--;
+            if (countdownVal <= 0) {
+                countdownVal = 5;
+                doCheck();
+            }
+            cdEl.textContent = countdownVal;
+        }, 1000);
+
+        // Hỗ trợ remote TV: Enter = kiểm tra
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 13) { manualCheck(); e.preventDefault(); }
+        });
+    </script>
+</body>
+</html>

@@ -12,25 +12,20 @@
       }
     })();
 
-    function fetchWithTimeout(url, timeout = 2000) {
-      return Promise.race([
-        fetch(url),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout')), timeout)
-        )
-      ]);
+    function checkServer() {
+      fetch('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', { signal: AbortSignal.timeout(3000) })
+        .then(function(response) {
+          if (response.ok) {
+            window.location.replace('https://xemtv.vn');
+          }
+        })
+        .catch(function() {});
     }
 
-    fetchWithTimeout('https://server.xemtv.vn', 2000)
-      .then(response => {
-        if (response.ok) {
-          window.location.replace('https://xemtv.vn'); // Redirect nếu JSON hoạt động
-        }
-      })
-      .catch(error => {
-        // Không làm gì cả, giữ nguyên trang lỗi
-        console.log("Still down:", error);
-      });
+    // Kiểm tra ngay khi load
+    checkServer();
+    // Kiểm tra lại mỗi 5 giây
+    setInterval(checkServer, 5000);
   </script>
 
     <meta charset="UTF-8">
