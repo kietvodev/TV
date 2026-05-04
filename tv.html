@@ -27,13 +27,42 @@
     <link rel="icon" type="image/png" sizes="192x192" href="https://xemtv.vn/Image_WEB/XEMTV_192X192.png">
 
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
+    <!-- JW Player for catchup -->
+    <script src="https://content.jwplatform.com/libraries/KB5zFt7A.js"></script>
+    <script src="https://server.xemtv.vn/jquery.js"></script>
+    <link rel="stylesheet" href="https://server.xemtv.vn/css.css" type="text/css" media="all">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/csstv.css?v=101">
-    <script src="https://server.xemtv.vn/fpt/jstv.js?v=104"></script>
+    <script src="https://server.xemtv.vn/fpt/jstv.js?v=105"></script>
 
     <style>
         html { visibility: hidden; }
+        #jw-catchup-player {
+            position: absolute;
+            inset: 0;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 5;
+            display: none;
+        }
+        .catchup-mode #jw-catchup-player .jwplayer {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .jwplayer .jw-slider-time .jw-progress {
+            background: #ff0000 !important;
+        }
+        .jwplayer .jw-slider-time .jw-buffer {
+            background-color: #cccccc !important;
+        }
+        .jw-flag-small-player .jw-nextup-container,
+        .jw-flag-small-player .jw-nextup-container .jw-nextup,
+        .jw-icon-cc,
+        .jw-icon.jw-icon-inline.jw-button-color.jw-reset.jw-icon-pip,
+        .jw-rightclick {
+            display: none !important;
+        }
     </style>
 </head>
 
