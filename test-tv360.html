@@ -32,16 +32,20 @@ video { width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000; bor
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <script>
-const BASE = 'https://admin.xemtv.vn';
+// Tự detect: nếu mở từ localhost thì dùng local server, còn lại dùng production
+const BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
+    ? location.origin
+    : 'https://admin.xemtv.vn';
 const API = BASE + '/api/tv360?url=';
 const PROXY = BASE + '/api/tv360-proxy?url=';
 
 let shakaPlayer = null;
 
-// Chuyển URL CDN tv360 sang proxy
+// Chuyển URL CDN tv360 sang proxy (kể cả IP nội bộ CDN ateme)
 function proxyUrl(url) {
     if (!url) return url;
-    if (url.includes('tv360.vn') && !url.startsWith(BASE)) {
+    if (url.startsWith(BASE)) return url; // đã là proxy URL
+    if (url.includes('tv360.vn') || /\/tok_ey/.test(url)) {
         return PROXY + encodeURIComponent(url);
     }
     return url;
@@ -92,8 +96,10 @@ async function playStream(url, licenseProxyUrl) {
         shakaPlayer.addEventListener('error', e => {
             const err = e.detail;
             console.error('Shaka error', err);
+            const failUrl = (err.data && err.data[0]) ? '\n🔗 URL: ' + String(err.data[0]).substring(0, 120) : '';
+            const httpStatus = (err.data && err.data[1]) ? ' HTTP ' + err.data[1] : '';
             document.getElementById('status').className = 'err';
-            document.getElementById('status').textContent = `❌ Shaka Error ${err.code} (cat:${err.category}): ${err.message || ''}`;
+            document.getElementById('status').textContent = `❌ Shaka Error ${err.code}${httpStatus} (cat:${err.category})${failUrl}`;
         });
 
         // Intercept mọi request Shaka → đưa qua proxy
@@ -125,10 +131,8 @@ async function playStream(url, licenseProxyUrl) {
                         'com.microsoft.playready': licenseProxyUrl
                     },
                     advanced: {
-                        'com.widevine.alpha': {
-                            audioRobustness: 'SW_SECURE_CRYPTO',
-                            videoRobustness: 'SW_SECURE_DECODE'
-                        }
+                        'com.widevine.alpha': { audioRobustness: '', videoRobustness: '' },
+                        'com.microsoft.playready': { audioRobustness: '', videoRobustness: '' }
                     }
                 }
             });
