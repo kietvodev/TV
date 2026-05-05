@@ -53,7 +53,7 @@
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css?v=123">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/TV.js?v=125"></script>
+    <script src="https://server.xemtv.vn/fpt/TV.js?v=126"></script>
      <style>
     html {
       visibility: hidden;
@@ -204,10 +204,9 @@
     <div id="reco-strip"></div>
     <div id="epg-panel"></div>
     <style>
-    #reco-strip{position:fixed;left:0;right:0;background:rgba(8,8,14,0.97);border-top:1px solid rgba(255,255,255,0.05);z-index:9999;display:flex;align-items:center;gap:0;padding:0 6px;overflow-x:auto;scrollbar-width:none;transition:bottom 0.2s;cursor:grab;user-select:none;-webkit-user-select:none;bottom:0;}
-    #reco-strip::-webkit-scrollbar{display:none}
+    #reco-strip{position:fixed;left:0;right:0;background:rgba(8,8,14,0.97);border-top:1px solid rgba(255,255,255,0.05);z-index:9999;display:flex;align-items:center;padding:0 0 0 6px;overflow:hidden;transition:bottom 0.2s;bottom:0;}
     #reco-strip:empty{display:none}
-    #reco-strip.is-dragging{cursor:grabbing;}
+    #reco-inner{display:flex;align-items:center;width:max-content;will-change:transform;}
     .reco-label{flex-shrink:0;font-size:0.59rem;font-weight:700;color:rgba(255,80,80,0.7);text-transform:uppercase;letter-spacing:1.2px;padding:0 10px 0 4px;white-space:nowrap;pointer-events:none;}
     .reco-card{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:6px 10px;cursor:pointer;border-radius:6px;margin:3px 1px;transition:background 0.15s;max-width:190px;min-width:0;border:1px solid transparent;}
     .reco-card:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.08);}
