@@ -35,6 +35,9 @@ video { width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000; bor
 const BASE = 'https://admin.xemtv.vn';
 const API = BASE + '/api/tv360?url=';
 const PROXY = BASE + '/api/tv360-proxy?url=';
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const needsHLS = isIOS || isSafari; // iOS + macOS Safari → cần HLS, không xài DASH
 
 let shakaPlayer = null;
 
@@ -58,23 +61,82 @@ async function loadChannel() {
     mpdEl.textContent = '';
 
     try {
-        const res = await fetch(API + encodeURIComponent(tv360Url));
+        // iOS/Safari → gọi API với ios=1 để lấy HLS thay DASH
+        const apiUrl = needsHLS
+            ? API + encodeURIComponent(tv360Url) + '&ios=1'
+            : API + encodeURIComponent(tv360Url);
+        const res = await fetch(apiUrl);
         const data = await res.json();
-        if (!data.ok || !data.m3u8) throw new Error(data.error || 'Không lấy được link');
+        if (!data.ok) throw new Error(data.error || 'Không lấy được link');
 
-        const streamUrl = data.m3u8;
-        const licenseProxyUrl = data.licenseUrl
-            ? BASE + '/api/tv360-license?url=' + encodeURIComponent(tv360Url)
-            : null;
-        mpdEl.textContent = '🔗 ' + streamUrl + (licenseProxyUrl ? '\n🔑 DRM: ' + data.licenseUrl : '');
-        statusEl.className = 'ok';
-        statusEl.textContent = '✓ Đã lấy link' + (licenseProxyUrl ? ' (DRM)' : '') + ' – đang load player...';
-
-        await playStream(streamUrl, licenseProxyUrl);
-        statusEl.textContent = '✅ Đang phát: ' + streamUrl.split('/').pop().split('?')[0];
+        if (data.mode === 'ios' || data.hls) {
+            // iOS/Safari path → HLS
+            const hlsUrl = data.hlsProxy ? BASE + data.hlsProxy : proxyUrl(data.hls);
+            const fpsLicUrl = data.fpsLicProxy ? BASE + data.fpsLicProxy : null;
+            const fpsCertUrl = data.fpsCertProxy ? BASE + data.fpsCertProxy : null;
+            mpdEl.textContent = '🔗 HLS: ' + data.hls + (fpsLicUrl ? '\n🔑 FairPlay DRM' : ' (clear/AES)');
+            statusEl.className = 'ok';
+            statusEl.textContent = '✓ Lấy HLS OK – đang load...';
+            await playHLS(hlsUrl, fpsLicUrl, fpsCertUrl);
+            statusEl.textContent = '✅ Đang phát (HLS): ' + data.hls.split('/').pop().split('?')[0];
+        } else {
+            // Desktop path → DASH
+            if (!data.m3u8) throw new Error('Không lấy được link MPD');
+            const streamUrl = data.m3u8;
+            const licenseProxyUrl = data.licenseUrl
+                ? BASE + '/api/tv360-license?url=' + encodeURIComponent(tv360Url)
+                : null;
+            mpdEl.textContent = '🔗 ' + streamUrl + (licenseProxyUrl ? '\n🔑 DRM: ' + data.licenseUrl : '');
+            statusEl.className = 'ok';
+            statusEl.textContent = '✓ Đã lấy link' + (licenseProxyUrl ? ' (DRM)' : '') + ' – đang load player...';
+            await playStream(streamUrl, licenseProxyUrl);
+            statusEl.textContent = '✅ Đang phát: ' + streamUrl.split('/').pop().split('?')[0];
+        }
     } catch(e) {
         statusEl.className = 'err';
         statusEl.textContent = '❌ Lỗi: ' + e.message;
+    }
+}
+
+// Phát HLS trên iOS/Safari — native hoặc FairPlay qua Shaka
+async function playHLS(hlsUrl, fpsLicUrl, fpsCertUrl) {
+    const video = document.getElementById('player');
+    if (shakaPlayer) { try { await shakaPlayer.destroy(); } catch(e) {} shakaPlayer = null; }
+    video.removeAttribute('src'); video.load();
+
+    if (fpsLicUrl && window.shaka && shaka.Player.isBrowserSupported()) {
+        // FairPlay DRM → dùng Shaka
+        shaka.polyfill.installAll();
+        shakaPlayer = new shaka.Player(video);
+        shakaPlayer.addEventListener('error', e => {
+            const err = e.detail;
+            console.error('Shaka FPS error', err);
+            document.getElementById('status').className = 'err';
+            document.getElementById('status').textContent = `❌ FairPlay Error ${err.code}: ${err.message || ''}`;
+        });
+        shakaPlayer.getNetworkingEngine().registerRequestFilter((type, req) => {
+            req.uris[0] = proxyUrl(req.uris[0]);
+        });
+        const drmCfg = { drm: { servers: { 'com.apple.fps.1_0': fpsLicUrl }, advanced: {} } };
+        if (fpsCertUrl) {
+            drmCfg.drm.advanced['com.apple.fps.1_0'] = { serverCertificateUri: fpsCertUrl };
+        }
+        shakaPlayer.configure(drmCfg);
+        shakaPlayer.configure({ streaming: { bufferingGoal: 4, rebufferingGoal: 1 } });
+        await shakaPlayer.load(hlsUrl);
+        video.play();
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        // Native HLS (no DRM hoặc AES-128) — Safari tự xử lý
+        video.src = hlsUrl;
+        video.play();
+    } else if (window.Hls && Hls.isSupported()) {
+        // Fallback: hls.js trên desktop Chrome/Firefox (không có DRM)
+        const hls = new Hls({ xhrSetup: (xhr, u) => { xhr.open('GET', proxyUrl(u), true); } });
+        hls.loadSource(hlsUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+    } else {
+        throw new Error('Trình duyệt không hỗ trợ HLS');
     }
 }
 
@@ -92,18 +154,6 @@ async function playStream(url, licenseProxyUrl) {
 
     const isMpd = url.includes('.mpd');
     const isM3u8 = url.includes('.m3u8');
-
-    // iOS Safari chỉ hỗ trợ FairPlay — không thể phát DASH/Widevine
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isSafariDesktop = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) && !isIOS;
-    const needsFairPlay = isIOS || isSafariDesktop;
-
-    if (isMpd && needsFairPlay) {
-        // DASH + Widevine không chạy được trên Safari/iOS → cần FairPlay từ server
-        document.getElementById('status').className = 'err';
-        document.getElementById('status').textContent = '❌ Safari/iOS chỉ hỗ trợ FairPlay DRM. Kênh DASH/Widevine này không phát được trên thiết bị Apple.';
-        return;
-    }
 
     if (isMpd) {
         shaka.polyfill.installAll();
