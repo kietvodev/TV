@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Test TV360 Player</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; color: #fff; font-family: sans-serif; padding: 20px; }
+h2 { margin-bottom: 16px; color: #ff5722; }
+.input-row { display: flex; gap: 8px; margin-bottom: 16px; }
+input { flex: 1; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 6px; font-size: 0.9rem; }
+button { padding: 10px 20px; background: #ff5722; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
+button:hover { background: #e64a19; }
+#status { margin-bottom: 12px; font-size: 0.85rem; color: #aaa; min-height: 20px; }
+#status.ok { color: #4caf50; }
+#status.err { color: #f44336; }
+video { width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000; border-radius: 10px; display: block; }
+.url-box { margin-top: 12px; font-size: 0.72rem; color: #555; word-break: break-all; max-width: 900px; }
+</style>
+</head>
+<body>
+<h2>🎬 Test TV360 Player (DASH)</h2>
+<div class="input-row">
+    <input id="tv360url" type="text" value="https://tv360.vn/tv/cartoon?ch=277&col=2&sect=LIVE&page=home_live&tab=2&c=2" placeholder="Nhập URL trang TV360..." />
+    <button onclick="loadChannel()">▶ Lấy & Phát</button>
+</div>
+<div id="status">Nhấn "Lấy & Phát" để bắt đầu...</div>
+<video id="player" controls autoplay></video>
+<div class="url-box" id="mpd-url"></div>
+
+<!-- Shaka Player (hỗ trợ DASH + HLS) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
+<script>
+const BASE = 'https://admin.xemtv.vn';
+const API = BASE + '/api/tv360?url=';
+const PROXY = BASE + '/api/tv360-proxy?url=';
+
+let shakaPlayer = null;
+
+// Chuyển URL CDN tv360 sang proxy
+function proxyUrl(url) {
+    if (!url) return url;
+    if (url.includes('tv360.vn') && !url.startsWith(BASE)) {
+        return PROXY + encodeURIComponent(url);
+    }
+    return url;
+}
+
+async function loadChannel() {
+    const tv360Url = document.getElementById('tv360url').value.trim();
+    if (!tv360Url) return;
+
+    const statusEl = document.getElementById('status');
+    const mpdEl = document.getElementById('mpd-url');
+    statusEl.className = '';
+    statusEl.textContent = '⏳ Đang lấy link stream từ TV360...';
+    mpdEl.textContent = '';
+
+    try {
+        const res = await fetch(API + encodeURIComponent(tv360Url));
+        const data = await res.json();
+        if (!data.ok || !data.m3u8) throw new Error(data.error || 'Không lấy được link');
+
+        const streamUrl = data.m3u8;
+        const licenseProxyUrl = data.licenseUrl
+            ? BASE + '/api/tv360-license?url=' + encodeURIComponent(tv360Url)
+            : null;
+        mpdEl.textContent = '🔗 ' + streamUrl + (licenseProxyUrl ? '\n🔑 DRM: ' + data.licenseUrl : '');
+        statusEl.className = 'ok';
+        statusEl.textContent = '✓ Đã lấy link' + (licenseProxyUrl ? ' (DRM)' : '') + ' – đang load player...';
+
+        await playStream(streamUrl, licenseProxyUrl);
+        statusEl.textContent = '✅ Đang phát: ' + streamUrl.split('/').pop().split('?')[0];
+    } catch(e) {
+        statusEl.className = 'err';
+        statusEl.textContent = '❌ Lỗi: ' + e.message;
+    }
+}
+
+async function playStream(url, licenseProxyUrl) {
+    const video = document.getElementById('player');
+    if (shakaPlayer) { try { await shakaPlayer.destroy(); } catch(e) {} shakaPlayer = null; }
+
+    const isMpd = url.includes('.mpd');
+    const isM3u8 = url.includes('.m3u8');
+
+    if (isMpd) {
+        shaka.polyfill.installAll();
+        if (!shaka.Player.isBrowserSupported()) throw new Error('Trình duyệt không hỗ trợ Shaka Player');
+        shakaPlayer = new shaka.Player(video);
+        shakaPlayer.addEventListener('error', e => {
+            const err = e.detail;
+            console.error('Shaka error', err);
+            document.getElementById('status').className = 'err';
+            document.getElementById('status').textContent = `❌ Shaka Error ${err.code} (cat:${err.category}): ${err.message || ''}`;
+        });
+
+        // Intercept mọi request Shaka → đưa qua proxy
+        shakaPlayer.getNetworkingEngine().registerRequestFilter((type, req) => {
+            const orig = req.uris[0];
+            req.uris[0] = proxyUrl(orig);
+            delete req.headers['Range'];
+        });
+
+        // Sigma DRM trả JSON {"license":"<base64>"} → unwrap → binary cho Widevine CDM
+        shakaPlayer.getNetworkingEngine().registerResponseFilter((type, res) => {
+            if (type === shaka.net.NetworkingEngine.RequestType.LICENSE) {
+                try {
+                    const text = shaka.util.StringUtils.fromUTF8(res.data);
+                    const json = JSON.parse(text);
+                    if (json.license) {
+                        res.data = shaka.util.Uint8ArrayUtils.fromBase64(json.license).buffer;
+                    }
+                } catch(e) { /* không phải JSON → giữ nguyên binary */ }
+            }
+        });
+
+        // Cấu hình DRM nếu có license server
+        if (licenseProxyUrl) {
+            shakaPlayer.configure({
+                drm: {
+                    servers: {
+                        'com.widevine.alpha': licenseProxyUrl,
+                        'com.microsoft.playready': licenseProxyUrl
+                    },
+                    advanced: {
+                        'com.widevine.alpha': {
+                            audioRobustness: 'SW_SECURE_CRYPTO',
+                            videoRobustness: 'SW_SECURE_DECODE'
+                        }
+                    }
+                }
+            });
+        }
+
+        const proxiedMpd = proxyUrl(url);
+        await shakaPlayer.load(proxiedMpd);
+        video.play();
+    } else if (isM3u8) {
+        if (window.Hls && Hls.isSupported()) {
+            const hls = new Hls({ xhrSetup: (xhr, u) => {
+                xhr.open('GET', proxyUrl(u), true);
+            }});
+            hls.loadSource(proxyUrl(url));
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = proxyUrl(url);
+            video.play();
+        }
+    } else {
+        video.src = proxyUrl(url);
+        video.play();
+    }
+}
+</script>
+</body>
+</html>
