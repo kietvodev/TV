@@ -11,7 +11,7 @@ h2 { margin-bottom: 16px; color: #ff5722; }
 input { flex: 1; padding: 10px 14px; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 6px; font-size: 0.9rem; }
 button { padding: 10px 20px; background: #ff5722; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
 button:hover { background: #e64a19; }
-#status { margin-bottom: 12px; font-size: 0.85rem; color: #aaa; min-height: 20px; white-space: pre-wrap; }
+#status { margin-bottom: 12px; font-size: 0.85rem; color: #aaa; min-height: 20px; }
 #status.ok { color: #4caf50; }
 #status.err { color: #f44336; }
 video { width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000; border-radius: 10px; display: block; }
@@ -21,27 +21,27 @@ video { width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000; bor
 <body>
 <h2>🎬 Test TV360 Player (DASH)</h2>
 <div class="input-row">
-    <input id="tv360url" type="text" value="https://tv360.vn/tv/cartoon?ch=277" placeholder="Nhập URL trang TV360..." />
+    <input id="tv360url" type="text" value="https://tv360.vn/tv/cartoon?ch=277&col=2&sect=LIVE&page=home_live&tab=2&c=2" placeholder="Nhập URL trang TV360..." />
     <button onclick="loadChannel()">▶ Lấy & Phát</button>
 </div>
 <div id="status">Nhấn "Lấy & Phát" để bắt đầu...</div>
-<video id="player" controls autoplay muted></video>
+<video id="player" controls autoplay></video>
 <div class="url-box" id="mpd-url"></div>
 
+<!-- Shaka Player (hỗ trợ DASH + HLS) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <script>
-// Auto-detect: localhost → local server, production → admin.xemtv.vn
-const BASE = (location.hostname === '127.0.0.1' || location.hostname === 'localhost')
-    ? location.origin
-    : 'https://admin.xemtv.vn';
+const BASE = 'https://admin.xemtv.vn';
 const API = BASE + '/api/tv360?url=';
 const PROXY = BASE + '/api/tv360-proxy?url=';
 
 let shakaPlayer = null;
 
+// Chuyển URL CDN tv360 sang proxy
 function proxyUrl(url) {
-    if (!url || url.startsWith(BASE)) return url;
-    if (url.includes('tv360.vn') || /\/tok_ey/.test(url)) {
+    if (!url) return url;
+    if (url.includes('tv360.vn') && !url.startsWith(BASE)) {
         return PROXY + encodeURIComponent(url);
     }
     return url;
@@ -50,6 +50,7 @@ function proxyUrl(url) {
 async function loadChannel() {
     const tv360Url = document.getElementById('tv360url').value.trim();
     if (!tv360Url) return;
+
     const statusEl = document.getElementById('status');
     const mpdEl = document.getElementById('mpd-url');
     statusEl.className = '';
@@ -67,9 +68,10 @@ async function loadChannel() {
             : null;
         mpdEl.textContent = '🔗 ' + streamUrl + (licenseProxyUrl ? '\n🔑 DRM: ' + data.licenseUrl : '');
         statusEl.className = 'ok';
-        statusEl.textContent = '✓ Đã lấy link – đang load player...';
+        statusEl.textContent = '✓ Đã lấy link' + (licenseProxyUrl ? ' (DRM)' : '') + ' – đang load player...';
 
         await playStream(streamUrl, licenseProxyUrl);
+        statusEl.textContent = '✅ Đang phát: ' + streamUrl.split('/').pop().split('?')[0];
     } catch(e) {
         statusEl.className = 'err';
         statusEl.textContent = '❌ Lỗi: ' + e.message;
@@ -78,99 +80,107 @@ async function loadChannel() {
 
 async function playStream(url, licenseProxyUrl) {
     const video = document.getElementById('player');
-    const statusEl = document.getElementById('status');
     if (shakaPlayer) { try { await shakaPlayer.destroy(); } catch(e) {} shakaPlayer = null; }
 
-    shaka.polyfill.installAll();
-    if (!shaka.Player.isBrowserSupported()) throw new Error('Trình duyệt không hỗ trợ Shaka');
+    const isMpd = url.includes('.mpd');
+    const isM3u8 = url.includes('.m3u8');
 
-    shakaPlayer = new shaka.Player(video);
+    if (isMpd) {
+        shaka.polyfill.installAll();
+        if (!shaka.Player.isBrowserSupported()) throw new Error('Trình duyệt không hỗ trợ Shaka Player');
+        shakaPlayer = new shaka.Player(video);
 
-    // Error 1001 (segment 404) → seek live edge thay vì crash
-    shakaPlayer.addEventListener('error', e => {
-        const err = e.detail;
-        if (err.code === 1001) {
-            console.warn('[TV360] Segment 404 → seek to safe live position');
-            try { const sr = shakaPlayer.seekRange(); if (sr && sr.end > 0) video.currentTime = Math.max(sr.start, sr.end - 25); } catch(ex) {}
-            return;
-        }
-        console.error('Shaka error', err);
-        statusEl.className = 'err';
-        const failUrl = (err.data && err.data[0]) ? '\nURL: ' + String(err.data[0]).substring(0, 100) : '';
-        statusEl.textContent = `❌ Shaka Error ${err.code} (cat:${err.category})${failUrl}`;
-    });
-
-    // Proxy mọi request qua server (CORS)
-    shakaPlayer.getNetworkingEngine().registerRequestFilter((type, req) => {
-        req.uris[0] = proxyUrl(req.uris[0]);
-        delete req.headers['Range'];
-    });
-
-    // Sigma DRM: JSON {"license":"base64"} → binary
-    shakaPlayer.getNetworkingEngine().registerResponseFilter((type, res) => {
-        if (type === shaka.net.NetworkingEngine.RequestType.LICENSE) {
-            try {
-                const text = shaka.util.StringUtils.fromUTF8(res.data);
-                const json = JSON.parse(text);
-                if (json.license) res.data = shaka.util.Uint8ArrayUtils.fromBase64(json.license).buffer;
-            } catch(e) {}
-        }
-    });
-
-    // Config: DRM + streaming (CDN buffer chỉ 30s → lui 20s)
-    shakaPlayer.configure({
-        drm: licenseProxyUrl ? {
-            servers: { 'com.widevine.alpha': licenseProxyUrl, 'com.microsoft.playready': licenseProxyUrl },
-            advanced: {
-                'com.widevine.alpha': { audioRobustness: '', videoRobustness: '' },
-                'com.microsoft.playready': { audioRobustness: '', videoRobustness: '' }
+        // Error 1001 (segment 404) → bỏ qua, Shaka tự retry/skip segment tiếp
+        shakaPlayer.addEventListener('error', e => {
+            const err = e.detail;
+            if (err.code === 1001) {
+                console.warn('[TV360] Segment 404 → skip');
+                return; // không crash player
             }
-        } : {},
-        streaming: {
-            liveEdgeOffset: 20,
-            bufferingGoal: 6,
-            rebufferingGoal: 2,
-            retryParameters: { maxAttempts: 5, baseDelay: 500, fuzzFactor: 0.3 },
-            stallEnabled: true,
-            stallThreshold: 1,
-            stallSkipSeconds: 7
-        },
-        manifest: {
-            retryParameters: { maxAttempts: 4, baseDelay: 500, fuzzFactor: 0.5 }
-        }
-    });
+            console.error('Shaka error', err);
+            document.getElementById('status').className = 'err';
+            document.getElementById('status').textContent = `❌ Shaka Error ${err.code} (cat:${err.category}): ${err.message || ''}`;
+        });
 
-    const proxiedMpd = proxyUrl(url);
-    try {
-        await shakaPlayer.load(proxiedMpd);
-    } catch(shakaErr) {
-        // 6007 = DRM unavailable → retry without DRM
-        if (shakaErr.code === 6007 || (shakaErr.detail && shakaErr.detail.code === 6007)) {
-            console.warn('[TV360] 6007 → retry without DRM');
-            await shakaPlayer.destroy();
-            shakaPlayer = new shaka.Player(video);
-            shakaPlayer.getNetworkingEngine().registerRequestFilter((type, req) => {
-                req.uris[0] = proxyUrl(req.uris[0]);
-                delete req.headers['Range'];
-            });
+        // Intercept mọi request Shaka → đưa qua proxy
+        shakaPlayer.getNetworkingEngine().registerRequestFilter((type, req) => {
+            const orig = req.uris[0];
+            req.uris[0] = proxyUrl(orig);
+            delete req.headers['Range'];
+        });
+
+        // Sigma DRM trả JSON {"license":"<base64>"} → unwrap → binary cho Widevine CDM
+        shakaPlayer.getNetworkingEngine().registerResponseFilter((type, res) => {
+            if (type === shaka.net.NetworkingEngine.RequestType.LICENSE) {
+                try {
+                    const text = shaka.util.StringUtils.fromUTF8(res.data);
+                    const json = JSON.parse(text);
+                    if (json.license) {
+                        res.data = shaka.util.Uint8ArrayUtils.fromBase64(json.license).buffer;
+                    }
+                } catch(e) { /* không phải JSON → giữ nguyên binary */ }
+            }
+        });
+
+        // Streaming config: giữ gần live edge, retry khi fail
+        shakaPlayer.configure({
+            streaming: {
+                bufferingGoal: 4,
+                rebufferingGoal: 1,
+                retryParameters: { maxAttempts: 3, baseDelay: 300, fuzzFactor: 0.3 },
+                stallEnabled: true,
+                stallThreshold: 1,
+                stallSkipSeconds: 5
+            },
+            manifest: {
+                retryParameters: { maxAttempts: 3, baseDelay: 500, fuzzFactor: 0.5 }
+            }
+        });
+
+        // Cấu hình DRM nếu có license server
+        if (licenseProxyUrl) {
             shakaPlayer.configure({
-                streaming: { liveEdgeOffset: 20, bufferingGoal: 6, rebufferingGoal: 2, stallEnabled: true, stallThreshold: 1, stallSkipSeconds: 7 }
+                drm: {
+                    servers: {
+                        'com.widevine.alpha': licenseProxyUrl,
+                        'com.microsoft.playready': licenseProxyUrl
+                    },
+                    advanced: {
+                        'com.widevine.alpha': {
+                            audioRobustness: 'SW_SECURE_CRYPTO',
+                            videoRobustness: 'SW_SECURE_DECODE'
+                        }
+                    }
+                }
             });
-            await shakaPlayer.load(proxiedMpd);
-        } else {
-            throw shakaErr;
         }
+
+        const proxiedMpd = proxyUrl(url);
+        await shakaPlayer.load(proxiedMpd);
+
+        // Seek gần live edge nhất có thể
+        try {
+            const sr = shakaPlayer.seekRange();
+            if (sr && sr.end > 0) video.currentTime = sr.end - 5;
+        } catch(e) {}
+
+        video.play();
+    } else if (isM3u8) {
+        if (window.Hls && Hls.isSupported()) {
+            const hls = new Hls({ xhrSetup: (xhr, u) => {
+                xhr.open('GET', proxyUrl(u), true);
+            }});
+            hls.loadSource(proxyUrl(url));
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = proxyUrl(url);
+            video.play();
+        }
+    } else {
+        video.src = proxyUrl(url);
+        video.play();
     }
-
-    // Seek to live edge - 15s (an toàn trong window 30s)
-    try {
-        const sr = shakaPlayer.seekRange();
-        if (sr && sr.end > 0) video.currentTime = sr.end - 15;
-    } catch(e) {}
-
-    video.play().catch(() => {});
-    statusEl.className = 'ok';
-    statusEl.textContent = '✅ Đang phát (live edge -20s)';
 }
 </script>
 </body>
