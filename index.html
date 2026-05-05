@@ -53,7 +53,7 @@
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css?v=117">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/TV.js?v=136"></script>
+    <script src="https://server.xemtv.vn/fpt/TV.js?v=137"></script>
      <style>
     html {
       visibility: hidden;
@@ -218,10 +218,13 @@
     .reco-prog{font-size:0.71rem;color:#e0e0e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
     .reco-sep{flex-shrink:0;width:1px;height:28px;background:rgba(255,255,255,0.05);margin:0 2px;pointer-events:none;}
     @keyframes recoShimmer{0%{background-position:-200px 0}100%{background-position:200px 0}}
-    .reco-skeleton{cursor:default;pointer-events:none;border-color:transparent!important;}
-    .reco-logo-skel{width:26px;height:18px;border-radius:3px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200px 100%;animation:recoShimmer 1.2s infinite linear;}
-    .reco-ch-skel{height:8px;border-radius:4px;margin-bottom:4px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.08) 50%,rgba(255,255,255,0.04) 75%);background-size:200px 100%;animation:recoShimmer 1.2s infinite linear;}
-    .reco-prog-skel{height:10px;border-radius:4px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.04) 75%);background-size:200px 100%;animation:recoShimmer 1.2s infinite linear;}
+    @keyframes recoFadeIn{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:translateY(0)}}
+    @keyframes recoPulse{0%,100%{opacity:0.5}50%{opacity:1}}
+    .reco-skeleton{cursor:default;pointer-events:none;border-color:transparent!important;opacity:0;animation:recoFadeIn 0.3s ease forwards;}
+    .reco-loading-label{animation:recoPulse 1.5s ease-in-out infinite;}
+    .reco-logo-skel{width:26px;height:18px;border-radius:3px;flex-shrink:0;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.04) 75%);background-size:200px 100%;animation:recoShimmer 1.2s infinite linear;}
+    .reco-ch-skel{height:8px;border-radius:4px;margin-bottom:4px;background:linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.1) 50%,rgba(255,255,255,0.04) 75%);background-size:200px 100%;animation:recoShimmer 1.2s infinite linear;}
+    .reco-prog-skel{height:10px;border-radius:4px;background:linear-gradient(90deg,rgba(255,255,255,0.05) 25%,rgba(255,255,255,0.12) 50%,rgba(255,255,255,0.05) 75%);background-size:200px 100%;animation:recoShimmer 1.2s infinite linear;}
     #epg-panel{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(8,8,12,0.98),rgba(14,14,20,0.95));border-top:1px solid rgba(255,255,255,0.06);z-index:500;padding:0;display:flex;flex-direction:row;gap:0;align-items:stretch;font-size:0.78rem;color:#e0e0e0;overflow-x:scroll;overflow-y:hidden;white-space:nowrap;user-select:none;cursor:grab;scrollbar-width:none;-ms-overflow-style:none;}
     #epg-panel:empty{display:none}
     #epg-panel::-webkit-scrollbar{display:none}
