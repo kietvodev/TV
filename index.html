@@ -53,7 +53,7 @@
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/TV.css?v=117">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/TV.js?v=131"></script>
+    <script src="https://server.xemtv.vn/fpt/TV.js?v=132"></script>
      <style>
     html {
       visibility: hidden;
@@ -199,6 +199,47 @@
         </div>
     </footer>
 
+
+    <!-- Reco strip + EPG panel (static containers) -->
+    <div id="reco-strip"></div>
+    <div id="epg-panel"></div>
+    <style>
+    #reco-strip{position:fixed;left:0;right:0;background:rgba(8,8,14,0.97);border-top:1px solid rgba(255,255,255,0.05);z-index:9999;display:flex;align-items:center;gap:0;padding:0 6px;overflow-x:auto;scrollbar-width:none;transition:bottom 0.2s;cursor:grab;user-select:none;-webkit-user-select:none;bottom:0;}
+    #reco-strip::-webkit-scrollbar{display:none}
+    #reco-strip:empty{display:none}
+    #reco-strip.is-dragging{cursor:grabbing;}
+    .reco-label{flex-shrink:0;font-size:0.59rem;font-weight:700;color:rgba(255,80,80,0.7);text-transform:uppercase;letter-spacing:1.2px;padding:0 10px 0 4px;white-space:nowrap;pointer-events:none;}
+    .reco-card{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:6px 10px;cursor:pointer;border-radius:6px;margin:3px 1px;transition:background 0.15s;max-width:190px;min-width:0;border:1px solid transparent;}
+    .reco-card:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.08);}
+    .reco-card.reco-active{background:rgba(79,195,247,0.08);border-color:rgba(79,195,247,0.15);}
+    .reco-logo{width:26px;height:18px;object-fit:contain;border-radius:2px;flex-shrink:0;opacity:0.9;pointer-events:none;}
+    .reco-info{overflow:hidden;min-width:0;pointer-events:none;}
+    .reco-ch{font-size:0.62rem;font-weight:600;color:#9e9e9e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .reco-prog{font-size:0.71rem;color:#e0e0e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+    .reco-sep{flex-shrink:0;width:1px;height:28px;background:rgba(255,255,255,0.05);margin:0 2px;pointer-events:none;}
+    #epg-panel{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(to top,rgba(8,8,12,0.98),rgba(14,14,20,0.95));border-top:1px solid rgba(255,255,255,0.06);z-index:500;padding:0;display:flex;flex-direction:row;gap:0;align-items:stretch;font-size:0.78rem;color:#e0e0e0;overflow-x:scroll;overflow-y:hidden;white-space:nowrap;user-select:none;cursor:grab;scrollbar-width:none;-ms-overflow-style:none;}
+    #epg-panel:empty{display:none}
+    #epg-panel::-webkit-scrollbar{display:none}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+    @keyframes epgPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,61,0,0.3)}50%{box-shadow:0 0 12px 2px rgba(255,61,0,0.15)}}
+    .epg-card{flex-shrink:0;width:175px;padding:10px 12px;position:relative;overflow:hidden;border-radius:0;border-right:1px solid rgba(255,255,255,0.04);transition:background 0.2s,opacity 0.2s;box-sizing:border-box;}
+    .epg-card:last-child{border-right:none;}
+    .epg-card.epg-past{opacity:0.65;background:transparent;}
+    .epg-card.epg-past:hover{opacity:0.9;background:rgba(255,255,255,0.03);}
+    .epg-card.epg-current{opacity:1;background:rgba(255,61,0,0.08);animation:epgPulse 3s ease-in-out infinite;}
+    .epg-card.epg-future{opacity:0.85;background:transparent;}
+    .epg-card.epg-playing{opacity:1;background:rgba(79,195,247,0.1);}
+    .epg-card.epg-catchup{cursor:pointer;}
+    .epg-card.epg-catchup:hover{opacity:1!important;background:rgba(79,195,247,0.08)!important;}
+    .epg-divider{flex-shrink:0;width:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px 0;}
+    .epg-divider-line{width:1px;flex:1;background:linear-gradient(180deg,transparent,rgba(255,255,255,0.12),transparent);}
+    .epg-divider-dot{width:6px;height:6px;border-radius:50%;}
+    .epg-divider-label{font-size:0.55rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;white-space:nowrap;writing-mode:vertical-lr;text-orientation:mixed;transform:rotate(180deg);}
+    .epg-time{font-size:0.67rem;margin-bottom:3px;font-weight:500;line-height:1.3;}
+    .epg-title{font-size:0.77rem;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.35;}
+    .epg-tag{display:inline-flex;align-items:center;gap:3px;font-size:0.55rem;font-weight:600;padding:2px 6px;border-radius:3px;margin-top:4px;}
+    .epg-progress{position:absolute;bottom:0;left:0;height:2px;border-radius:0 1px 0 0;}
+    </style>
 
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QHCHRWQJFC"></script>
