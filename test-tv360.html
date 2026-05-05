@@ -29,7 +29,7 @@ video { width: 100%; max-width: 900px; aspect-ratio: 16/9; background: #000; bor
 <div class="url-box" id="mpd-url"></div>
 
 <!-- Shaka Player (hỗ trợ DASH + HLS) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.compiled.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.16.3/shaka-player.compiled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
 <script>
 const BASE = 'https://admin.xemtv.vn';
@@ -82,8 +82,28 @@ async function playStream(url, licenseProxyUrl) {
     const video = document.getElementById('player');
     if (shakaPlayer) { try { await shakaPlayer.destroy(); } catch(e) {} shakaPlayer = null; }
 
+    // Reset video element hoàn toàn → tránh lỗi 6007 (FAILED_TO_ATTACH_TO_VIDEO)
+    // do MediaKeys cũ vẫn attach từ kênh DRM trước
+    try {
+        await video.setMediaKeys(null);
+    } catch(e) {}
+    video.removeAttribute('src');
+    video.load();
+
     const isMpd = url.includes('.mpd');
     const isM3u8 = url.includes('.m3u8');
+
+    // iOS Safari chỉ hỗ trợ FairPlay — không thể phát DASH/Widevine
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    const isSafariDesktop = /^((?!chrome|android).)*safari/i.test(navigator.userAgent) && !isIOS;
+    const needsFairPlay = isIOS || isSafariDesktop;
+
+    if (isMpd && needsFairPlay) {
+        // DASH + Widevine không chạy được trên Safari/iOS → cần FairPlay từ server
+        document.getElementById('status').className = 'err';
+        document.getElementById('status').textContent = '❌ Safari/iOS chỉ hỗ trợ FairPlay DRM. Kênh DASH/Widevine này không phát được trên thiết bị Apple.';
+        return;
+    }
 
     if (isMpd) {
         shaka.polyfill.installAll();
@@ -98,8 +118,16 @@ async function playStream(url, licenseProxyUrl) {
                 return; // không crash player
             }
             console.error('Shaka error', err);
+            // Log data[0] ra console riêng để debug DRM 6007
+            if (err.data) {
+                err.data.forEach((d, i) => {
+                    if (d instanceof Error) console.error(`[Shaka] err.data[${i}]:`, d.name, d.message, d);
+                    else console.error(`[Shaka] err.data[${i}]:`, d);
+                });
+            }
+            const dataStr = err.data ? err.data.map((d,i) => `data[${i}]=${d instanceof Error ? d.name+':'+d.message : String(d)}`).join(' | ') : '';
             document.getElementById('status').className = 'err';
-            document.getElementById('status').textContent = `❌ Shaka Error ${err.code} (cat:${err.category}): ${err.message || ''}`;
+            document.getElementById('status').textContent = `❌ Shaka Error ${err.code} (cat:${err.category}): ${err.message || ''} ${dataStr}`;
         });
 
         // Intercept mọi request Shaka → đưa qua proxy
@@ -137,23 +165,24 @@ async function playStream(url, licenseProxyUrl) {
             }
         });
 
-        // Cấu hình DRM nếu có license server
-        if (licenseProxyUrl) {
-            shakaPlayer.configure({
-                drm: {
-                    servers: {
-                        'com.widevine.alpha': licenseProxyUrl,
-                        'com.microsoft.playready': licenseProxyUrl
-                    },
-                    advanced: {
-                        'com.widevine.alpha': {
-                            audioRobustness: 'SW_SECURE_CRYPTO',
-                            videoRobustness: 'SW_SECURE_DECODE'
-                        }
+        // Cấu hình DRM nếu có license server (hoặc fallback dùng endpoint chung của TV360)
+        // MPD có thể có Widevine PSSH nhưng scrape không bắt được licenseUrl → vẫn cần config
+        const _drmServer = licenseProxyUrl
+            || (BASE + '/api/tv360-license?url=' + encodeURIComponent(document.getElementById('tv360url').value.trim()));
+        shakaPlayer.configure({
+            drm: {
+                servers: {
+                    'com.widevine.alpha': _drmServer
+                },
+                advanced: {
+                    'com.widevine.alpha': {
+                        audioRobustness: '',
+                        videoRobustness: ''
                     }
-                }
-            });
-        }
+                },
+                preferredKeySystems: ['com.widevine.alpha']
+            }
+        });
 
         const proxiedMpd = proxyUrl(url);
         await shakaPlayer.load(proxiedMpd);
