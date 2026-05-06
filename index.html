@@ -288,16 +288,21 @@
       document.documentElement.style.visibility = 'visible';
       return;
     }
-    fetchWithTimeout('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', 2500)
+    // Thử lần 1 (timeout 5s), nếu thất bại thử lần 2 (timeout 5s), sau đó mới redirect
+    fetchWithTimeout('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', 5000)
       .then(response => {
-        if (!response.ok) {
-          window.location.replace('/404.html');
-        } else {
-          document.documentElement.style.visibility = 'visible';
-        }
+        if (!response.ok) throw new Error('Server error');
+        document.documentElement.style.visibility = 'visible';
       })
-      .catch(error => {
-        window.location.replace('/404.html');
+      .catch(() => {
+        return fetchWithTimeout('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', 5000)
+          .then(response => {
+            if (!response.ok) throw new Error('Server error');
+            document.documentElement.style.visibility = 'visible';
+          })
+          .catch(() => {
+            window.location.replace('/404.html');
+          });
       });
   });
 </script>
