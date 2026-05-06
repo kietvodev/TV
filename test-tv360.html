@@ -61,27 +61,41 @@ async function loadChannel() {
     mpdEl.textContent = '';
 
     try {
-        // iOS/Safari → gọi API với ios=1 để lấy HLS thay DASH
-        const apiUrl = needsHLS
-            ? API + encodeURIComponent(tv360Url) + '&ios=1'
-            : API + encodeURIComponent(tv360Url);
-        const res = await fetch(apiUrl);
-        const data = await res.json();
-        if (!data.ok) throw new Error(data.error || 'Không lấy được link');
+        if (needsHLS) {
+            // iOS/Safari → Server-side transcode (DASH DRM → clear HLS via ffmpeg)
+            statusEl.textContent = '⏳ Đang khởi động server-side transcode...';
+            // Đầu tiên lấy link DASH từ server (cần để server fetch MPD + keys)
+            const res = await fetch(API + encodeURIComponent(tv360Url));
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error || 'Không lấy được link');
 
-        if (data.mode === 'ios' || data.hls) {
-            // iOS/Safari path → HLS
-            const hlsUrl = data.hlsProxy ? BASE + data.hlsProxy : proxyUrl(data.hls);
-            const fpsLicUrl = data.fpsLicProxy ? BASE + data.fpsLicProxy : null;
-            const fpsCertUrl = data.fpsCertProxy ? BASE + data.fpsCertProxy : null;
-            mpdEl.textContent = '🔗 HLS: ' + data.hls + (fpsLicUrl ? '\n🔑 FairPlay DRM' : ' (clear/AES)');
-            statusEl.className = 'ok';
-            statusEl.textContent = '✓ Lấy HLS OK – đang load...';
-            await playHLS(hlsUrl, fpsLicUrl, fpsCertUrl);
-            statusEl.textContent = '✅ Đang phát (HLS): ' + data.hls.split('/').pop().split('?')[0];
+            // Không có kênh channelId trên trang test → dùng API trực tiếp
+            // Tìm channelId từ URL (slug)
+            const slug = tv360Url.split('/').filter(Boolean).pop().split('?')[0];
+            statusEl.textContent = '⏳ Server đang giải mã stream (có thể mất 10-20s)...';
+            mpdEl.textContent = '🔗 MPD: ' + (data.m3u8 || '') + '\n⚙ Server transcoding DASH→HLS...';
+
+            // Poll server HLS endpoint cho đến khi sẵn sàng
+            // Trang test không biết channelId → dùng trực tiếp URL proxy HLS
+            // Fallback: phát trực tiếp qua proxy nếu stream không có DRM
+            if (!data.licenseUrl) {
+                // Clear stream → phát trực tiếp qua proxy
+                const hlsUrl = PROXY + encodeURIComponent(data.m3u8);
+                await playHLS(hlsUrl, null, null);
+                statusEl.className = 'ok';
+                statusEl.textContent = '✅ Đang phát (HLS proxy, no DRM)';
+            } else {
+                // DRM → cần server transcode, nhưng test page không có channelId
+                statusEl.className = 'err';
+                statusEl.textContent = '⚠ Kênh có DRM. Trên iOS, dùng trang chính (xemtv.vn) để xem qua server transcode. Trang test không hỗ trợ DRM trên iOS.';
+                mpdEl.textContent += '\n💡 Cần file .wvd trong thư mục cdm/ trên server + dùng trang chính với channelId';
+            }
         } else {
-            // Desktop path → DASH
-            if (!data.m3u8) throw new Error('Không lấy được link MPD');
+            // Desktop path → DASH (giữ nguyên)
+            const res = await fetch(API + encodeURIComponent(tv360Url));
+            const data = await res.json();
+            if (!data.ok || !data.m3u8) throw new Error(data.error || 'Không lấy được link');
+
             const streamUrl = data.m3u8;
             const licenseProxyUrl = data.licenseUrl
                 ? BASE + '/api/tv360-license?url=' + encodeURIComponent(tv360Url)
