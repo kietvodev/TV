@@ -70,10 +70,109 @@
     body.catchup-mode #catchup-player {
       display: block;
     }
+    /* ===== CONNECTION SPLASH ===== */
+    #conn-splash{
+      visibility:visible;
+      position:fixed;inset:0;
+      background:#0d0d0d;
+      z-index:99990;
+      display:flex;flex-direction:column;
+      align-items:center;justify-content:center;
+      font-family:'Roboto',system-ui,sans-serif;
+      transition:opacity 0.55s ease;
+    }
+    #conn-splash.cs-out{opacity:0;pointer-events:none}
+    .cs-brand{
+      color:#ff3d00;font-size:1.55rem;font-weight:700;
+      letter-spacing:-0.3px;margin-bottom:32px;
+    }
+    .cs-brand span{color:#fff;font-weight:300}
+    .cs-rings{
+      position:relative;width:88px;height:88px;
+      flex-shrink:0;
+    }
+    .cs-ring{
+      position:absolute;border-radius:50%;
+      border:2px solid #ff3d00;
+      animation:csRing 2.2s ease-out infinite;
+    }
+    .cs-ring:nth-child(1){inset:32px;animation-delay:0s;border-color:rgba(255,61,0,0.9)}
+    .cs-ring:nth-child(2){inset:18px;animation-delay:0.45s;border-color:rgba(255,61,0,0.65)}
+    .cs-ring:nth-child(3){inset:4px;animation-delay:0.9s;border-color:rgba(255,61,0,0.35)}
+    .cs-dot{
+      position:absolute;inset:36px;
+      background:#ff3d00;border-radius:50%;
+      box-shadow:0 0 14px rgba(255,61,0,0.8);
+    }
+    @keyframes csRing{
+      0%{opacity:.9;transform:scale(.75)}
+      60%{opacity:.3}
+      100%{opacity:0;transform:scale(1.6)}
+    }
+    .cs-steps{
+      margin-top:28px;
+      display:flex;flex-direction:column;gap:8px;
+      min-width:220px;
+    }
+    .cs-step{
+      display:flex;align-items:center;gap:10px;
+      font-size:0.83rem;color:#555;
+      transition:color 0.3s;
+    }
+    .cs-step.active{color:#ddd}
+    .cs-step.done{color:#4caf50}
+    .cs-step.err{color:#ef5350}
+    .cs-step-ic{
+      width:18px;height:18px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      font-size:0.7rem;
+    }
+    .cs-step.active .cs-step-ic::before{content:'';display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid #ff6e40;border-top-color:transparent;animation:csSpin 0.8s linear infinite}
+    .cs-step.done .cs-step-ic::before{content:'✓';color:#4caf50;font-size:0.85rem;font-weight:700}
+    .cs-step.err .cs-step-ic::before{content:'✕';color:#ef5350;font-size:0.85rem;font-weight:700}
+    .cs-step.pending .cs-step-ic::before{content:'○';color:#444;font-size:0.85rem}
+    @keyframes csSpin{to{transform:rotate(360deg)}}
+    .cs-timer{
+      margin-top:20px;color:#333;
+      font-size:0.75rem;font-variant-numeric:tabular-nums;
+    }
+    .cs-ok-msg{
+      display:none;flex-direction:column;align-items:center;gap:8px;
+      margin-top:28px;
+    }
+    .cs-ok-check{
+      width:44px;height:44px;border-radius:50%;
+      background:rgba(76,175,80,0.15);border:2px solid #4caf50;
+      display:flex;align-items:center;justify-content:center;
+      font-size:1.3rem;color:#4caf50;
+      animation:csPopIn 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes csPopIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+    .cs-ok-label{color:#aaa;font-size:0.82rem}
   </style>
 </head>
     
 <body>
+    <!-- Connection splash - visible even when html has visibility:hidden -->
+    <div id="conn-splash">
+      <div class="cs-brand">XemTV<span>.vn</span></div>
+      <div class="cs-rings">
+        <div class="cs-ring"></div>
+        <div class="cs-ring"></div>
+        <div class="cs-ring"></div>
+        <div class="cs-dot"></div>
+      </div>
+      <div class="cs-steps">
+        <div class="cs-step active" id="cs-s1"><span class="cs-step-ic"></span>Khởi tạo kết nối</div>
+        <div class="cs-step pending" id="cs-s2"><span class="cs-step-ic"></span>Kết nối máy chủ</div>
+        <div class="cs-step pending" id="cs-s3"><span class="cs-step-ic"></span>Tải danh sách kênh</div>
+      </div>
+      <div class="cs-timer" id="cs-timer">0.0s</div>
+      <div class="cs-ok-msg" id="cs-ok">
+        <div class="cs-ok-check">✓</div>
+        <div class="cs-ok-label">Kết nối thành công!</div>
+      </div>
+    </div>
     <header>
         <div class="header-container">
             <a href="#" class="logo" id="home-link">
@@ -266,42 +365,85 @@
   gtag('config', 'G-QHCHRWQJFC');
 </script>
         <script>
-  function fetchWithTimeout(url, timeout = 2500) {
+  function fetchWithTimeout(url, timeout) {
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error('Timeout')), timeout);
-
       fetch(url)
-        .then(response => {
-          clearTimeout(timer);
-          resolve(response);
-        })
-        .catch(err => {
-          clearTimeout(timer);
-          reject(err);
-        });
+        .then(r => { clearTimeout(timer); resolve(r); })
+        .catch(e => { clearTimeout(timer); reject(e); });
     });
   }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    // Bỏ qua redirect khi chạy local
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') {
+  // ---- Splash helpers ----
+  function csStep(id, state) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'cs-step ' + state;
+  }
+  function csShow() {
+    var splash = document.getElementById('conn-splash');
+    var rings  = splash && splash.querySelector('.cs-rings');
+    var steps  = splash && splash.querySelector('.cs-steps');
+    var ok     = document.getElementById('cs-ok');
+    if (rings)  rings.style.display  = 'none';
+    if (steps)  steps.style.display  = 'none';
+    if (ok) { ok.style.display = 'flex'; }
+    setTimeout(function() {
       document.documentElement.style.visibility = 'visible';
+      if (splash) splash.classList.add('cs-out');
+      setTimeout(function() { if (splash) splash.remove(); }, 600);
+    }, 500);
+  }
+
+  window.addEventListener('DOMContentLoaded', function() {
+    // Bỏ qua check khi chạy local
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.protocol === 'file:') {
+      document.documentElement.style.visibility = 'visible';
+      var s = document.getElementById('conn-splash'); if (s) s.remove();
       return;
     }
-    // Thử lần 1 (timeout 5s), nếu thất bại thử lần 2 (timeout 5s), sau đó mới redirect
-    fetchWithTimeout('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', 5000)
-      .then(response => {
-        if (!response.ok) throw new Error('Server error');
-        document.documentElement.style.visibility = 'visible';
+
+    // Elapsed timer
+    var t0 = Date.now();
+    var timerEl = document.getElementById('cs-timer');
+    var timerInt = setInterval(function() {
+      if (timerEl) timerEl.textContent = ((Date.now()-t0)/1000).toFixed(1)+'s';
+    }, 100);
+    function stopTimer() { clearInterval(timerInt); }
+
+    // Step 1 already active; advance to step 2 after brief moment
+    setTimeout(function() { csStep('cs-s1','done'); csStep('cs-s2','active'); }, 350);
+
+    var URL = 'https://server.xemtv.vn/fpt/proxy/xemtv/channels.php';
+
+    // Attempt 1
+    fetchWithTimeout(URL, 5000)
+      .then(function(r) {
+        if (!r.ok) throw new Error('bad');
+        stopTimer();
+        csStep('cs-s2','done'); csStep('cs-s3','active');
+        setTimeout(function() { csStep('cs-s3','done'); csShow(); }, 300);
       })
-      .catch(() => {
-        return fetchWithTimeout('https://server.xemtv.vn/fpt/proxy/xemtv/channels.php', 5000)
-          .then(response => {
-            if (!response.ok) throw new Error('Server error');
-            document.documentElement.style.visibility = 'visible';
+      .catch(function() {
+        // Attempt 2 - update step 2 text and state
+        var s2 = document.getElementById('cs-s2');
+        if (s2) {
+          var txt = s2.lastChild;
+          if (txt && txt.nodeType === 3) txt.textContent = 'Thử kết nối lại...';
+        }
+        csStep('cs-s2','active');
+        return fetchWithTimeout(URL, 5000)
+          .then(function(r) {
+            if (!r.ok) throw new Error('bad');
+            stopTimer();
+            csStep('cs-s2','done'); csStep('cs-s3','active');
+            setTimeout(function() { csStep('cs-s3','done'); csShow(); }, 300);
           })
-          .catch(() => {
-            window.location.replace('/404.html');
+          .catch(function() {
+            stopTimer();
+            csStep('cs-s2','err'); csStep('cs-s3','err');
+            if (timerEl) timerEl.textContent = 'Không thể kết nối';
+            setTimeout(function() { window.location.replace('/404.html'); }, 800);
           });
       });
   });
