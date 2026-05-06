@@ -5,7 +5,7 @@
     // SPA routing: nếu URL là /xem-tv/xxx → chuyển về index.html giữ path
     (function() {
       var path = window.location.pathname;
-      if (path.indexOf('/xem-tv/') === 0) {
+      if (path.indexOf('/truyen-hinh-truc-tuyen/') === 0) {
         sessionStorage.setItem('spa_redirect', path);
         window.location.replace('/?p=' + encodeURIComponent(path));
         return;
