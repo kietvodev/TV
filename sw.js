@@ -1,7 +1,7 @@
 // Service Worker - XemTV.vn
 // Cache JS/CSS trong phiên, xóa khi user thoát web
 
-const CACHE_NAME = 'xemtv-session-v2';
+const CACHE_NAME = 'xemtv-session-v3';
 const STATIC_ASSETS = [
   '/Image_WEB/XEMTV_192X192.png',
   '/Image_WEB/XEMTV_96X96.png'
