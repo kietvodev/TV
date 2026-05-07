@@ -443,7 +443,7 @@
             stopTimer();
             csStep('cs-s2','err'); csStep('cs-s3','err');
             if (timerEl) timerEl.textContent = 'Không thể kết nối';
-            setTimeout(function() { window.location.replace('/404.html'); }, 800);
+            setTimeout(function() { csShow(); }, 800);
           });
       });
   });
