@@ -51,10 +51,10 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/web/web.css?v=181">
+    <link rel="stylesheet" href="https://server.xemtv.vn/fpt/web/web.css?v=182">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/web/web.js?v=198"></script>
+    <script src="https://server.xemtv.vn/fpt/web/web.js?v=199"></script>
      <style>
     html {
       visibility: hidden;
@@ -77,7 +77,6 @@
       gap:0;
       background:var(--card-bg,#1a1a2e);
       border-bottom:1px solid rgba(255,255,255,0.06);
-      position:sticky;top:56px;z-index:50;
     }
     .mct-btn{
       flex:1;padding:10px 0;border:none;background:transparent;
@@ -144,10 +143,10 @@
     html.is-mobile.epg-tab-active #bottom-stack{display:none!important;}
     /* Player không tràn ra ngoài */
     html.is-mobile .player-container{position:relative;overflow:hidden;z-index:1;}
-    /* Player sticky khi xem EPG tab — player ghim trên, danh sách scroll bên dưới */
-    html.is-mobile.epg-tab-active .player-section{position:sticky;top:56px;z-index:52;background:#000;}
+    /* Player sticky trên mobile — player ghim trên cả 2 tab */
+    html.is-mobile .player-section{position:sticky;top:56px;z-index:52;background:#000;}
+    html.is-mobile #mobile-content-tabs{position:sticky;top:calc(56px + 56.25vw);z-index:51;}
     html.is-mobile.epg-tab-active .player-section #pull-refresh-indicator{display:none!important;}
-    html.is-mobile.epg-tab-active #mobile-content-tabs{position:sticky;top:calc(56px + 56.25vw);z-index:51;}
     html.is-mobile.epg-tab-active #mobile-epg-dates{position:sticky;top:calc(56px + 56.25vw + 42px);z-index:50;}
     html.is-mobile #buffer-overlay{position:absolute;inset:0;z-index:10;}
     html.is-mobile .catchup-controls{position:absolute;bottom:0;left:0;right:0;z-index:20;}
