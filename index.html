@@ -67,6 +67,11 @@
       aspect-ratio: 16/9;
       object-fit: contain;
     }
+    html.is-mobile #catchup-player {
+      height: 56.25vw !important;
+      min-height: 200px !important;
+      border-radius: 0 !important;
+    }
     body.catchup-mode #catchup-player {
       display: block;
     }
@@ -145,9 +150,9 @@
     html.is-mobile .player-container{position:relative;overflow:hidden;z-index:1;}
     /* Player sticky trên mobile — player ghim trên cả 2 tab */
     html.is-mobile .player-section{position:sticky;top:56px;z-index:52;background:#000;}
-    html.is-mobile #mobile-content-tabs{position:sticky;top:calc(56px + 56.25vw);z-index:51;}
-    html.is-mobile.epg-tab-active .player-section #pull-refresh-indicator{display:none!important;}
-    html.is-mobile.epg-tab-active #mobile-epg-dates{position:sticky;top:calc(56px + 56.25vw + 42px);z-index:50;}
+    html.is-mobile .player-section #pull-refresh-indicator{display:none!important;}
+    html.is-mobile #mobile-content-tabs{position:sticky;top:calc(56px + 56.25vw);z-index:51;background:var(--card-bg,#1a1a2e);}
+    html.is-mobile.epg-tab-active #mobile-epg-dates{position:sticky;top:calc(56px + 56.25vw + 37px);z-index:50;}
     html.is-mobile #buffer-overlay{position:absolute;inset:0;z-index:10;}
     html.is-mobile .catchup-controls{position:absolute;bottom:0;left:0;right:0;z-index:20;}
     /* ===== CONNECTION SPLASH ===== */
