@@ -54,7 +54,7 @@
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/web/web.css?v=179">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/web/web.js?v=190"></script>
+    <script src="https://server.xemtv.vn/fpt/web/web.js?v=191"></script>
      <style>
     html {
       visibility: hidden;
@@ -70,6 +70,76 @@
     body.catchup-mode #catchup-player {
       display: block;
     }
+    /* ===== Mobile Content Tabs ===== */
+    #mobile-content-tabs{display:none;}
+    html.is-mobile #mobile-content-tabs{
+      display:flex;
+      gap:0;
+      background:var(--card-bg,#1a1a2e);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      position:sticky;top:56px;z-index:50;
+    }
+    .mct-btn{
+      flex:1;padding:10px 0;border:none;background:transparent;
+      color:#888;font-size:0.85rem;font-weight:500;cursor:pointer;
+      border-bottom:2px solid transparent;transition:all 0.2s;
+      display:flex;align-items:center;justify-content:center;gap:6px;
+    }
+    .mct-btn.active{color:#ff6a3d;border-bottom-color:#ff6a3d;}
+    .mct-btn:hover{color:#ccc;}
+    .mct-btn i{font-size:0.8rem;}
+    /* Mobile EPG View */
+    #mobile-epg-view{padding:0;background:var(--bg-color,#0d0d0d);}
+    html:not(.is-mobile) #mobile-epg-view{display:none!important;}
+    #mobile-epg-dates{
+      display:flex;overflow-x:auto;gap:0;
+      background:var(--card-bg,#1a1a2e);
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      scrollbar-width:none;-ms-overflow-style:none;
+      position:sticky;top:98px;z-index:49;
+    }
+    #mobile-epg-dates::-webkit-scrollbar{display:none;}
+    .med-btn{
+      flex-shrink:0;padding:8px 16px;border:none;background:transparent;
+      color:#999;font-size:0.82rem;white-space:nowrap;cursor:pointer;
+      border-bottom:2px solid transparent;transition:all 0.2s;
+    }
+    .med-btn.active{color:#ff6a3d;border-bottom-color:#ff6a3d;font-weight:600;}
+    .med-btn:hover{color:#ccc;}
+    #mobile-epg-programs{padding:0;}
+    .mep-item{
+      display:flex;align-items:flex-start;gap:10px;
+      padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.04);
+      transition:background 0.15s;
+    }
+    .mep-item:last-child{border-bottom:none;}
+    .mep-item.mep-current{background:rgba(255,61,0,0.08);}
+    .mep-item.mep-past{opacity:0.6;}
+    .mep-item.mep-past:hover{opacity:0.85;}
+    .mep-item.mep-playing{background:rgba(79,195,247,0.1);}
+    .mep-item.mep-catchup{cursor:pointer;}
+    .mep-item.mep-catchup:hover{background:rgba(79,195,247,0.06);}
+    .mep-time{
+      flex-shrink:0;width:50px;font-size:0.8rem;font-weight:500;
+      color:#888;padding-top:1px;
+    }
+    .mep-current .mep-time{color:#ff6a3d;}
+    .mep-playing .mep-time{color:#4fc3f7;}
+    .mep-body{flex:1;min-width:0;}
+    .mep-title{font-size:0.88rem;color:#ddd;line-height:1.4;}
+    .mep-current .mep-title{color:#fff;font-weight:500;}
+    .mep-playing .mep-title{color:#fff;font-weight:500;}
+    .mep-tag{
+      display:inline-flex;align-items:center;gap:3px;
+      font-size:0.65rem;font-weight:600;padding:2px 6px;
+      border-radius:3px;margin-top:4px;
+    }
+    .mep-progress{
+      height:3px;border-radius:2px;margin-top:6px;
+      background:rgba(255,255,255,0.08);overflow:hidden;
+    }
+    .mep-progress-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,#ff3d00,#ff8040);}
+    .mep-empty{padding:40px 16px;text-align:center;color:#555;font-size:0.9rem;}
     /* ===== CONNECTION SPLASH ===== */
     #conn-splash{
       visibility:visible;
@@ -254,6 +324,16 @@
             </div>
         </div>
     </section>
+
+    <!-- Mobile tabs: Danh sách kênh / Lịch phát sóng -->
+    <div id="mobile-content-tabs">
+        <button class="mct-btn active" data-tab="channels"><i class="fas fa-list"></i> Danh sách kênh</button>
+        <button class="mct-btn" data-tab="epg"><i class="fas fa-calendar-alt"></i> Lịch phát sóng</button>
+    </div>
+    <div id="mobile-epg-view" style="display:none;">
+        <div id="mobile-epg-dates"></div>
+        <div id="mobile-epg-programs"></div>
+    </div>
 
     <main class="container">
         <section class="section" id="favorites">
