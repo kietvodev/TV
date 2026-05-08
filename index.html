@@ -54,7 +54,7 @@
     <link rel="stylesheet" href="https://server.xemtv.vn/fpt/web/web.css?v=179">
     <meta property="og:url" content="https://xemtv.vn">
     <meta property="og:type" content="website">
-    <script src="https://server.xemtv.vn/fpt/web/web.js?v=191"></script>
+    <script src="https://server.xemtv.vn/fpt/web/web.js?v=192"></script>
      <style>
     html {
       visibility: hidden;
@@ -140,6 +140,12 @@
     }
     .mep-progress-bar{height:100%;border-radius:2px;background:linear-gradient(90deg,#ff3d00,#ff8040);}
     .mep-empty{padding:40px 16px;text-align:center;color:#555;font-size:0.9rem;}
+    /* Ẩn bottom EPG strip trên mobile khi đang xem tab Lịch phát sóng */
+    html.is-mobile.epg-tab-active #bottom-stack{display:none!important;}
+    /* Player không tràn ra ngoài */
+    html.is-mobile .player-container{position:relative;overflow:hidden;z-index:1;}
+    html.is-mobile #buffer-overlay{position:absolute;inset:0;z-index:10;}
+    html.is-mobile .catchup-controls{position:absolute;bottom:0;left:0;right:0;z-index:20;}
     /* ===== CONNECTION SPLASH ===== */
     #conn-splash{
       visibility:visible;
