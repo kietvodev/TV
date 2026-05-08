@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MyTV Test – Xem Trực Tiếp</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.16.3/shaka-player.compiled.js" defer></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f13;
+  --surface:#1a1a22;
+  --surface2:#22222e;
+  --accent:#00c2ff;
+  --accent2:#0088bb;
+  --text:#eaeaf2;
+  --muted:#8888aa;
+  --radius:10px;
+  --active-ch:#00c2ff22;
+  --active-border:#00c2ff;
+}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',sans-serif;height:100dvh;overflow:hidden;display:flex;flex-direction:column}
+/* HEADER */
+.header{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--surface);border-bottom:1px solid #2a2a38;flex-shrink:0}
+.header-logo{font-size:1.2rem;font-weight:700;color:var(--accent);letter-spacing:.5px;white-space:nowrap}
+.header-logo span{color:#fff}
+.search-box{flex:1;max-width:360px;position:relative}
+.search-box input{width:100%;background:var(--surface2);border:1px solid #333344;border-radius:6px;padding:7px 12px 7px 34px;color:var(--text);font-size:.9rem;outline:none;transition:border .2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box::before{content:"🔍";position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:.85rem;pointer-events:none}
+.header-info{margin-left:auto;font-size:.8rem;color:var(--muted)}
+/* MAIN LAYOUT */
+.main{display:flex;flex:1;min-height:0;overflow:hidden}
+/* SIDEBAR */
+.sidebar{width:320px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid #2a2a38;background:var(--surface)}
+.group-tabs{display:flex;flex-wrap:wrap;gap:4px;padding:8px 10px;background:var(--surface2);border-bottom:1px solid #2a2a38;flex-shrink:0}
+.group-tab{padding:4px 10px;border-radius:14px;border:1px solid #333344;font-size:.78rem;cursor:pointer;color:var(--muted);background:transparent;transition:all .15s;white-space:nowrap}
+.group-tab:hover{border-color:var(--accent);color:var(--accent)}
+.group-tab.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}
+.ch-list{flex:1;overflow-y:auto;padding:6px 0}
+.ch-list::-webkit-scrollbar{width:4px}
+.ch-list::-webkit-scrollbar-track{background:transparent}
+.ch-list::-webkit-scrollbar-thumb{background:#333344;border-radius:2px}
+.ch-item{display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;border-radius:6px;margin:1px 6px;transition:all .12s;border:1px solid transparent}
+.ch-item:hover{background:var(--surface2)}
+.ch-item.active{background:var(--active-ch);border-color:var(--active-border)}
+.ch-logo{width:42px;height:28px;object-fit:contain;border-radius:3px;background:#1a1a22;flex-shrink:0}
+.ch-info{flex:1;min-width:0}
+.ch-name{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-group{font-size:.72rem;color:var(--muted)}
+.ch-badge{font-size:.65rem;padding:1px 5px;border-radius:8px;background:#cc333333;color:#ff7777;border:1px solid #cc3333}
+/* PLAYER AREA */
+.player-area{flex:1;display:flex;flex-direction:column;min-width:0;background:#000}
+.player-wrap{position:relative;width:100%;flex:1;min-height:0;background:#000}
+video{width:100%;height:100%;display:block;object-fit:contain;background:#000}
+/* OVERLAY */
+.overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000000cc;z-index:10;gap:14px}
+.overlay.hidden{display:none}
+.spinner{width:44px;height:44px;border:3px solid #333;border-top-color:var(--accent);border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay-logo{width:72px;height:48px;object-fit:contain;border-radius:6px}
+.overlay-text{color:var(--text);font-size:.9rem;text-align:center;max-width:300px}
+.overlay-sub{color:var(--muted);font-size:.78rem;text-align:center}
+/* PLAYER BOTTOM BAR */
+.player-bar{background:var(--surface);border-top:1px solid #2a2a38;padding:8px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.now-playing-logo{width:36px;height:24px;object-fit:contain;border-radius:3px;background:var(--surface2)}
+.now-playing-name{font-size:.9rem;font-weight:600}
+.now-playing-status{font-size:.78rem;color:var(--muted);margin-left:auto}
+.badge-hls{background:#00aa5533;color:#00cc66;border:1px solid #00aa55;padding:1px 6px;border-radius:8px;font-size:.7rem}
+.badge-dash{background:#aa550033;color:#ff9900;border:1px solid #aa5500;padding:1px 6px;border-radius:8px;font-size:.7rem}
+.badge-loading{background:#555;color:#bbb;border:1px solid #666;padding:1px 6px;border-radius:8px;font-size:.7rem}
+/* WELCOME SCREEN */
+.welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--muted)}
+.welcome-icon{font-size:4rem;opacity:.3}
+.welcome-text{font-size:1.1rem;opacity:.5}
+.welcome-sub{font-size:.85rem;opacity:.4;text-align:center;max-width:260px;line-height:1.6}
+/* TOAST */
+#toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%) translateY(20px);background:#222234;color:#eaeaf2;border:1px solid #333;padding:8px 18px;border-radius:8px;font-size:.85rem;opacity:0;transition:all .3s;z-index:100;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* RESPONSIVE MOBILE */
+@media(max-width:700px){
+  .main{flex-direction:column}
+  .sidebar{width:100%;height:240px;border-right:none;border-bottom:1px solid #2a2a38}
+  .group-tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .group-tabs::-webkit-scrollbar{display:none}
+  .player-area{flex:1;min-height:0}
+}
+/* QUALITY BADGE (DRM warning) */
+.drm-lock{font-size:.75rem;margin-left:4px;opacity:.6}
+/* NO RESULTS */
+.no-results{padding:30px;text-align:center;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">My<span>TV</span> Test</div>
+  <div class="search-box">
+    <input type="search" id="search-input" placeholder="Tìm kênh..." autocomplete="off">
+  </div>
+  <div class="header-info" id="header-info">Proxy: localhost:3001</div>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="group-tabs" id="group-tabs">
+      <button class="group-tab active" data-group="all">Tất cả</button>
+    </div>
+    <div class="ch-list" id="ch-list">
+      <div class="no-results">Đang tải danh sách kênh...</div>
+    </div>
+  </div>
+
+  <!-- PLAYER AREA -->
+  <div class="player-area">
+    <div class="player-wrap" id="player-wrap">
+      <!-- Welcome screen -->
+      <div class="welcome" id="welcome-screen">
+        <div class="welcome-icon">📺</div>
+        <div class="welcome-text">Chọn kênh để xem</div>
+        <div class="welcome-sub">Nhấp vào bất kỳ kênh nào bên trái để bắt đầu xem ngay lập tức</div>
+      </div>
+      <!-- Video -->
+      <video id="video" autoplay playsinline muted style="display:none"></video>
+      <!-- Overlay (loading / error) -->
+      <div class="overlay hidden" id="overlay">
+        <img class="overlay-logo" id="overlay-logo" src="" alt="" style="display:none">
+        <div class="spinner" id="overlay-spinner"></div>
+        <div class="overlay-text" id="overlay-text">Đang kết nối...</div>
+        <div class="overlay-sub" id="overlay-sub"></div>
+      </div>
+    </div>
+    <div class="player-bar" id="player-bar" style="display:none">
+      <img class="now-playing-logo" id="bar-logo" src="" alt="">
+      <div class="now-playing-name" id="bar-name">-</div>
+      <div class="now-playing-status" id="bar-status">
+        <span class="badge-loading" id="bar-badge">⌛ Chờ</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const PROXY = 'http://localhost:3001';
+const HB_INTERVAL = 20000; // heartbeat mỗi 20s
+const POLL_INTERVAL = 600; // poll type mỗi 600ms
+const MAX_POLL = 50; // tối đa 30s
+
+// ============================================================
+// CHANNEL DATA (từ config/mytv_channels_full.json)
+// ============================================================
+const CHANNELS = [{"id":210,"name":"VTV1 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/09/99/9f/f7/7a/ab/099f7-pvtv1hd-channel-unkn.png","group":"VTV","drm":0},{"id":377,"name":"VTV2 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/17/7c/c2/2c/c5/50/17c2c-pvtv2hd-channel-unkn.png","group":"VTV","drm":0},{"id":211,"name":"VTV3 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/7a/a1/11/13/30/0c/7a113-pvtv3hd-channel-unkn.png","group":"VTV","drm":0},{"id":378,"name":"VTV4 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/8f/ff/f9/93/31/1c/8ff93-pvtv4hd-channel-unkn.png","group":"VTV","drm":0},{"id":379,"name":"VTV5 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/03/3c/c0/01/1e/e6/03c01-pvtv5hd-channel-unkn.png","group":"VTV","drm":0},{"id":212,"name":"VTV10 (HD)","logo":"https://s7768.cdn.mytvnet.vn/vimages/b3/3f/ff/fe/eb/b5/b3ffe-lvtv10hdappc1710png-content-mytv.png","group":"VTV","drm":0},{"id":857,"name":"Vietnam Today","logo":"https://s7768.cdn.mytvnet.vn/vimages/64/4d/db/b8/80/03/64db8-pvietnamtoday-channel-unkn.png","group":"VTV","drm":0},{"id":115,"name":"BTV6 - Shopping 24h","logo":"https://s7768.cdn.mytvnet.vn/vimages/cf/f0/0b/b7/75/51/cf0b7-pbtv6shopping24h-channel-unkn.png","group":"Mua sắm","drm":0},{"id":459,"name":"VTV7 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/e5/53/33/33/33/3c/e5333-pvtv7hd-channel-unkn.png","group":"VTV","drm":0},{"id":7,"name":"HTV1 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/8c/ce/ee/e7/79/98/8cee7-phtv1hd-channel-unkn.png","group":"HTV","drm":0},{"id":766,"name":"SCTV - Phim Tổng hợp","logo":"https://s7768.cdn.mytvnet.vn/vimages/09/91/13/30/0b/b8/09130-psctvphimtnghp-channel-unkn.png","group":"SCTV","drm":0},{"id":769,"name":"SCTV1","logo":"https://s7768.cdn.mytvnet.vn/vimages/52/20/05/5a/aa/ad/5205a-psctv1knhhi-channel-unkn.png","group":"SCTV","drm":0},{"id":9,"name":"HTV4","logo":"https://s7768.cdn.mytvnet.vn/vimages/63/3d/d7/7f/f9/93/63d7f-phtv4-channel-unkn.png","group":"HTV","drm":0},{"id":18,"name":"HTV Thể thao","logo":"https://s7768.cdn.mytvnet.vn/vimages/69/92/28/83/3b/b0/69283-phtvththao-channel-unkn.png","group":"HTV","drm":0},{"id":27,"name":"HTV7 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/b7/72/27/7c/ca/a0/b727c-phtv7hd-channel-unkn.png","group":"HTV","drm":0},{"id":69,"name":"HTV9 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/e6/62/24/4b/b6/69/e624b-phtv9hd-channel-unkn.png","group":"HTV","drm":0},{"id":105,"name":"HTV2","logo":"https://s7768.cdn.mytvnet.vn/vimages/30/07/73/3d/dc/c9/3073d-phtv2-channel-unkn.png","group":"HTV","drm":0},{"id":197,"name":"HTV3 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/1a/af/fe/e3/38/88/1afe3-phtv3hd-channel-unkn.png","group":"HTV","drm":0},{"id":198,"name":"HTVC Gia đình","logo":"https://s7768.cdn.mytvnet.vn/vimages/be/e5/52/2f/f4/40/be52f-phtvngianh-channel-unkn.png","group":"HTV","drm":0},{"id":201,"name":"HTVC Phim","logo":"https://s7768.cdn.mytvnet.vn/vimages/e6/69/96/66/60/0e/e9666-phtvphim-channel-unkn.png","group":"HTV","drm":0},{"id":202,"name":"HTVC Thể thao","logo":"https://s7768.cdn.mytvnet.vn/vimages/e1/14/47/73/38/84/e1473-phtvcthaothao-channel-unkn.png","group":"HTV","drm":0},{"id":204,"name":"HTVC Du lịch","logo":"https://s7768.cdn.mytvnet.vn/vimages/d6/65/52/26/63/36/d6526-phtvcdulch-channel-unkn.png","group":"HTV","drm":0},{"id":206,"name":"HTVC Phụ nữ","logo":"https://s7768.cdn.mytvnet.vn/vimages/94/48/84/44/42/2a/94844-phtvphn-channel-unkn.png","group":"HTV","drm":0},{"id":209,"name":"HTVC Ca nhạc","logo":"https://s7768.cdn.mytvnet.vn/vimages/8d/d3/35/5b/b2/27/8d35b-phtvccnhc-channel-unkn.png","group":"HTV","drm":0},{"id":241,"name":"HTV Plus","logo":"https://s7768.cdn.mytvnet.vn/vimages/4b/b0/04/41/13/38/4b041-phtvplus-channel-unkn.png","group":"HTV","drm":0},{"id":339,"name":"HTVC Thuần Việt HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/4f/f1/1c/cc/c5/5c/4f1cc-phtvcthuanviet-channel-unkn.png","group":"HTV","drm":0},{"id":435,"name":"HTVC Plus","logo":"https://s7768.cdn.mytvnet.vn/vimages/9d/d4/42/27/76/66/9d427-phtvplus-channel-unkn.png","group":"HTV","drm":0},{"id":437,"name":"BTV1","logo":"https://s7768.cdn.mytvnet.vn/vimages/20/05/59/9e/e3/39/2059e-pbtv1-channel-unkn.png","group":"Địa phương","drm":0},{"id":439,"name":"BTV2","logo":"https://s7768.cdn.mytvnet.vn/vimages/b0/08/82/2d/dc/c8/b082d-pbtv2-channel-unkn.png","group":"Địa phương","drm":0},{"id":479,"name":"HTV8 HD","logo":"https://s7768.cdn.mytvnet.vn/vimages/ce/e2/25/5b/bd/d9/ce25b-phtv8hd-channel-unkn.png","group":"HTV","drm":0},{"id":616,"name":"HTVC Giải trí","logo":"https://s7768.cdn.mytvnet.vn/vimages/db/b4/40/0f/f8/83/db40f-phtvgitri-channel-unkn.png","group":"HTV","drm":0},{"id":745,"name":"HTV Tổng hợp","logo":"https://s7768.cdn.mytvnet.vn/vimages/e8/84/4c/c4/47/74/e84c4-phtvtnghp-channel-unkn.png","group":"HTV","drm":0},{"id":775,"name":"SCTV2","logo":"https://s7768.cdn.mytvnet.vn/vimages/e0/08/85/59/96/63/e0859-psctv2-channel-unkn.png","group":"SCTV","drm":0},{"id":778,"name":"SCTV3","logo":"https://s7768.cdn.mytvnet.vn/vimages/d7/74/44/47/77/73/d7447-psctv3-channel-unkn.png","group":"SCTV","drm":0},{"id":781,"name":"SCTV4","logo":"https://s7768.cdn.mytvnet.vn/vimages/fb/b2/2c/c4/43/3d/fb2c4-psctv4-channel-unkn.png","group":"SCTV","drm":0},{"id":784,"name":"SCTV5","logo":"https://s7768.cdn.mytvnet.vn/vimages/4c/ca/a4/4c/c0/06/4ca4c-psctv5-channel-unkn.png","group":"SCTV","drm":0},{"id":787,"name":"SCTV6","logo":"https://s7768.cdn.mytvnet.vn/vimages/13/36/63/3a/ad/d7/1363a-psctv6-channel-unkn.png","group":"SCTV","drm":0},{"id":790,"name":"SCTV7","logo":"https://s7768.cdn.mytvnet.vn/vimages/5b/b4/4a/a7/72/27/5b4a7-psctv7-channel-unkn.png","group":"SCTV","drm":0},{"id":793,"name":"SCTV8","logo":"https://s7768.cdn.mytvnet.vn/vimages/54/49/97/7b/b8/80/5497b-psctv8-channel-unkn.png","group":"SCTV","drm":0},{"id":796,"name":"SCTV9","logo":"https://s7768.cdn.mytvnet.vn/vimages/0e/e5/58/80/07/7f/0e580-psctv9-channel-unkn.png","group":"SCTV","drm":0},{"id":799,"name":"SCTV10","logo":"https://s7768.cdn.mytvnet.vn/vimages/ee/e6/6b/b3/3b/bc/ee6b3-psctv10-channel-unkn.png","group":"SCTV","drm":0},{"id":802,"name":"SCTV11","logo":"https://s7768.cdn.mytvnet.vn/vimages/c7/72/21/1b/b3/3e/c721b-psctv11-channel-unkn.png","group":"SCTV","drm":0},{"id":808,"name":"SCTV14","logo":"https://s7768.cdn.mytvnet.vn/vimages/e2/20/04/47/75/5c/e2047-psctv14-channel-unkn.png","group":"SCTV","drm":0},{"id":811,"name":"SCTV15","logo":"https://s7768.cdn.mytvnet.vn/vimages/57/72/25/54/42/27/57254-psctv15-channel-unkn.png","group":"SCTV","drm":0},{"id":814,"name":"SCTV16","logo":"https://s7768.cdn.mytvnet.vn/vimages/a0/09/91/10/0b/b8/a0910-psctv16-channel-unkn.png","group":"SCTV","drm":0},{"id":817,"name":"SCTV17","logo":"https://s7768.cdn.mytvnet.vn/vimages/93/39/91/18/88/82/93918-psctv17-channel-unkn.png","group":"SCTV","drm":0},{"id":321,"name":"VTVCab 1 (On Sports)","logo":"https://s7768.cdn.mytvnet.vn/vimages/24/49/9e/e0/04/4f/249e0-pvtvcab1onsports-channel-unkn.png","group":"VTVCab","drm":0},{"id":523,"name":"VTVCab 2 (On Sports 2)","logo":"https://s7768.cdn.mytvnet.vn/vimages/a2/27/73/31/19/92/a2731-pvtvcab2onsports2-channel-unkn.png","group":"VTVCab","drm":0},{"id":589,"name":"VTVCab 3 (On Cinema)","logo":"https://s7768.cdn.mytvnet.vn/vimages/96/61/1d/d2/27/78/961d2-pvtvcab3oncinema-channel-unkn.png","group":"VTVCab","drm":0},{"id":590,"name":"VTVCab 4 (On Kids)","logo":"https://s7768.cdn.mytvnet.vn/vimages/68/89/90/08/8b/b1/68990-pvtvcab4onkids-channel-unkn.png","group":"VTVCab","drm":0},{"id":593,"name":"VTVCab 7 (On Entertainment)","logo":"https://s7768.cdn.mytvnet.vn/vimages/24/4c/ca/a9/9c/cc/24ca9-pvtvcab7onentertainment-channel-unkn.png","group":"VTVCab","drm":0},{"id":594,"name":"VTVCab 8 (On Beauty)","logo":"https://s7768.cdn.mytvnet.vn/vimages/7a/a7/71/1e/e3/3e/7a71e-pvtvcab8onbeauty-channel-unkn.png","group":"VTVCab","drm":0},{"id":595,"name":"VTVCab 9 (On Travel)","logo":"https://s7768.cdn.mytvnet.vn/vimages/3d/da/aa/a7/73/32/3daa7-pvtvcab9ontravel-channel-unkn.png","group":"VTVCab","drm":0},{"id":596,"name":"VTVCab 10 (On Life)","logo":"https://s7768.cdn.mytvnet.vn/vimages/17/74/47/72/27/73/17472-pvtvcab10onlife-channel-unkn.png","group":"VTVCab","drm":0},{"id":597,"name":"VTVCab 11 (On Phim)","logo":"https://s7768.cdn.mytvnet.vn/vimages/9d/d3/36/63/38/87/9d363-pvtvcab11onphim-channel-unkn.png","group":"VTVCab","drm":0},{"id":598,"name":"VTVCab 12 (On Family)","logo":"https://s7768.cdn.mytvnet.vn/vimages/14/40/04/44/45/50/14044-pvtvcab12onfamily-channel-unkn.png","group":"VTVCab","drm":0},{"id":739,"name":"VTVCab 6 (On Info)","logo":"https://s7768.cdn.mytvnet.vn/vimages/8d/d0/00/0e/e0/05/8d00e-pvtvcab6oninfo-channel-unkn.png","group":"VTVCab","drm":0},{"id":866,"name":"VTVCab 5 (On Music)","logo":"https://s7768.cdn.mytvnet.vn/vimages/19/9b/bf/f1/14/4c/19bbf-pvtvcab5onmusic-channel-unkn.png","group":"VTVCab","drm":0},{"id":869,"name":"VTVCab 13 (On Football)","logo":"https://s7768.cdn.mytvnet.vn/vimages/c2/29/9f/f1/11/1d/c29f1-pvtvcab13onfootball-channel-unkn.png","group":"VTVCab","drm":0},{"id":185,"name":"Thể thao TV","logo":"https://s7768.cdn.mytvnet.vn/vimages/16/62/28/8b/b1/1a/1628b-pthethaotvhd-channel-unkn.png","group":"Thể thao","drm":0},{"id":190,"name":"K+ 1","logo":"https://s7768.cdn.mytvnet.vn/vimages/0f/fe/e9/95/5b/b9/0fe95-pkplus1-channel-unkn.png","group":"Thể thao","drm":0},{"id":200,"name":"K+ PM","logo":"https://s7768.cdn.mytvnet.vn/vimages/a6/61/10/09/91/17/a6109-pkpm-channel-unkn.png","group":"Thể thao","drm":0},{"id":205,"name":"K+ Sport 1","logo":"https://s7768.cdn.mytvnet.vn/vimages/0a/a5/5c/c5/59/99/0a5c5-pksport1-channel-unkn.png","group":"Thể thao","drm":0},{"id":1866,"name":"K+ Sport 2","logo":"https://s7768.cdn.mytvnet.vn/vimages/a1/12/27/7a/a0/07/a127a-pksport2-channel-unkn.png","group":"Thể thao","drm":0},{"id":633,"name":"K+ Sport 3","logo":"https://s7768.cdn.mytvnet.vn/vimages/62/23/3d/dd/d5/51/623dd-pksport3-channel-unkn.png","group":"Thể thao","drm":0},{"id":742,"name":"K+ Sport 4","logo":"https://s7768.cdn.mytvnet.vn/vimages/b5/57/74/4b/b9/9a/b574b-pksport4-channel-unkn.png","group":"Thể thao","drm":0},{"id":829,"name":"K+ NS","logo":"https://s7768.cdn.mytvnet.vn/vimages/ac/ca/a7/73/31/1c/aca73-pkns-channel-unkn.png","group":"Thể thao","drm":0},{"id":201,"name":"K+ 2","logo":"https://s7768.cdn.mytvnet.vn/vimages/2b/b5/59/9d/d0/05/2b59d-pkplus2-channel-unkn.png","group":"Thể thao","drm":0},{"id":1,"name":"Al Jazeera","logo":"https://s7768.cdn.mytvnet.vn/vimages/61/1d/db/b3/38/84/61db3-paljazeera-channel-unkn.png","group":"Quốc tế","drm":0},{"id":2,"name":"BBC World News","logo":"https://s7768.cdn.mytvnet.vn/vimages/48/8d/d6/65/5c/c8/48d65-pbbcworldnews-channel-unkn.png","group":"Quốc tế","drm":0},{"id":3,"name":"Bloomberg TV","logo":"https://s7768.cdn.mytvnet.vn/vimages/d1/1d/da/a8/84/47/d1da8-pbloombergtv-channel-unkn.png","group":"Quốc tế","drm":0},{"id":4,"name":"CNBC Asia","logo":"https://s7768.cdn.mytvnet.vn/vimages/c8/82/27/7e/e9/96/c827e-pcnbcasia-channel-unkn.png","group":"Quốc tế","drm":0},{"id":5,"name":"CNN International","logo":"https://s7768.cdn.mytvnet.vn/vimages/3e/e6/60/0b/b0/00/3e60b-pCNNinternational-channel-unkn.png","group":"Quốc tế","drm":0},{"id":6,"name":"France 24","logo":"https://s7768.cdn.mytvnet.vn/vimages/a6/6e/e0/09/90/04/a6e09-pfrance24-channel-unkn.png","group":"Quốc tế","drm":0},{"id":8,"name":"NHK World","logo":"https://s7768.cdn.mytvnet.vn/vimages/98/83/3e/ed/d4/49/983ed-pnhkworld-channel-unkn.png","group":"Quốc tế","drm":0},{"id":10,"name":"Arirang TV","logo":"https://s7768.cdn.mytvnet.vn/vimages/4a/a6/60/00/07/73/4a600-parirangtv-channel-unkn.png","group":"Quốc tế","drm":0},{"id":11,"name":"KBS World","logo":"https://s7768.cdn.mytvnet.vn/vimages/a8/8d/db/b4/40/09/a8db4-pkbsworld-channel-unkn.png","group":"Quốc tế","drm":0},{"id":12,"name":"DW","logo":"https://s7768.cdn.mytvnet.vn/vimages/de/e0/05/5c/ca/a0/de05c-pdw-channel-unkn.png","group":"Quốc tế","drm":0},{"id":13,"name":"Russia Today","logo":"https://s7768.cdn.mytvnet.vn/vimages/6e/e0/07/7c/c2/29/6e07c-prussiatoday-channel-unkn.png","group":"Quốc tế","drm":0},{"id":14,"name":"TV5 Monde","logo":"https://s7768.cdn.mytvnet.vn/vimages/8d/de/ec/c8/88/82/8dec8-ptv5monde-channel-unkn.png","group":"Quốc tế","drm":0},{"id":15,"name":"Channel News Asia","logo":"https://s7768.cdn.mytvnet.vn/vimages/e2/20/0a/ad/de/e3/e20ad-pchannelnewsasia-channel-unkn.png","group":"Quốc tế","drm":0},{"id":16,"name":"Da Vinci Learning","logo":"https://s7768.cdn.mytvnet.vn/vimages/5c/ca/a1/18/84/41/5ca18-pdavincilearning-channel-unkn.png","group":"Quốc tế","drm":0},{"id":17,"name":"Asian Food Channel","logo":"https://s7768.cdn.mytvnet.vn/vimages/4d/d4/45/51/16/61/4d451-pasianfoodchannel-channel-unkn.png","group":"Quốc tế","drm":0},{"id":19,"name":"KIX","logo":"https://s7768.cdn.mytvnet.vn/vimages/7a/a4/42/26/65/5e/7a426-pkix-channel-unkn.png","group":"Quốc tế","drm":0},{"id":20,"name":"Outdoor Channel","logo":"https://s7768.cdn.mytvnet.vn/vimages/83/31/1b/b3/33/31/831b3-poutdoorchannel-channel-unkn.png","group":"Quốc tế","drm":0},{"id":21,"name":"Star Movies","logo":"https://s7768.cdn.mytvnet.vn/vimages/e5/56/6e/e8/81/18/e56e8-pstarmovies-channel-unkn.png","group":"Quốc tế","drm":0},{"id":22,"name":"Animax","logo":"https://s7768.cdn.mytvnet.vn/vimages/08/86/60/07/7f/f3/08607-panimax-channel-unkn.png","group":"Quốc tế","drm":0},{"id":23,"name":"Fox Movies","logo":"https://s7768.cdn.mytvnet.vn/vimages/5e/e3/36/6a/a0/06/5e36a-pfoxmovies-channel-unkn.png","group":"Quốc tế","drm":0},{"id":24,"name":"Fox Sports 1","logo":"https://s7768.cdn.mytvnet.vn/vimages/4f/f3/30/06/62/29/4f306-pfoxsports1-channel-unkn.png","group":"Quốc tế","drm":0},{"id":25,"name":"Fox Sports 2","logo":"https://s7768.cdn.mytvnet.vn/vimages/97/78/8b/b1/13/34/978b1-pfoxsports2-channel-unkn.png","group":"Quốc tế","drm":0},{"id":26,"name":"National Geographic","logo":"https://s7768.cdn.mytvnet.vn/vimages/48/83/36/68/8d/d4/48368-pnationalgeographic-channel-unkn.png","group":"Quốc tế","drm":0},{"id":28,"name":"Discovery","logo":"https://s7768.cdn.mytvnet.vn/vimages/ce/e8/8d/df/f2/24/ce8dd-pdiscovery-channel-unkn.png","group":"Quốc tế","drm":0},{"id":29,"name":"Disney Channel","logo":"https://s7768.cdn.mytvnet.vn/vimages/d5/55/56/6f/fc/c8/d556f-pdisneychannel-channel-unkn.png","group":"Quốc tế","drm":0},{"id":30,"name":"Disney Junior","logo":"https://s7768.cdn.mytvnet.vn/vimages/5a/ab/b0/04/42/22/5ab04-pdisneyjunior-channel-unkn.png","group":"Quốc tế","drm":0},{"id":31,"name":"Cartoon Network","logo":"https://s7768.cdn.mytvnet.vn/vimages/e1/14/49/9d/d9/98/e149d-pcartoonnetwork-channel-unkn.png","group":"Quốc tế","drm":0},{"id":32,"name":"Nickelodeon","logo":"https://s7768.cdn.mytvnet.vn/vimages/11/15/51/18/84/40/11518-pnickelodeon-channel-unkn.png","group":"Quốc tế","drm":0},{"id":33,"name":"Cinemax","logo":"https://s7768.cdn.mytvnet.vn/vimages/43/33/30/0b/b5/5a/4330b-pcinemax-channel-unkn.png","group":"Quốc tế","drm":0},{"id":34,"name":"HBO","logo":"https://s7768.cdn.mytvnet.vn/vimages/0c/cf/f6/6f/f6/6a/0cf6f-phbo-channel-unkn.png","group":"Quốc tế","drm":0},{"id":35,"name":"Star World","logo":"https://s7768.cdn.mytvnet.vn/vimages/ab/b0/09/96/65/5f/ab096-pstarworld-channel-unkn.png","group":"Quốc tế","drm":0},{"id":36,"name":"MTV","logo":"https://s7768.cdn.mytvnet.vn/vimages/8c/c1/18/83/30/00/8c183-pmtv-channel-unkn.png","group":"Quốc tế","drm":0},{"id":37,"name":"National Geographic Wild","logo":"https://s7768.cdn.mytvnet.vn/vimages/71/14/48/8f/f3/36/7148f-pnationalgeographicwild-channel-unkn.png","group":"Quốc tế","drm":0},{"id":38,"name":"History","logo":"https://s7768.cdn.mytvnet.vn/vimages/d0/08/88/8a/a8/87/d088a-phistory-channel-unkn.png","group":"Quốc tế","drm":0},{"id":39,"name":"Lifetime","logo":"https://s7768.cdn.mytvnet.vn/vimages/73/31/19/96/62/2e/73196-plifetime-channel-unkn.png","group":"Quốc tế","drm":0},{"id":40,"name":"TLC","logo":"https://s7768.cdn.mytvnet.vn/vimages/77/71/10/04/44/4e/77104-ptlc-channel-unkn.png","group":"Quốc tế","drm":0},{"id":41,"name":"E! Entertainment","logo":"https://s7768.cdn.mytvnet.vn/vimages/46/6f/f4/43/34/4b/46f43-peen-channel-unkn.png","group":"Quốc tế","drm":0},{"id":42,"name":"AXN","logo":"https://s7768.cdn.mytvnet.vn/vimages/bf/f5/55/53/34/43/bf553-paxn-channel-unkn.png","group":"Quốc tế","drm":0},{"id":43,"name":"Star Sports 1","logo":"https://s7768.cdn.mytvnet.vn/vimages/28/80/0d/d3/35/59/280d3-pstarsports1-channel-unkn.png","group":"Quốc tế","drm":0},{"id":44,"name":"Star Sports 2","logo":"https://s7768.cdn.mytvnet.vn/vimages/0b/b0/0a/a6/6a/ac/0b0a6-pstarsports2-channel-unkn.png","group":"Quốc tế","drm":0},{"id":45,"name":"Star Sports 3","logo":"https://s7768.cdn.mytvnet.vn/vimages/b2/2b/b2/28/81/1a/b2b28-pstarsports3-channel-unkn.png","group":"Quốc tế","drm":0},{"id":46,"name":"BabyTV","logo":"https://s7768.cdn.mytvnet.vn/vimages/43/33/3a/ac/ce/ef/433ac-pbabytv-channel-unkn.png","group":"Quốc tế","drm":0},{"id":47,"name":"Sony Entertainment","logo":"https://s7768.cdn.mytvnet.vn/vimages/52/2d/d4/49/9e/e0/52d49-psonyentertainment-channel-unkn.png","group":"Quốc tế","drm":0},{"id":48,"name":"Sony Sports","logo":"https://s7768.cdn.mytvnet.vn/vimages/a6/6f/fc/c5/5e/e7/a6fc5-psonysports-channel-unkn.png","group":"Quốc tế","drm":0},{"id":49,"name":"Rakuten TV","logo":"https://s7768.cdn.mytvnet.vn/vimages/40/09/98/8a/a6/6e/4098a-psonyliv-channel-unkn.png","group":"Quốc tế","drm":0},{"id":50,"name":"RED by HBO","logo":"https://s7768.cdn.mytvnet.vn/vimages/3d/d1/16/6f/f4/42/3d16f-predbyhbo-channel-unkn.png","group":"Quốc tế","drm":0},{"id":51,"name":"Warner TV","logo":"https://s7768.cdn.mytvnet.vn/vimages/e2/24/49/96/62/25/e2496-pwarnertv-channel-unkn.png","group":"Quốc tế","drm":0},{"id":52,"name":"CGTN","logo":"https://s7768.cdn.mytvnet.vn/vimages/a1/14/4c/c0/04/43/a14c0-pcgtn-channel-unkn.png","group":"Quốc tế","drm":0},{"id":53,"name":"iNews","logo":"https://s7768.cdn.mytvnet.vn/vimages/bc/c9/93/37/78/82/bc937-pinews-channel-unkn.png","group":"Quốc tế","drm":0},{"id":54,"name":"Berita Satu","logo":"https://s7768.cdn.mytvnet.vn/vimages/67/72/2f/f4/4d/d8/672f4-pberitasatu-channel-unkn.png","group":"Quốc tế","drm":0},{"id":55,"name":"TVBS News","logo":"https://s7768.cdn.mytvnet.vn/vimages/de/ef/f5/5b/bc/c0/def5b-ptvbsnews-channel-unkn.png","group":"Quốc tế","drm":0},{"id":56,"name":"One Championship","logo":"https://s7768.cdn.mytvnet.vn/vimages/f5/58/80/09/97/73/f5809-ponechampionship-channel-unkn.png","group":"Quốc tế","drm":0},{"id":57,"name":"Astro AWANI","logo":"https://s7768.cdn.mytvnet.vn/vimages/a7/79/99/90/0b/b0/a7990-pastroawani-channel-unkn.png","group":"Quốc tế","drm":0},{"id":58,"name":"NDTV India","logo":"https://s7768.cdn.mytvnet.vn/vimages/a0/0c/cd/d1/17/79/a0cd1-pndtvindia-channel-unkn.png","group":"Quốc tế","drm":0},{"id":825,"name":"Eurosport 1","logo":"https://s7768.cdn.mytvnet.vn/vimages/19/9d/d1/11/17/74/19d11-peurosport1hd-channel-unkn.png","group":"Quốc tế","drm":0},{"id":826,"name":"Eurosport 2","logo":"https://s7768.cdn.mytvnet.vn/vimages/44/47/7f/f9/9e/ec/447f9-peurosport2hd-channel-unkn.png","group":"Quốc tế","drm":0},{"id":59,"name":"HAN TV","logo":"https://s7768.cdn.mytvnet.vn/vimages/2e/e1/18/80/0b/ba/2e180-phantv-channel-unkn.png","group":"Địa phương","drm":0},{"id":60,"name":"Hà Nội 2","logo":"https://s7768.cdn.mytvnet.vn/vimages/4c/c1/17/70/0b/b1/4c170-phanoi2-channel-unkn.png","group":"Địa phương","drm":0},{"id":61,"name":"Hải Phòng","logo":"https://s7768.cdn.mytvnet.vn/vimages/48/82/28/88/83/3d/48288-phaiphong-channel-unkn.png","group":"Địa phương","drm":0},{"id":62,"name":"Bắc Ninh","logo":"https://s7768.cdn.mytvnet.vn/vimages/d8/81/12/26/6b/b6/d8126-pbacninh-channel-unkn.png","group":"Địa phương","drm":0},{"id":63,"name":"Đà Nẵng","logo":"https://s7768.cdn.mytvnet.vn/vimages/2b/be/ea/a5/57/7c/2bea5-pdanang-channel-unkn.png","group":"Địa phương","drm":0},{"id":64,"name":"Bình Dương","logo":"https://s7768.cdn.mytvnet.vn/vimages/bd/d1/12/24/42/2d/bd124-pbinhduong-channel-unkn.png","group":"Địa phương","drm":0},{"id":65,"name":"Đồng Nai","logo":"https://s7768.cdn.mytvnet.vn/vimages/9a/a7/7e/e5/52/28/9a7e5-pdongnai-channel-unkn.png","group":"Địa phương","drm":0},{"id":66,"name":"Vĩnh Long","logo":"https://s7768.cdn.mytvnet.vn/vimages/cf/f0/0d/da/a3/3f/cf0da-pvinhlong-channel-unkn.png","group":"Địa phương","drm":0},{"id":67,"name":"Cần Thơ","logo":"https://s7768.cdn.mytvnet.vn/vimages/e8/89/9a/a0/08/8b/e89a0-pcantho-channel-unkn.png","group":"Địa phương","drm":0},{"id":68,"name":"An Giang","logo":"https://s7768.cdn.mytvnet.vn/vimages/ab/ba/a1/1c/c5/5d/aba1c-pangiang-channel-unkn.png","group":"Địa phương","drm":0},{"id":70,"name":"Khánh Hòa","logo":"https://s7768.cdn.mytvnet.vn/vimages/89/91/16/6f/f1/15/89166-pkhanhhoa-channel-unkn.png","group":"Địa phương","drm":0},{"id":71,"name":"Nghệ An","logo":"https://s7768.cdn.mytvnet.vn/vimages/ab/b5/51/17/76/6e/ab517-pnghean-channel-unkn.png","group":"Địa phương","drm":0},{"id":72,"name":"Đắk Lắk","logo":"https://s7768.cdn.mytvnet.vn/vimages/01/15/5e/e7/7a/ae/015e7-pdaklak-channel-unkn.png","group":"Địa phương","drm":0},{"id":73,"name":"Lâm Đồng","logo":"https://s7768.cdn.mytvnet.vn/vimages/f1/1c/c1/12/28/87/f1c12-plamdong-channel-unkn.png","group":"Địa phương","drm":0},{"id":74,"name":"Long An","logo":"https://s7768.cdn.mytvnet.vn/vimages/50/08/8d/d2/21/17/508d2-plongan-channel-unkn.png","group":"Địa phương","drm":0},{"id":75,"name":"Tiền Giang","logo":"https://s7768.cdn.mytvnet.vn/vimages/4a/a4/41/1c/c1/14/4a41c-ptiengiang-channel-unkn.png","group":"Địa phương","drm":0},{"id":76,"name":"Sóc Trăng","logo":"https://s7768.cdn.mytvnet.vn/vimages/c0/0d/d9/9b/bf/f2/c0d9b-psoctrang-channel-unkn.png","group":"Địa phương","drm":0},{"id":77,"name":"Bạc Liêu","logo":"https://s7768.cdn.mytvnet.vn/vimages/e6/61/1e/eb/be/e8/e61eb-pbaclieau-channel-unkn.png","group":"Địa phương","drm":0},{"id":78,"name":"Cà Mau","logo":"https://s7768.cdn.mytvnet.vn/vimages/05/5e/e5/59/97/7c/05e59-pcamau-channel-unkn.png","group":"Địa phương","drm":0},{"id":79,"name":"Đồng Tháp","logo":"https://s7768.cdn.mytvnet.vn/vimages/f6/6b/bb/bd/d4/47/f6bbd-pdonhthap-channel-unkn.png","group":"Địa phương","drm":0},{"id":80,"name":"Bình Thuận","logo":"https://s7768.cdn.mytvnet.vn/vimages/eb/b6/6a/a3/37/70/eb6a3-pbinhthuan-channel-unkn.png","group":"Địa phương","drm":0},{"id":81,"name":"Tây Ninh","logo":"https://s7768.cdn.mytvnet.vn/vimages/09/96/67/71/14/4e/09671-ptayninh-channel-unkn.png","group":"Địa phương","drm":0},{"id":82,"name":"Bà Rịa Vũng Tàu","logo":"https://s7768.cdn.mytvnet.vn/vimages/97/78/85/5b/ba/a8/97885-pbariavungtau-channel-unkn.png","group":"Địa phương","drm":0},{"id":83,"name":"Cao Bằng","logo":"https://s7768.cdn.mytvnet.vn/vimages/85/5b/b3/3e/ee/e3/85b3e-pcaobang-channel-unkn.png","group":"Địa phương","drm":0},{"id":84,"name":"Hà Giang","logo":"https://s7768.cdn.mytvnet.vn/vimages/d5/5b/b7/78/8a/a0/d5b78-phagiang-channel-unkn.png","group":"Địa phương","drm":0},{"id":85,"name":"Lai Châu","logo":"https://s7768.cdn.mytvnet.vn/vimages/c1/16/61/1f/f5/5e/c161f-plaichau-channel-unkn.png","group":"Địa phương","drm":0},{"id":86,"name":"Điện Biên","logo":"https://s7768.cdn.mytvnet.vn/vimages/27/72/28/8b/b9/95/2728b-pdienBien-channel-unkn.png","group":"Địa phương","drm":0},{"id":87,"name":"Hưng Yên","logo":"https://s7768.cdn.mytvnet.vn/vimages/50/0a/a7/74/41/13/50a74-phungyen-channel-unkn.png","group":"Địa phương","drm":0},{"id":88,"name":"Hà Tĩnh","logo":"https://s7768.cdn.mytvnet.vn/vimages/ee/e5/50/06/67/71/ee506-phatinh-channel-unkn.png","group":"Địa phương","drm":0},{"id":89,"name":"Lào Cai","logo":"https://s7768.cdn.mytvnet.vn/vimages/a8/88/82/29/90/00/a8829-plaocai-channel-unkn.png","group":"Địa phương","drm":0},{"id":90,"name":"Trà Vinh","logo":"https://s7768.cdn.mytvnet.vn/vimages/18/8e/ec/c4/4a/ac/18ec4-ptravinh-channel-unkn.png","group":"Địa phương","drm":0}];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentCh = null;
+let hlsPlayer = null;
+let shakaPlayer = null;
+let hbTimer = null;
+let pollTimer = null;
+let pollCount = 0;
+let activeGroup = 'all';
+let searchQuery = '';
+
+// ============================================================
+// UTILS
+// ============================================================
+const $ = id => document.getElementById(id);
+const toast = (msg, dur=3000) => {
+  const el = $('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => el.classList.remove('show'), dur);
+};
+
+// ============================================================
+// RENDER CHANNELS
+// ============================================================
+function getFilteredChannels() {
+  return CHANNELS.filter(ch => {
+    const matchGroup = activeGroup === 'all' || ch.group === activeGroup;
+    const matchSearch = !searchQuery || ch.name.toLowerCase().includes(searchQuery);
+    return matchGroup && matchSearch;
+  });
+}
+
+function renderGroups() {
+  const groups = ['all', ...new Set(CHANNELS.map(c => c.group))];
+  const tabOrder = ['all','VTV','HTV','SCTV','VTVCab','Thể thao','Quốc tế','Địa phương','Mua sắm'];
+  const sorted = tabOrder.filter(g => groups.includes(g));
+  const labels = { all: 'Tất cả', VTV: 'VTV', HTV: 'HTV', SCTV: 'SCTV', VTVCab: 'VTVCab',
+    'Thể thao': '⚽ Thể thao', 'Quốc tế': '🌍 Quốc tế', 'Địa phương': '📍 Địa phương', 'Mua sắm': '🛍️ Mua sắm' };
+  const container = $('group-tabs');
+  container.innerHTML = sorted.map(g =>
+    `<button class="group-tab${g === activeGroup ? ' active' : ''}" data-group="${g}">${labels[g] || g}</button>`
+  ).join('');
+  container.querySelectorAll('.group-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeGroup = btn.dataset.group;
+      renderGroups();
+      renderChannels();
+    });
+  });
+}
+
+function renderChannels() {
+  const list = getFilteredChannels();
+  const container = $('ch-list');
+  if (!list.length) {
+    container.innerHTML = '<div class="no-results">Không tìm thấy kênh</div>';
+    return;
+  }
+  container.innerHTML = list.map(ch => `
+    <div class="ch-item${currentCh && currentCh.id === ch.id ? ' active' : ''}" data-id="${ch.id}">
+      <img class="ch-logo" src="${ch.logo}" alt="${ch.name}" loading="lazy"
+           onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 40 28%22><rect width=%2240%22 height=%2228%22 fill=%22%23222%22/><text x=%2250%%22 y=%2258%%22 fill=%22%23555%22 font-size=%2210%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22>📺</text></svg>'">
+      <div class="ch-info">
+        <div class="ch-name">${ch.name}${ch.drm ? ' <span class="drm-lock" title="DRM – cần DASH player">🔒</span>' : ''}</div>
+        <div class="ch-group">${ch.group}${ch._inProxy ? ' <span style="color:#00cc66;font-size:.68rem">●</span>' : ''}</div>
+      </div>
+    </div>
+  `).join('');
+  container.querySelectorAll('.ch-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const id = parseInt(el.dataset.id);
+      const ch = CHANNELS.find(c => c.id === id);
+      if (ch) playChannel(ch);
+    });
+  });
+}
+
+// ============================================================
+// OVERLAY HELPERS
+// ============================================================
+function showOverlay(text, sub, logo) {
+  const ov = $('overlay');
+  ov.classList.remove('hidden');
+  $('overlay-text').textContent = text;
+  $('overlay-sub').textContent = sub || '';
+  $('overlay-spinner').style.display = '';
+  if (logo) {
+    $('overlay-logo').src = logo;
+    $('overlay-logo').style.display = '';
+  } else {
+    $('overlay-logo').style.display = 'none';
+  }
+}
+
+function hideOverlay() {
+  $('overlay').classList.add('hidden');
+}
+
+function showError(msg) {
+  const ov = $('overlay');
+  ov.classList.remove('hidden');
+  $('overlay-spinner').style.display = 'none';
+  $('overlay-text').textContent = msg;
+  $('overlay-sub').textContent = 'Nhấp vào kênh khác hoặc thử lại';
+  if (currentCh) $('overlay-logo').style.display = 'none';
+}
+
+function setBarBadge(type) {
+  const el = $('bar-badge');
+  if (type === 'hls') { el.className = 'badge-hls'; el.textContent = '▶ HLS'; }
+  else if (type === 'dash') { el.className = 'badge-dash'; el.textContent = '▶ DASH'; }
+  else if (type === 'loading') { el.className = 'badge-loading'; el.textContent = '⌛ Chờ...'; }
+  else if (type === 'error') { el.className = 'badge-loading'; el.textContent = '✗ Lỗi'; }
+}
+
+// ============================================================
+// PLAYER CLEANUP
+// ============================================================
+function stopAll() {
+  clearInterval(hbTimer);
+  clearTimeout(pollTimer);
+  hbTimer = null; pollTimer = null; pollCount = 0;
+
+  if (hlsPlayer) {
+    try { hlsPlayer.destroy(); } catch(e) {}
+    hlsPlayer = null;
+  }
+  if (shakaPlayer) {
+    try { shakaPlayer.destroy(); } catch(e) {}
+    shakaPlayer = null;
+  }
+  const vid = $('video');
+  vid.src = '';
+  vid.pause();
+}
+
+// ============================================================
+// HEARTBEAT
+// ============================================================
+function startHeartbeat(channelId) {
+  clearInterval(hbTimer);
+  const beat = () => fetch(`${PROXY}/heartbeat/${channelId}`, { mode: 'no-cors' }).catch(() => {});
+  beat();
+  hbTimer = setInterval(beat, HB_INTERVAL);
+}
+
+// ============================================================
+// HLS PLAYER
+// ============================================================
+function startHls(url, ch) {
+  const vid = $('video');
+  vid.style.display = '';
+  $('welcome-screen').style.display = 'none';
+  stopAll(); // gọi sau khi hide welcome, trước khi tạo mới
+
+  showOverlay('Đang tải stream HLS...', '', ch.logo);
+  setBarBadge('loading');
+
+  const hls = new Hls({
+    enableWorker: false,
+    maxBufferLength: 12,
+    maxMaxBufferLength: 30,
+    liveSyncDurationCount: 2,
+    liveMaxLatencyDurationCount: 4,
+    fragLoadingTimeOut: 20000,
+    manifestLoadingTimeOut: 10000,
+  });
+  hlsPlayer = hls;
+  hls.attachMedia(vid);
+  hls.on(Hls.Events.MEDIA_ATTACHED, () => hls.loadSource(url));
+  hls.on(Hls.Events.MANIFEST_PARSED, () => {
+    vid.muted = true;
+    vid.play().then(() => { vid.muted = false; }).catch(() => {});
+  });
+  hls.on(Hls.Events.FRAG_LOADED, () => {
+    hideOverlay();
+    setBarBadge('hls');
+  });
+  hls.on(Hls.Events.ERROR, (e, data) => {
+    if (data.fatal) {
+      if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+        hls.startLoad();
+      } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+        hls.recoverMediaError();
+      } else {
+        showError('Stream lỗi – không thể phát');
+        setBarBadge('error');
+      }
+    }
+  });
+  vid.addEventListener('playing', () => { hideOverlay(); setBarBadge('hls'); }, { once: false });
+
+  startHeartbeat('mytv_' + ch.id);
+}
+
+// ============================================================
+// SHAKA PLAYER (DASH)
+// ============================================================
+async function startDash(url, ch) {
+  const vid = $('video');
+  vid.style.display = '';
+  $('welcome-screen').style.display = 'none';
+
+  showOverlay('Đang tải stream DASH...', '', ch.logo);
+  setBarBadge('loading');
+
+  if (typeof shaka === 'undefined') {
+    showError('Shaka Player chưa tải – thử lại sau 2s');
+    setTimeout(() => startDash(url, ch), 2000);
+    return;
+  }
+  shaka.polyfill.installAll();
+  if (!shaka.Player.isBrowserSupported()) {
+    showError('Trình duyệt không hỗ trợ DASH/DRM');
+    setBarBadge('error');
+    return;
+  }
+
+  try {
+    const player = new shaka.Player(vid);
+    shakaPlayer = player;
+
+    player.configure({
+      streaming: { bufferingGoal: 12, rebufferingGoal: 2, retryParameters: { maxAttempts: 3 } }
+    });
+
+    const licUrl = `${PROXY}/license/mytv_${ch.id}`;
+    player.configure('drm.servers', {
+      'com.widevine.alpha': licUrl,
+      'com.microsoft.playready': licUrl + '?type=playready',
+    });
+
+    player.addEventListener('error', evt => {
+      console.error('[Shaka] error', evt.detail);
+      showError('DASH lỗi: ' + (evt.detail?.message || 'không rõ'));
+      setBarBadge('error');
+    });
+
+    await player.load(url);
+    vid.muted = true;
+    await vid.play().catch(() => {});
+    vid.muted = false;
+    hideOverlay();
+    setBarBadge('dash');
+    startHeartbeat('mytv_' + ch.id);
+  } catch(e) {
+    console.error('[Shaka]', e);
+    showError('Không thể phát DASH: ' + (e.message || e));
+    setBarBadge('error');
+  }
+}
+
+// ============================================================
+// PLAY CHANNEL – MAIN ENTRY
+// ============================================================
+async function playChannel(ch) {
+  if (currentCh && currentCh.id === ch.id) return;
+
+  stopAll();
+  currentCh = ch;
+
+  // Update UI
+  const welcome = $('welcome-screen');
+  const vid = $('video');
+  welcome.style.display = 'none';
+  vid.style.display = '';
+
+  const bar = $('player-bar');
+  bar.style.display = 'flex';
+  $('bar-logo').src = ch.logo;
+  $('bar-name').textContent = ch.name;
+  setBarBadge('loading');
+
+  // Highlight active channel in list
+  document.querySelectorAll('.ch-item').forEach(el => {
+    el.classList.toggle('active', parseInt(el.dataset.id) === ch.id);
+  });
+
+  showOverlay('Đang kết nối...', 'Đang mở kênh ' + ch.name, ch.logo);
+
+  // Trigger startLoop on proxy.js – calling /live/mytv_{id}.m3u8 triggers
+  // startLoop() directly regardless of whether channel is in channelInfo.
+  // Returns 503 initially (Puppeteer hasn't loaded yet), but that's OK.
+  fetch(`${PROXY}/live/mytv_${ch.id}.m3u8`).catch(() => {});
+
+  // Poll for stream type (hls / dash / pending)
+  pollCount = 0;
+  pollForType(ch);
+}
+
+function pollForType(ch) {
+  if (!currentCh || currentCh.id !== ch.id) return; // user changed channel
+
+  fetch(`${PROXY}/api/type/${ch.id}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!currentCh || currentCh.id !== ch.id) return;
+
+      if (data.type === 'hls') {
+        const url = `${PROXY}/live/mytv_${ch.id}.m3u8`;
+        startHls(url, ch);
+      } else if (data.type === 'dash') {
+        const url = `${PROXY}/live/mytv_${ch.id}.mpd`;
+        startDash(url, ch);
+      } else {
+        // pending – keep triggering startLoop every few polls and retry
+        pollCount++;
+        // Re-trigger loop every 5 polls (3s) in case proxy missed the first call
+        if (pollCount % 5 === 0) {
+          fetch(`${PROXY}/live/mytv_${ch.id}.m3u8`).catch(() => {});
+        }
+        const elapsed = Math.round(pollCount * POLL_INTERVAL / 1000);
+        showOverlay(
+          'Đang mở kênh...',
+          `Puppeteer đang mở tab (${elapsed}s) – chờ stream URL`,
+          ch.logo
+        );
+        if (pollCount < MAX_POLL) {
+          pollTimer = setTimeout(() => pollForType(ch), POLL_INTERVAL);
+        } else {
+          showError('Hết thời gian – proxy không phản hồi\nĐảm bảo proxy.js đang chạy (node proxy.js)');
+          setBarBadge('error');
+        }
+      }
+    })
+    .catch(() => {
+      if (!currentCh || currentCh.id !== ch.id) return;
+      pollCount++;
+      if (pollCount < 5) {
+        pollTimer = setTimeout(() => pollForType(ch), 1000);
+      } else {
+        showError('Không kết nối được proxy\nĐảm bảo proxy.js đang chạy ở cổng 3001');
+        setBarBadge('error');
+      }
+    });
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+$('search-input').addEventListener('input', e => {
+  searchQuery = e.target.value.toLowerCase().trim();
+  renderChannels();
+});
+
+// ============================================================
+// PROXY STATUS
+// ============================================================
+async function checkProxy() {
+  try {
+    const r = await fetch(`${PROXY}/status`, { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      $('header-info').textContent = '✅ Proxy online :3001';
+      $('header-info').style.color = '#00cc66';
+    }
+  } catch {
+    $('header-info').textContent = '❌ Proxy offline :3001';
+    $('header-info').style.color = '#ff5555';
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+
+// Try to enrich channel list with live channel info from proxy
+async function enrichChannels() {
+  try {
+    const r = await fetch(`${PROXY}/api/channels/list`, { signal: AbortSignal.timeout(3000) });
+    if (!r.ok) return;
+    const list = await r.json();
+    const mytvLive = list.filter(c => c.source === 'mytv' || (c.channelId && c.channelId.startsWith('mytv_')));
+    // Mark channels that are configured in proxy (will stream faster)
+    mytvLive.forEach(live => {
+      const rawId = (live.channelId || '').replace('mytv_', '');
+      const ch = CHANNELS.find(c => String(c.id) === rawId);
+      if (ch) ch._inProxy = true;
+    });
+    renderChannels(); // re-render with proxy status
+  } catch {}
+}
+
+renderGroups();
+renderChannels();
+checkProxy();
+enrichChannels();
+setInterval(checkProxy, 30000);
+</script>
+</body>
+</html>
