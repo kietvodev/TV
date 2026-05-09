@@ -917,30 +917,20 @@
     }
 
     /* ===== Desktop 2-Column Main Layout ===== */
+    html:not(.is-mobile) .main-layout {
+        display: none;
+    }
     .main-layout {
-        display: flex;
-        gap: 0;
         max-width: 1340px;
         margin: 0 auto;
-        padding: 1.5rem 1rem;
+        padding: 0;
     }
     .main-left {
         flex: 1;
         min-width: 0;
-        padding-right: 1.5rem;
     }
     .main-right {
-        width: 360px;
-        flex-shrink: 0;
-        background: var(--card-bg, #161620);
-        border-radius: var(--border-radius, 12px);
-        border: 1px solid rgba(255,255,255,0.06);
-        display: flex;
-        flex-direction: column;
-        position: sticky;
-        top: 70px;
-        max-height: calc(100vh - 90px);
-        overflow: hidden;
+        display: none;
     }
     .main-epg-header {
         display: flex;
@@ -974,26 +964,13 @@
     .main-epg-list::-webkit-scrollbar-track { background: transparent; }
     .main-epg-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
 
-    /* Mobile: single column, hide main-right */
+    /* Mobile: single column */
     html.is-mobile .main-layout {
         display: block;
         padding: 0;
     }
     html.is-mobile .main-left {
         padding-right: 0;
-    }
-    html.is-mobile .main-right {
-        display: none;
-    }
-    @media (max-width: 900px) {
-        .main-layout { flex-direction: column; padding: 1rem 0.5rem; }
-        .main-left { padding-right: 0; }
-        .main-right {
-            width: 100%;
-            position: static;
-            max-height: 400px;
-            margin-top: 1rem;
-        }
     }
     </style>
 
