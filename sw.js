@@ -1,7 +1,7 @@
 // Service Worker - XemTV.vn
 // Cache JS/CSS trong phiên, xóa khi user thoát web
 
-const CACHE_NAME = 'xemtv-session-v3';
+const CACHE_NAME = 'xemtv-session-v4';
 const STATIC_ASSETS = [
   '/Image_WEB/XEMTV_192X192.png',
   '/Image_WEB/XEMTV_96X96.png'
@@ -37,8 +37,11 @@ self.addEventListener('fetch', e => {
   const url = e.request.url;
   if (e.request.method !== 'GET') return;
 
-  // Không cache: stream, API, PHP
-  const skipCache = ['.m3u8', '.ts', '.mpd', '.dash', '.mp4', '.php', '.json', '/api/', 'localhost'];
+  // Bỏ qua scheme không hỗ trợ Cache API
+  if (!url.startsWith('http://') && !url.startsWith('https://')) return;
+
+  // Không cache: stream, API, PHP, segments
+  const skipCache = ['.m3u8', '.ts', '.mpd', '.dash', '.mp4', '.m4s', '.php', '.json', '/api/', '/cdn/', '/seg', '/license/', 'localhost'];
   if (skipCache.some(s => url.includes(s))) return;
 
   // Cache JS, CSS, ảnh: network first, lưu vào cache
