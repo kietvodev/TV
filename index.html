@@ -395,6 +395,11 @@
         flex-direction: column;
         background: #0e0e14;
         border-left: 1px solid rgba(255,255,255,0.06);
+        max-height: calc((100vw - 360px) * 9 / 16 + 70px); /* video 16:9 + info bar */
+        overflow: hidden;
+    }
+    @media (min-width: 1340px) {
+        .player-right { max-height: calc(980px * 9 / 16 + 70px); } /* capped at max-width */
     }
     .player-info-bar {
         display: flex;
@@ -568,6 +573,8 @@
         .epg-sidebar-list { max-height: 300px; }
     }
     html.is-mobile .player-right { display: none; }
+    html.is-mobile .player-info-bar { display: none; }
+    html.is-mobile .player-layout { background: transparent; border-radius: 0; }
     </style>
 
 <!-- Google tag (gtag.js) -->
