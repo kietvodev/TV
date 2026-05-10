@@ -543,6 +543,7 @@ async function init() {
   const params = new URLSearchParams(location.search);
   const status = params.get('status');
   const orderCode = params.get('orderCode');
+  const autostart = params.get('autostart') === '1';
   if (status && orderCode) {
     renderMain();
     if (status === 'PAID') showWaiting(parseInt(orderCode));
@@ -554,6 +555,12 @@ async function init() {
     const data = await r.json();
     if (!data.enabled) { renderMaint(); return; }
     renderMain(data.plans);
+    // autostart=1: tự chọn gói đầu tiên (rẻ nhất) và thanh toán ngay
+    if (autostart && data.plans && data.plans.length > 0) {
+      selectPlan(data.plans[0].id);
+      // Đợi DOM render xong rồi gọi
+      setTimeout(startPayment, 300);
+    }
   } catch(e) {
     renderMaint('Không kết nối được máy chủ.');
   }
