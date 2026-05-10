@@ -550,17 +550,39 @@ async function init() {
     else showResult('cancel');
     return;
   }
+  // autostart=1: hiện loading ngay, không render UI chọn gói
+  if (autostart) {
+    el('main-content').innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:18px;">
+        <div class="spinner" style="margin:0;"></div>
+        <div style="font-size:1rem;font-weight:600;">Đang tạo đơn thanh toán...</div>
+        <div style="font-size:0.8rem;color:var(--dim);">Gói 30 ngày — 29.000đ</div>
+      </div>`;
+    try {
+      const r = await fetch(API + '/api/payos/plans');
+      const data = await r.json();
+      if (!data.enabled || !data.plans?.length) { renderMaint(); return; }
+      // Chọn gói đầu tiên (29k/30 ngày) và tạo đơn ngay
+      selectedPlan = data.plans[0].id;
+      const body = { planId: selectedPlan };
+      const r2 = await fetch(API + '/api/payos/create-payment', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const d2 = await r2.json();
+      if (!d2.ok) throw new Error(d2.error || 'Lỗi tạo đơn');
+      // Chuyển thẳng sang PayOS trong cùng tab
+      window.location.href = d2.checkoutUrl;
+    } catch(e) {
+      renderMaint('Không tạo được đơn thanh toán. ' + e.message);
+    }
+    return;
+  }
   try {
     const r = await fetch(API + '/api/payos/plans');
     const data = await r.json();
     if (!data.enabled) { renderMaint(); return; }
     renderMain(data.plans);
-    // autostart=1: tự chọn gói đầu tiên (rẻ nhất) và thanh toán ngay
-    if (autostart && data.plans && data.plans.length > 0) {
-      selectPlan(data.plans[0].id);
-      // Đợi DOM render xong rồi gọi
-      setTimeout(startPayment, 300);
-    }
   } catch(e) {
     renderMaint('Không kết nối được máy chủ.');
   }
