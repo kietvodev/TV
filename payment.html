@@ -314,10 +314,64 @@ async function copyCode(code, btn) {
   if (btn) { btn.innerHTML = '<i class="fas fa-check"></i> Đã sao chép!'; setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Sao chép mã'; }, 2000); }
 }
 
-function activateNow(code) {
+function getFingerprint() {
+  let fp = localStorage.getItem('xemtv_fp');
+  if (fp) return fp;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.textBaseline = 'top'; ctx.font = '14px Arial'; ctx.fillText('xemtv-fp', 2, 2);
+  const raw = navigator.userAgent + '|' + screen.width + 'x' + screen.height + '|' +
+    (navigator.language || '') + '|' + new Date().getTimezoneOffset() + '|' + canvas.toDataURL();
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) { hash = ((hash << 5) - hash) + raw.charCodeAt(i); hash |= 0; }
+  fp = 'fp_' + Math.abs(hash).toString(36) + '_' + raw.length.toString(36);
+  localStorage.setItem('xemtv_fp', fp);
+  return fp;
+}
+
+async function activateNow(code) {
   closeModal();
-  localStorage.setItem('pendingActivationCode', code);
-  location.href = '/';
+  showModal(`
+    <div class="spinner"></div>
+    <div class="modal-title">Đang kích hoạt...</div>
+    <div class="modal-sub">Vui lòng chờ trong giây lát.</div>
+  `);
+  try {
+    const fingerprint = getFingerprint();
+    const r = await fetch(API + '/api/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, fingerprint })
+    });
+    const data = await r.json();
+    if (data.ok) {
+      localStorage.setItem('xemtv_activated', '1');
+      localStorage.removeItem('pendingActivationCode');
+      showModal(`
+        <div class="modal-icon">✅</div>
+        <div class="modal-title">Kích hoạt thành công!</div>
+        <div class="modal-sub">Thiết bị đã được kích hoạt. Nhấn bên dưới để bắt đầu xem TV.</div>
+        <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Xem TV ngay</button>
+      `);
+    } else {
+      // Kích hoạt thất bại → để người dùng tự nhập tay
+      localStorage.setItem('pendingActivationCode', code);
+      showModal(`
+        <div class="modal-icon">⚠️</div>
+        <div class="modal-title">Kích hoạt thất bại</div>
+        <div class="modal-sub">${escHtml(data.error || 'Lỗi không xác định')}<br><br>Mã của bạn: <b style="font-family:monospace;font-size:1.1rem;color:#4caf50;">${escHtml(code)}</b><br><br>Vui lòng nhập mã thủ công trên trang TV.</div>
+        <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Đến trang TV</button>
+      `);
+    }
+  } catch(e) {
+    localStorage.setItem('pendingActivationCode', code);
+    showModal(`
+      <div class="modal-icon">⚠️</div>
+      <div class="modal-title">Lỗi kết nối</div>
+      <div class="modal-sub">Mã của bạn: <b style="font-family:monospace;font-size:1.1rem;color:#4caf50;">${escHtml(code)}</b><br><br>Vào trang TV và nhập mã thủ công.</div>
+      <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Đến trang TV</button>
+    `);
+  }
 }
 
 function showModal(html) { el('modal-content').innerHTML = html; el('modal-bg').classList.add('show'); }
