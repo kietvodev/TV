@@ -534,58 +534,168 @@ body {
 const API = 'https://cdn-vn.iof.vn';
 let selectedPlan = null;
 let pollTimer = null;
+let _paymentMethod = 'payos'; // 'payos' | 'bank'
+let _bankInfo = null;
 
 const fmtMoney = (n) => n.toLocaleString('vi-VN') + 'đ';
 const el = (id) => document.getElementById(id);
 const escHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+// ── VietQR URL ──
+const vietQrUrl = (bankId, accountNo, accountName, amount, desc) =>
+  `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png` +
+  `?amount=${amount}&addInfo=${encodeURIComponent(desc)}&accountName=${encodeURIComponent(accountName)}`;
 
 async function init() {
   const params = new URLSearchParams(location.search);
   const status = params.get('status');
   const orderCode = params.get('orderCode');
   const autostart = params.get('autostart') === '1';
+
+  // Return flow: PayOS redirect về sau khi thanh toán
   if (status && orderCode) {
+    // Thử bank trước, rồi payos
     renderMain();
     if (status === 'PAID') showWaiting(parseInt(orderCode));
     else showResult('cancel');
     return;
   }
-  // autostart=1: hiện loading ngay, không render UI chọn gói
-  if (autostart) {
-    el('main-content').innerHTML = `
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:18px;">
-        <div class="spinner" style="margin:0;"></div>
-        <div style="font-size:1rem;font-weight:600;">Đang tạo đơn thanh toán...</div>
-        <div style="font-size:0.8rem;color:var(--dim);">Gói 30 ngày — 29.000đ</div>
-      </div>`;
+
+  // Lấy thông tin phương thức thanh toán
+  let info;
+  try {
+    const r = await fetch(API + '/api/payment/info');
+    info = await r.json();
+  } catch(e) {
+    // Fallback: thử /api/payos/plans
     try {
-      const r = await fetch(API + '/api/payos/plans');
-      const data = await r.json();
-      if (!data.enabled || !data.plans?.length) { renderMaint(); return; }
-      // Chọn gói đầu tiên (29k/30 ngày) và tạo đơn ngay
-      selectedPlan = data.plans[0].id;
-      const body = { planId: selectedPlan };
-      const r2 = await fetch(API + '/api/payos/create-payment', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
+      const r2 = await fetch(API + '/api/payos/plans');
       const d2 = await r2.json();
-      if (!d2.ok) throw new Error(d2.error || 'Lỗi tạo đơn');
-      // Chuyển thẳng sang PayOS trong cùng tab
-      window.location.href = d2.checkoutUrl;
-    } catch(e) {
-      renderMaint('Không tạo được đơn thanh toán. ' + e.message);
+      info = { enabled: d2.enabled, method: 'payos', plans: d2.plans };
+    } catch(e2) {
+      renderMaint('Không kết nối được máy chủ.');
+      return;
+    }
+  }
+
+  if (!info.enabled) { renderMaint(); return; }
+  _paymentMethod = info.method || 'payos';
+  _bankInfo = info.bank || null;
+
+  // autostart=1: bỏ qua UI chọn gói
+  if (autostart && info.plans?.length) {
+    if (_paymentMethod === 'bank') {
+      el('main-content').innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:18px;">
+          <div class="spinner" style="margin:0;"></div>
+          <div style="font-size:1rem;font-weight:600;">Đang tạo đơn thanh toán...</div>
+          <div style="font-size:0.8rem;color:var(--dim);">Gói ${info.plans[0].label} — ${fmtMoney(info.plans[0].amount)}</div>
+        </div>`;
+      await startBankPayment(info.plans[0].id);
+    } else {
+      el('main-content').innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;gap:18px;">
+          <div class="spinner" style="margin:0;"></div>
+          <div style="font-size:1rem;font-weight:600;">Đang tạo đơn thanh toán...</div>
+          <div style="font-size:0.8rem;color:var(--dim);">Gói ${info.plans[0].label} — ${fmtMoney(info.plans[0].amount)}</div>
+        </div>`;
+      selectedPlan = info.plans[0].id;
+      try {
+        const r = await fetch(API + '/api/payos/create-payment', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ planId: selectedPlan })
+        });
+        const d = await r.json();
+        if (!d.ok) throw new Error(d.error || 'Lỗi tạo đơn');
+        window.location.href = d.checkoutUrl;
+      } catch(e) { renderMaint('Không tạo được đơn thanh toán. ' + e.message); }
     }
     return;
   }
+
+  renderMain(info.plans);
+}
+
+// ── BANK: tạo đơn + hiện QR ──
+async function startBankPayment(planId) {
+  if (!planId && !selectedPlan) return;
+  planId = planId || selectedPlan;
+  const btn = el('btn-pay');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo đơn...'; }
   try {
-    const r = await fetch(API + '/api/payos/plans');
-    const data = await r.json();
-    if (!data.enabled) { renderMaint(); return; }
-    renderMain(data.plans);
+    const name  = el('buyer-name')?.value?.trim();
+    const email = el('buyer-email')?.value?.trim();
+    const body  = { planId };
+    if (name)  body.buyerName  = name;
+    if (email) body.buyerEmail = email;
+    const r = await fetch(API + '/api/bank/create-order', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error || 'Lỗi tạo đơn');
+    setStep(2);
+    showBankQR(d);
   } catch(e) {
-    renderMaint('Không kết nối được máy chủ.');
+    alert('Lỗi: ' + e.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Thử lại'; }
   }
+}
+
+// ── BANK: hiện QR chuyển khoản ──
+function showBankQR(order) {
+  const { orderCode, transferCode, amount, label, bank } = order;
+  const b = bank || _bankInfo || {};
+  const qr = vietQrUrl(b.bankId, b.accountNo, b.accountName, amount, transferCode);
+  showModal(`
+    <img src="${escHtml(qr)}" alt="QR" style="width:200px;height:200px;border-radius:12px;margin:0 auto 16px;display:block;background:var(--bg3);"
+         onerror="this.style.display='none'">
+    <div class="modal-title" style="font-size:1rem;">Quét QR hoặc chuyển khoản thủ công</div>
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin:14px 0;text-align:left;font-size:0.82rem;line-height:2;">
+      <div><span style="color:var(--dim);">Ngân hàng:</span> <b>${escHtml(b.accountName||'')}</b></div>
+      <div><span style="color:var(--dim);">Số tài khoản:</span> <b style="font-family:monospace;font-size:0.95rem;">${escHtml(b.accountNo||'')}</b></div>
+      <div><span style="color:var(--dim);">Số tiền:</span> <b style="color:var(--accent);">${fmtMoney(amount)}</b></div>
+      <div><span style="color:var(--dim);">Nội dung:</span>
+        <b id="tc-text" style="font-family:monospace;color:var(--green);font-size:1rem;"> ${escHtml(transferCode)}</b>
+        <button onclick="copyTransferCode('${escHtml(transferCode)}')" style="background:none;border:none;color:var(--blue);cursor:pointer;font-size:0.75rem;padding:0 4px;vertical-align:middle;"><i class="fas fa-copy"></i></button>
+      </div>
+    </div>
+    <div class="modal-sub" style="font-size:0.75rem;color:var(--gold);margin-bottom:16px;">
+      <i class="fas fa-triangle-exclamation"></i> Nhập <b>đúng nội dung</b> khi chuyển khoản để hệ thống tự xác nhận.
+    </div>
+    <div class="modal-sub" style="font-size:0.78rem;margin-bottom:0;">
+      Đang chờ xác nhận <span class="poll-dots"></span>
+    </div>
+    <div class="modal-actions" style="margin-top:14px;">
+      <button class="btn-ghost" onclick="closeModal()"><i class="fas fa-xmark"></i> Đóng</button>
+    </div>
+  `);
+  startBankPolling(orderCode);
+}
+
+async function copyTransferCode(code) {
+  try { await navigator.clipboard.writeText(code); } catch(e) {}
+  showToastInline('Đã sao chép!');
+}
+function showToastInline(msg) {
+  let t = document.getElementById('_inline-toast');
+  if (!t) { t = document.createElement('div'); t.id='_inline-toast'; t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(34,197,94,0.9);color:#fff;padding:8px 18px;border-radius:8px;font-size:0.82rem;z-index:99999;'; document.body.appendChild(t); }
+  t.textContent = msg; t.style.opacity='1';
+  clearTimeout(t._timer); t._timer = setTimeout(() => { t.style.opacity='0'; }, 2000);
+}
+
+function startBankPolling(orderCode) {
+  clearInterval(pollTimer);
+  let tries = 0;
+  pollTimer = setInterval(async () => {
+    tries++;
+    try {
+      const r = await fetch(API + `/api/bank/status/${orderCode}`);
+      const d = await r.json();
+      if (d.status === 'PAID' && d.code) { clearInterval(pollTimer); setStep(3); showCodeResult(d.code, d.label); }
+    } catch(e) {}
+    if (tries > 120) clearInterval(pollTimer); // dừng sau 10 phút
+  }, 5000);
 }
 
 function renderMaint(msg) {
@@ -721,6 +831,12 @@ function selectPlan(planId) {
 
 async function startPayment() {
   if (!selectedPlan) return;
+  // Route theo phương thức thanh toán đang bật
+  if (_paymentMethod === 'bank') {
+    await startBankPayment(selectedPlan);
+    return;
+  }
+  // PayOS flow
   const btn = el('btn-pay');
   if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo link...'; }
   try {
@@ -745,8 +861,6 @@ async function startPayment() {
 }
 
 function showCheckout(checkoutUrl, orderCode) {
-  // Mở PayOS trong cùng tab → khi PayOS redirect về payment?status=PAID,
-  // window.opener vẫn trỏ đúng về tab TV gốc
   showModal(`
     <div class="spinner"></div>
     <div class="modal-title">Đang chuyển đến trang thanh toán...</div>
@@ -761,7 +875,9 @@ function showWaiting(orderCode) {
     <div class="modal-title">Đang xác nhận thanh toán<span class="poll-dots"></span></div>
     <div class="modal-sub">Hệ thống đang kiểm tra giao dịch <code style="color:var(--blue);">#${orderCode}</code><br>Vui lòng chờ trong giây lát.</div>
   `);
-  startPolling(orderCode);
+  // Thử bank polling trước, fallback payos
+  if (_paymentMethod === 'bank') startBankPolling(orderCode);
+  else startPolling(orderCode);
 }
 
 function startPolling(orderCode) {
