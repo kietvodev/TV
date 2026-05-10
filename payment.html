@@ -548,27 +548,14 @@ async function startPayment() {
 }
 
 function showCheckout(checkoutUrl, orderCode) {
-  // Set step 2 active
-  ['step-1','step-2','step-3'].forEach((id,i) => {
-    const s = el(id); if (!s) return;
-    s.classList.toggle('done', i < 1);
-    s.classList.toggle('active', i === 1);
-  });
+  // Mở PayOS trong cùng tab → khi PayOS redirect về payment?status=PAID,
+  // window.opener vẫn trỏ đúng về tab TV gốc
   showModal(`
-    <div class="modal-icon" style="font-size:2.5rem;">📱</div>
-    <div class="modal-title">Quét mã QR để thanh toán</div>
-    <div class="modal-sub">Mở app ngân hàng → Chuyển khoản → Quét QR<br>Hoặc nhấn nút bên dưới để mở trang PayOS.</div>
-    <a href="${escHtml(checkoutUrl)}" target="_blank" class="checkout-btn">
-      <i class="fas fa-qrcode"></i> Mở trang thanh toán PayOS
-    </a>
-    <div class="order-id-tag"><i class="fas fa-receipt"></i> Mã đơn: <code>#${orderCode}</code></div>
-    <div class="modal-sub" style="font-size:0.78rem;margin-top:14px;margin-bottom:0;">Trang này tự cập nhật sau khi thanh toán thành công <span class="poll-dots"></span></div>
-    <div class="modal-actions" style="margin-top:16px;">
-      <button class="btn-ghost" onclick="closeModal()"><i class="fas fa-xmark"></i> Huỷ đơn hàng</button>
-    </div>
+    <div class="spinner"></div>
+    <div class="modal-title">Đang chuyển đến trang thanh toán...</div>
+    <div class="modal-sub">Bạn sẽ được chuyển đến PayOS để quét mã QR.<br>Tab này sẽ tự quay lại sau khi thanh toán xong.</div>
   `);
-  setTimeout(() => { window.open(checkoutUrl, '_blank'); }, 400);
-  startPolling(orderCode);
+  setTimeout(() => { window.location.href = checkoutUrl; }, 700);
 }
 
 function showWaiting(orderCode) {
