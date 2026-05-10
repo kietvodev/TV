@@ -335,17 +335,183 @@ body {
 .maint h2 { font-size: 1.3rem; font-weight: 700; }
 .maint p { color: var(--dim); font-size: 0.9rem; max-width: 380px; }
 
-@media (max-width: 700px) {
-  .hero h1 { font-size: 1.9rem; }
-  .plans { grid-template-columns: 1fr 1fr; }
-  .trust-bar { gap: 20px; }
-  .step-line { max-width: 30px; }
+/* ── LAYOUT WRAPPER ── */
+.main-cols { display: flex; flex-direction: column; }
+
+/* ══════════════════════════════════════
+   📱 MOBILE: ≤ 479px
+══════════════════════════════════════ */
+@media (max-width: 479px) {
+  .nav { padding: 0 14px; height: 52px; }
+  .nav-tagline, .nav-divider { display: none; }
+  .hero { padding: 36px 14px 24px; }
+  .hero-eyebrow { font-size: 0.68rem; padding: 4px 10px; }
+  .hero h1 { font-size: 1.55rem; letter-spacing: -0.3px; }
+  .hero-sub { font-size: 0.82rem; margin-bottom: 24px; }
+  .steps { max-width: 280px; }
+  .step-num { width: 28px; height: 28px; font-size: 0.7rem; }
+  .step-label { font-size: 0.62rem; }
+  .step-line { max-width: 24px; }
+  .plans-wrap { margin-top: 32px; padding: 0 12px; }
+  .plans { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .plan-card { padding: 18px 10px 14px; border-radius: 12px; }
+  .plan-icon { font-size: 1.2rem; margin-bottom: 4px; }
+  .plan-label { font-size: 0.75rem; margin-bottom: 6px; }
+  .plan-amount { font-size: 1.35rem; }
+  .plan-amount span { font-size: 0.75rem; }
+  .plan-per { font-size: 0.65rem; }
+  .plan-divider, .plan-features { display: none; }
+  .plan-save { font-size: 0.6rem; padding: 2px 7px; }
+  .checkout-section { padding: 0 12px; margin-top: 24px; }
+  .form-card { padding: 18px 14px; border-radius: 12px; }
+  .banks-section { padding: 0 12px; }
+  .trust-bar { flex-direction: column; align-items: flex-start; gap: 14px; padding: 28px 12px 44px; margin-top: 32px; }
+  .modal { padding: 24px 14px; border-radius: 18px; }
+  .modal-title { font-size: 1.05rem; }
+  .code-box { font-size: 1.4rem; letter-spacing: 4px; padding: 14px 12px; }
+  .btn-pay { padding: 14px 16px; font-size: 0.9rem; }
+  .btn-primary, .btn-secondary, .btn-ghost { padding: 12px 16px; font-size: 0.85rem; }
 }
-@media (max-width: 440px) {
+
+/* ══════════════════════════════════════
+   📱 MOBILE LỚN: 480–639px
+══════════════════════════════════════ */
+@media (min-width: 480px) and (max-width: 639px) {
+  .nav { padding: 0 18px; }
+  .nav-tagline { display: none; }
+  .hero { padding: 44px 18px 30px; }
+  .hero h1 { font-size: 1.85rem; }
+  .plans { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .plan-features { display: none; }
+  .step-line { max-width: 32px; }
+  .modal { padding: 28px 18px; }
+  .code-box { font-size: 1.65rem; letter-spacing: 6px; }
+  .trust-bar { flex-direction: column; align-items: flex-start; gap: 16px; padding: 32px 18px 48px; }
+}
+
+/* ══════════════════════════════════════
+   💻 TABLET: 640–1023px
+══════════════════════════════════════ */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .hero h1 { font-size: 2.15rem; }
   .plans { grid-template-columns: 1fr 1fr; }
-  .nav { padding: 0 16px; }
-  .modal { padding: 28px 20px; }
-  .code-box { font-size: 1.7rem; letter-spacing: 6px; }
+  .trust-bar { gap: 24px; }
+  .step-line { max-width: 40px; }
+}
+
+/* ══════════════════════════════════════
+   🖥️ DESKTOP: ≥1024px — 2 cột plans | form
+══════════════════════════════════════ */
+@media (min-width: 1024px) {
+  .main-cols {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 36px;
+    max-width: 1280px;
+    margin: 56px auto 0;
+    padding: 0 32px;
+  }
+  .plans-wrap { flex: 1; margin: 0; padding: 0; max-width: none; }
+  .checkout-section { width: 400px; flex-shrink: 0; margin: 0; padding: 0; position: sticky; top: 76px; }
+  .plans { grid-template-columns: 1fr 1fr; gap: 14px; }
+  .banks-section { max-width: 1280px; padding: 0 32px; }
+}
+
+/* ══════════════════════════════════════
+   📺 TV / SMART TV: ≥1400px
+══════════════════════════════════════ */
+@media (min-width: 1400px) {
+  .nav { height: 76px; padding: 0 64px; }
+  .nav-logo { font-size: 1.6rem; }
+  .nav-tagline { font-size: 0.9rem; }
+  .nav-back { font-size: 1rem; padding: 11px 24px; border-radius: 10px; }
+
+  .hero { padding: 96px 64px 64px; }
+  .hero-eyebrow { font-size: 0.88rem; padding: 7px 20px; }
+  .hero h1 { font-size: 3.8rem; letter-spacing: -2px; }
+  .hero-sub { font-size: 1.15rem; max-width: 700px; margin-bottom: 44px; }
+  .step-num { width: 46px; height: 46px; font-size: 0.9rem; }
+  .step-label { font-size: 0.85rem; }
+  .steps { max-width: 660px; }
+  .step-line { max-width: 90px; }
+
+  .main-cols { max-width: 1760px; padding: 0 80px; gap: 56px; }
+  .checkout-section { width: 540px; top: 92px; }
+
+  .section-label { font-size: 0.85rem; margin-bottom: 28px; }
+  .plans { grid-template-columns: 1fr 1fr; gap: 20px; }
+  .plan-card { padding: 34px 24px 30px; border-radius: 22px; border-width: 2px; }
+  .plan-icon { font-size: 2.2rem; margin-bottom: 12px; }
+  .plan-label { font-size: 1.05rem; margin-bottom: 14px; }
+  .plan-amount { font-size: 2.6rem; }
+  .plan-amount span { font-size: 1.2rem; }
+  .plan-per { font-size: 0.9rem; }
+  .plan-save { font-size: 0.8rem; padding: 5px 13px; border-radius: 8px; }
+  .plan-feat { font-size: 0.9rem; gap: 10px; }
+  .plan-feat i { font-size: 0.82rem; width: 14px; }
+  .plan-badge { font-size: 0.75rem; padding: 4px 16px; top: -13px; }
+
+  .form-card { padding: 40px 36px; border-radius: 22px; }
+  .form-card-title { font-size: 1.05rem; margin-bottom: 24px; }
+  .form-label { font-size: 0.9rem; margin-bottom: 8px; }
+  .form-input { padding: 15px 20px; font-size: 1.05rem; border-radius: 12px; }
+  .form-note { font-size: 0.85rem; }
+  .order-summary { padding: 20px 24px; border-radius: 14px; }
+  .order-summary-left { font-size: 0.95rem; }
+  .order-summary-left strong { font-size: 1.1rem; }
+  .order-summary-price { font-size: 1.6rem; }
+  .btn-pay { padding: 22px 32px; font-size: 1.15rem; border-radius: 15px; gap: 14px; }
+  .cta-note { font-size: 0.85rem; margin-top: 14px; }
+
+  .banks-section { padding: 0 80px; }
+  .bank-tag { font-size: 0.85rem; padding: 7px 18px; border-radius: 10px; }
+  .banks-label { font-size: 0.82rem; }
+
+  .trust-bar { padding: 64px 80px 88px; gap: 60px; margin-top: 64px; }
+  .trust-icon { width: 56px; height: 56px; font-size: 1.35rem; border-radius: 16px; }
+  .trust-text strong { font-size: 1rem; }
+  .trust-text span { font-size: 0.85rem; }
+
+  .modal { max-width: 600px; padding: 56px 48px; border-radius: 30px; }
+  .modal-icon { font-size: 3.8rem; margin-bottom: 22px; }
+  .modal-title { font-size: 1.65rem; margin-bottom: 12px; }
+  .modal-sub { font-size: 1rem; margin-bottom: 30px; }
+  .btn-primary, .btn-secondary, .btn-ghost { padding: 17px 28px; font-size: 1.05rem; border-radius: 13px; }
+  .code-box { font-size: 2.8rem; letter-spacing: 14px; padding: 28px 36px; border-radius: 20px; }
+  .spinner { width: 60px; height: 60px; border-width: 4px; margin-bottom: 24px; }
+}
+
+/* ══════════════════════════════════════
+   📺 TV FOCUS — Điều hướng bằng remote
+══════════════════════════════════════ */
+@media (min-width: 1400px) {
+  *:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+  }
+  .plan-card:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 5px rgba(232,57,14,0.25), 0 16px 48px rgba(232,57,14,0.15);
+    transform: translateY(-4px);
+  }
+  .plan-card.popular:focus-visible {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 5px rgba(245,158,11,0.25), 0 16px 48px rgba(245,158,11,0.15);
+  }
+  .btn-pay:focus-visible,
+  .btn-primary:focus-visible,
+  .btn-secondary:focus-visible,
+  .btn-ghost:focus-visible,
+  .nav-back:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 4px;
+  }
+  .form-input:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(232,57,14,0.18);
+  }
 }
 </style>
 </head>
@@ -427,11 +593,12 @@ function renderMain(plans) {
       </div>
     </div>
 
+    <div class="main-cols">
     <div class="plans-wrap">
       <div class="section-label">Chọn gói phù hợp</div>
       <div class="plans" id="plans-grid">
         ${plans.map((p, i) => `
-          <div class="plan-card${i === 1 ? ' popular' : ''}" data-id="${p.id}" data-amount="${p.amount}" data-label="${p.label}" onclick="selectPlan('${p.id}')">
+          <div class="plan-card${i === 1 ? ' popular' : ''}" data-id="${p.id}" data-amount="${p.amount}" data-label="${p.label}" onclick="selectPlan('${p.id}')" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();selectPlan('${p.id}')}">
             ${i === 1 ? '<div class="plan-badge">✦ Phổ biến nhất</div>' : ''}
             <div class="plan-icon">${PLAN_ICONS[i] || '📺'}</div>
             <div class="plan-label">${p.label}</div>
@@ -473,6 +640,7 @@ function renderMain(plans) {
         </div>
       </div>
     </div>
+    </div><!-- /.main-cols -->
 
     <div class="banks-section">
       <div class="banks-label">Hỗ trợ tất cả ngân hàng Việt Nam qua VietQR</div>
