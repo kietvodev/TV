@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mua gói XemTV.vn</title>
+<link rel="icon" href="/Image_WEB/logo.png">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg2: #12121a;
+    --bg3: #1a1a26;
+    --border: rgba(255,255,255,0.08);
+    --text: #e8e8f0;
+    --dim: #888;
+    --red: #ff3d00;
+    --red2: #ff6a3d;
+    --blue: #4fc3f7;
+    --green: #4caf50;
+    --gold: #ffa502;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; }
+
+  .nav { display: flex; align-items: center; gap: 14px; padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); }
+  .nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--red); text-decoration: none; }
+  .nav-logo span { color: #fff; font-weight: 300; }
+  .nav-back { margin-left: auto; color: var(--dim); text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+  .nav-back:hover { color: var(--text); }
+
+  .hero { text-align: center; padding: 48px 24px 32px; }
+  .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
+  .hero h1 span { color: var(--red); }
+  .hero p { color: var(--dim); font-size: 0.95rem; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+  .features { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 20px 24px 0; }
+  .feature { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--dim); background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; }
+  .feature i { color: var(--green); }
+
+  .plans-wrap { max-width: 900px; margin: 40px auto 0; padding: 0 20px; }
+  .plans-title { text-align: center; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; color: var(--dim); text-transform: uppercase; margin-bottom: 20px; }
+  .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+  .plan-card {
+    background: var(--bg2); border: 2px solid var(--border); border-radius: 14px;
+    padding: 22px 18px; cursor: pointer; transition: all 0.2s; position: relative; text-align: center;
+  }
+  .plan-card:hover { border-color: rgba(255,61,0,0.4); background: var(--bg3); transform: translateY(-2px); }
+  .plan-card.selected { border-color: var(--red); background: rgba(255,61,0,0.06); }
+  .plan-card.popular { border-color: var(--gold); }
+  .plan-card.popular .plan-badge { display: block; }
+  .plan-badge { display: none; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.65rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; white-space: nowrap; }
+  .plan-label { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
+  .plan-amount { font-size: 1.6rem; font-weight: 800; color: var(--red); margin-bottom: 4px; }
+  .plan-amount sub { font-size: 0.9rem; font-weight: 400; color: var(--dim); }
+  .plan-per { font-size: 0.75rem; color: var(--dim); }
+
+  .buyer-form { max-width: 480px; margin: 32px auto 0; padding: 0 20px; }
+  .form-row { margin-bottom: 14px; }
+  .form-label { font-size: 0.8rem; color: var(--dim); margin-bottom: 6px; display: block; }
+  .form-input { width: 100%; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.9rem; outline: none; }
+  .form-input:focus { border-color: rgba(255,61,0,0.5); }
+  .form-note { font-size: 0.75rem; color: var(--dim); margin-top: 5px; }
+
+  .cta-wrap { text-align: center; padding: 28px 24px 0; }
+  .btn-pay {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: linear-gradient(135deg, var(--red), #ff6a3d); color: #fff; border: none;
+    border-radius: 12px; padding: 14px 36px; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-pay:hover { opacity: 0.9; }
+  .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; }
+  .cta-note { font-size: 0.75rem; color: var(--dim); margin-top: 10px; }
+
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-bg.show { display: flex; }
+  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 32px 28px; max-width: 420px; width: 90%; text-align: center; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:scale(0.94) } to { opacity:1; transform:scale(1) } }
+  .modal-icon { font-size: 3rem; margin-bottom: 14px; }
+  .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
+  .modal-sub { font-size: 0.85rem; color: var(--dim); line-height: 1.6; margin-bottom: 20px; }
+
+  .checkout-url { display: inline-flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; color: var(--blue); text-decoration: none; font-size: 0.88rem; margin-bottom: 12px; word-break: break-all; }
+  .checkout-url:hover { border-color: var(--blue); }
+
+  .code-box { background: var(--bg3); border: 2px solid var(--green); border-radius: 12px; padding: 16px 24px; font-size: 2rem; font-weight: 800; font-family: monospace; letter-spacing: 6px; color: var(--green); margin: 16px 0; }
+  .btn-copy { display: inline-flex; align-items: center; gap: 6px; background: var(--green); color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
+  .btn-activate { display: inline-flex; align-items: center; gap: 6px; background: var(--red); color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+  .btn-close { background: none; border: 1px solid var(--border); color: var(--dim); border-radius: 8px; padding: 10px 22px; font-size: 0.85rem; cursor: pointer; margin-top: 8px; }
+  .btn-close:hover { color: var(--text); }
+
+  .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--red); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg) } }
+
+  .secure-row { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; padding: 32px 24px 48px; }
+  .secure-badge { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--dim); }
+  .secure-badge i { color: var(--green); font-size: 0.95rem; }
+
+  .maint { text-align: center; padding: 80px 24px; }
+  .maint i { font-size: 3rem; color: var(--dim); margin-bottom: 16px; display: block; }
+  .maint h2 { font-size: 1.3rem; margin-bottom: 8px; }
+  .maint p { color: var(--dim); font-size: 0.9rem; }
+
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 1.5rem; }
+    .plans { grid-template-columns: 1fr 1fr; }
+    .btn-pay { width: 100%; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="nav-logo">XemTV<span>.vn</span></a>
+  <a href="/" class="nav-back"><i class="fas fa-arrow-left"></i> Quay lại xem TV</a>
+</nav>
+
+<div id="main-content"></div>
+
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+const API = 'https://cdn-vn.iof.vn';
+let selectedPlan = null;
+let pollTimer = null;
+
+const fmtMoney = (n) => n.toLocaleString('vi-VN') + 'đ';
+const el = (id) => document.getElementById(id);
+const escHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+
+async function init() {
+  const params = new URLSearchParams(location.search);
+  const status = params.get('status');
+  const orderCode = params.get('orderCode');
+  if (status && orderCode) {
+    renderMain();
+    if (status === 'PAID') showWaiting(parseInt(orderCode));
+    else showResult('cancel');
+    return;
+  }
+  try {
+    const r = await fetch(API + '/api/payos/plans');
+    const data = await r.json();
+    if (!data.enabled) { renderMaint(); return; }
+    renderMain(data.plans);
+  } catch(e) {
+    renderMaint('Không kết nối được máy chủ.');
+  }
+}
+
+function renderMaint(msg) {
+  el('main-content').innerHTML = `
+    <div class="maint">
+      <i class="fas fa-tools"></i>
+      <h2>Thanh toán chưa khả dụng</h2>
+      <p>${msg || 'Tính năng mua gói đang được cập nhật. Vui lòng liên hệ admin để nhận mã kích hoạt.'}</p>
+    </div>`;
+}
+
+function renderMain(plans) {
+  plans = plans || [];
+  el('main-content').innerHTML = `
+    <div class="hero">
+      <h1>Mua gói <span>XemTV.vn</span></h1>
+      <p>Xem hàng trăm kênh truyền hình trực tuyến chất lượng HD — mọi lúc, mọi nơi.</p>
+    </div>
+    <div class="features">
+      <div class="feature"><i class="fas fa-check-circle"></i> 200+ kênh HD</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Xem lại 7 ngày</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Không quảng cáo</div>
+      <div class="feature"><i class="fas fa-check-circle"></i> Kích hoạt ngay</div>
+    </div>
+    <div class="plans-wrap">
+      <div class="plans-title">Chọn gói dịch vụ</div>
+      <div class="plans" id="plans-grid">
+        ${plans.map((p, i) => `
+          <div class="plan-card${i === 1 ? ' popular' : ''}" data-id="${p.id}" onclick="selectPlan('${p.id}')">
+            ${i === 1 ? '<div class="plan-badge">⭐ Phổ biến nhất</div>' : ''}
+            <div class="plan-label">${p.label}</div>
+            <div class="plan-amount">${fmtMoney(p.amount)}<sub>/gói</sub></div>
+            <div class="plan-per">${fmtMoney(Math.round(p.amount / p.days))}/ngày</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="buyer-form">
+      <div class="form-row">
+        <label class="form-label" for="buyer-name">Họ tên (tuỳ chọn)</label>
+        <input class="form-input" id="buyer-name" type="text" placeholder="Nguyễn Văn A">
+      </div>
+      <div class="form-row">
+        <label class="form-label" for="buyer-email">Email (tuỳ chọn)</label>
+        <input class="form-input" id="buyer-email" type="email" placeholder="email@example.com">
+        <div class="form-note">Mã kích hoạt sẽ hiển thị ngay sau khi thanh toán thành công.</div>
+      </div>
+    </div>
+    <div class="cta-wrap">
+      <button class="btn-pay" id="btn-pay" onclick="startPayment()" disabled>
+        <i class="fas fa-qrcode"></i> Chọn gói để tiếp tục
+      </button>
+      <div class="cta-note">Thanh toán qua QR chuyển khoản — hỗ trợ tất cả ngân hàng Việt Nam</div>
+    </div>
+    <div class="secure-row">
+      <div class="secure-badge"><i class="fas fa-shield-alt"></i> Bảo mật SSL</div>
+      <div class="secure-badge"><i class="fas fa-university"></i> Napas 247</div>
+      <div class="secure-badge"><i class="fas fa-bolt"></i> Kích hoạt tức thì</div>
+      <div class="secure-badge"><i class="fas fa-headset"></i> Hỗ trợ 24/7</div>
+    </div>`;
+  if (plans.length >= 2) selectPlan(plans[1].id);
+}
+
+function selectPlan(planId) {
+  selectedPlan = planId;
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.toggle('selected', c.dataset.id === planId));
+  const btn = el('btn-pay');
+  if (btn) {
+    btn.disabled = false;
+    const card = [...document.querySelectorAll('.plan-card')].find(c => c.dataset.id === planId);
+    const amount = card?.querySelector('.plan-amount')?.textContent || '';
+    btn.innerHTML = `<i class="fas fa-qrcode"></i> Thanh toán ${amount}`;
+  }
+}
+
+async function startPayment() {
+  if (!selectedPlan) return;
+  const btn = el('btn-pay');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tạo link...'; }
+  try {
+    const body = { planId: selectedPlan };
+    const name = el('buyer-name')?.value?.trim();
+    const email = el('buyer-email')?.value?.trim();
+    if (name) body.buyerName = name;
+    if (email) body.buyerEmail = email;
+
+    const r = await fetch(API + '/api/payos/create-payment', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'Lỗi tạo link thanh toán');
+    showCheckout(data.checkoutUrl, data.orderCode);
+  } catch(e) {
+    alert('Lỗi: ' + e.message);
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-qrcode"></i> Thử lại'; }
+  }
+}
+
+function showCheckout(checkoutUrl, orderCode) {
+  showModal(`
+    <div class="modal-icon">💳</div>
+    <div class="modal-title">Quét mã để thanh toán</div>
+    <div class="modal-sub">Nhấn nút bên dưới để mở trang thanh toán PayOS.</div>
+    <a href="${escHtml(checkoutUrl)}" target="_blank" class="checkout-url">
+      <i class="fas fa-external-link-alt"></i> Mở trang thanh toán PayOS
+    </a><br>
+    <div class="modal-sub" style="font-size:0.78rem;margin-top:8px;">Mã đơn hàng: <b>#${orderCode}</b></div>
+    <div class="modal-sub" style="margin-top:12px;font-size:0.8rem;">Sau khi thanh toán xong, mã kích hoạt sẽ hiện tự động.</div>
+    <button class="btn-close" onclick="closeModal()">Huỷ</button>
+  `);
+  setTimeout(() => { window.open(checkoutUrl, '_blank'); }, 400);
+  startPolling(orderCode);
+}
+
+function showWaiting(orderCode) {
+  showModal(`
+    <div class="spinner"></div>
+    <div class="modal-title">Đang xác nhận thanh toán...</div>
+    <div class="modal-sub">Hệ thống đang kiểm tra giao dịch #${orderCode}.<br>Vui lòng chờ trong giây lát.</div>
+  `);
+  startPolling(orderCode);
+}
+
+function startPolling(orderCode) {
+  clearInterval(pollTimer);
+  let tries = 0;
+  pollTimer = setInterval(async () => {
+    tries++;
+    try {
+      const r = await fetch(API + `/api/payos/status/${orderCode}`);
+      const d = await r.json();
+      if (d.status === 'PAID' && d.code) { clearInterval(pollTimer); showCodeResult(d.code, d.label); }
+    } catch(e) {}
+    if (tries > 60) clearInterval(pollTimer);
+  }, 5000);
+}
+
+function showCodeResult(code, label) {
+  showModal(`
+    <div class="modal-icon">🎉</div>
+    <div class="modal-title">Thanh toán thành công!</div>
+    <div class="modal-sub">Gói <b>${label}</b> đã được kích hoạt. Đây là mã của bạn:</div>
+    <div class="code-box">${escHtml(code)}</div>
+    <div class="modal-sub" style="font-size:0.78rem;margin-bottom:14px;">Lưu mã này lại — mỗi mã chỉ dùng được 1 lần trên 1 thiết bị.</div>
+    <button class="btn-copy" onclick="copyCode('${escHtml(code)}', this)"><i class="fas fa-copy"></i> Sao chép mã</button><br>
+    <button class="btn-activate" onclick="activateNow('${escHtml(code)}')"><i class="fas fa-check-circle"></i> Kích hoạt ngay</button><br>
+    <button class="btn-close" onclick="closeModal(); location.href='/'">Đi đến xem TV</button>
+  `);
+}
+
+function showResult(type) {
+  if (type === 'cancel') {
+    showModal(`
+      <div class="modal-icon">😔</div>
+      <div class="modal-title">Đơn hàng đã huỷ</div>
+      <div class="modal-sub">Bạn đã huỷ thanh toán. Chọn lại gói để thử lại.</div>
+      <button class="btn-activate" onclick="closeModal()">Chọn lại gói</button>
+    `);
+  }
+}
+
+async function copyCode(code, btn) {
+  try { await navigator.clipboard.writeText(code); } catch(e) {}
+  if (btn) { btn.innerHTML = '<i class="fas fa-check"></i> Đã sao chép!'; setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Sao chép mã'; }, 2000); }
+}
+
+function activateNow(code) {
+  closeModal();
+  localStorage.setItem('pendingActivationCode', code);
+  location.href = '/';
+}
+
+function showModal(html) { el('modal-content').innerHTML = html; el('modal-bg').classList.add('show'); }
+function closeModal() { el('modal-bg').classList.remove('show'); clearInterval(pollTimer); }
+
+el('modal-bg').addEventListener('click', (e) => { if (e.target === el('modal-bg')) closeModal(); });
+
+init();
+</script>
+</body>
+</html>
