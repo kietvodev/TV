@@ -347,12 +347,27 @@ async function activateNow(code) {
     if (data.ok) {
       localStorage.setItem('xemtv_activated', '1');
       localStorage.removeItem('pendingActivationCode');
-      showModal(`
-        <div class="modal-icon">✅</div>
-        <div class="modal-title">Kích hoạt thành công!</div>
-        <div class="modal-sub">Thiết bị đã được kích hoạt. Nhấn bên dưới để bắt đầu xem TV.</div>
-        <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Xem TV ngay</button>
-      `);
+      // Nếu mở từ tab xemtv.vn → báo tab gốc reload rồi đóng tab này
+      if (window.opener && !window.opener.closed) {
+        try {
+          window.opener.location.reload();
+          showModal(`
+            <div class="modal-icon">✅</div>
+            <div class="modal-title">Kích hoạt thành công!</div>
+            <div class="modal-sub">Tab XemTV đang được cập nhật...<br>Tab này sẽ tự đóng sau 2 giây.</div>
+          `);
+          setTimeout(() => window.close(), 2000);
+        } catch(e) {
+          location.href = '/';
+        }
+      } else {
+        showModal(`
+          <div class="modal-icon">✅</div>
+          <div class="modal-title">Kích hoạt thành công!</div>
+          <div class="modal-sub">Thiết bị đã được kích hoạt. Nhấn bên dưới để bắt đầu xem TV.</div>
+          <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Xem TV ngay</button>
+        `);
+      }
     } else {
       // Kích hoạt thất bại → để người dùng tự nhập tay
       localStorage.setItem('pendingActivationCode', code);
