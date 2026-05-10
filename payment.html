@@ -5,114 +5,357 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mua gói XemTV.vn</title>
 <link rel="icon" href="/Image_WEB/logo.png">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-  :root {
-    --bg: #0a0a0f;
-    --bg2: #12121a;
-    --bg3: #1a1a26;
-    --border: rgba(255,255,255,0.08);
-    --text: #e8e8f0;
-    --dim: #888;
-    --red: #ff3d00;
-    --red2: #ff6a3d;
-    --blue: #4fc3f7;
-    --green: #4caf50;
-    --gold: #ffa502;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: -apple-system, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; }
+:root {
+  --bg:    #070710;
+  --bg2:   #0f0f1c;
+  --bg3:   #16162a;
+  --bg4:   #1e1e35;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text:  #eeeef5;
+  --dim:   #7b7b9a;
+  --dim2:  #555570;
+  --accent: #e8390e;
+  --accent2: #ff6240;
+  --green: #22c55e;
+  --gold:  #f59e0b;
+  --blue:  #38bdf8;
+  --purple: #a78bfa;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, sans-serif;
+  min-height: 100vh;
+  line-height: 1.5;
+}
 
-  .nav { display: flex; align-items: center; gap: 14px; padding: 14px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); }
-  .nav-logo { font-size: 1.3rem; font-weight: 800; color: var(--red); text-decoration: none; }
-  .nav-logo span { color: #fff; font-weight: 300; }
-  .nav-back { margin-left: auto; color: var(--dim); text-decoration: none; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
-  .nav-back:hover { color: var(--text); }
+/* ── NAV ── */
+.nav {
+  display: flex; align-items: center; gap: 16px;
+  padding: 0 32px; height: 60px;
+  background: rgba(7,7,16,0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.nav-logo {
+  font-size: 1.2rem; font-weight: 900; letter-spacing: -0.5px;
+  color: var(--accent); text-decoration: none;
+}
+.nav-logo span { color: var(--text); font-weight: 400; }
+.nav-divider { width: 1px; height: 20px; background: var(--border2); }
+.nav-tagline { font-size: 0.78rem; color: var(--dim); font-weight: 500; }
+.nav-back {
+  margin-left: auto; color: var(--dim); text-decoration: none;
+  font-size: 0.82rem; font-weight: 500;
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 14px; border: 1px solid var(--border2); border-radius: 8px;
+  transition: all .15s;
+}
+.nav-back:hover { color: var(--text); border-color: var(--border2); background: var(--bg3); }
 
-  .hero { text-align: center; padding: 48px 24px 32px; }
-  .hero h1 { font-size: 2rem; font-weight: 800; margin-bottom: 10px; }
-  .hero h1 span { color: var(--red); }
-  .hero p { color: var(--dim); font-size: 0.95rem; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+/* ── HERO ── */
+.hero {
+  text-align: center; padding: 64px 24px 40px;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(232,57,14,0.1) 0%, transparent 70%);
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(232,57,14,0.1); border: 1px solid rgba(232,57,14,0.25);
+  color: var(--accent2); font-size: 0.75rem; font-weight: 600;
+  padding: 5px 14px; border-radius: 100px; margin-bottom: 20px;
+  letter-spacing: 0.03em; text-transform: uppercase;
+}
+.hero h1 {
+  font-size: 2.6rem; font-weight: 900; line-height: 1.15;
+  letter-spacing: -1px; margin-bottom: 14px;
+}
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero-sub { color: var(--dim); font-size: 1rem; max-width: 520px; margin: 0 auto 32px; font-weight: 400; }
 
-  .features { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; padding: 20px 24px 0; }
-  .feature { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--dim); background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 6px 14px; }
-  .feature i { color: var(--green); }
+/* Steps */
+.steps {
+  display: flex; justify-content: center; align-items: center;
+  gap: 0; max-width: 500px; margin: 0 auto 0;
+}
+.step {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  flex: 1;
+}
+.step-num {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--bg3); border: 1.5px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; color: var(--dim);
+  transition: all .3s;
+}
+.step.active .step-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+.step.done .step-num { background: var(--green); border-color: var(--green); color: #fff; }
+.step-label { font-size: 0.7rem; color: var(--dim); font-weight: 500; white-space: nowrap; }
+.step.active .step-label { color: var(--text); }
+.step-line { flex: 1; height: 1px; background: var(--border2); margin-bottom: 18px; max-width: 60px; }
 
-  .plans-wrap { max-width: 900px; margin: 40px auto 0; padding: 0 20px; }
-  .plans-title { text-align: center; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em; color: var(--dim); text-transform: uppercase; margin-bottom: 20px; }
-  .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
-  .plan-card {
-    background: var(--bg2); border: 2px solid var(--border); border-radius: 14px;
-    padding: 22px 18px; cursor: pointer; transition: all 0.2s; position: relative; text-align: center;
-  }
-  .plan-card:hover { border-color: rgba(255,61,0,0.4); background: var(--bg3); transform: translateY(-2px); }
-  .plan-card.selected { border-color: var(--red); background: rgba(255,61,0,0.06); }
-  .plan-card.popular { border-color: var(--gold); }
-  .plan-card.popular .plan-badge { display: block; }
-  .plan-badge { display: none; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--gold); color: #000; font-size: 0.65rem; font-weight: 700; padding: 2px 10px; border-radius: 20px; white-space: nowrap; }
-  .plan-label { font-size: 1.1rem; font-weight: 700; margin-bottom: 6px; }
-  .plan-amount { font-size: 1.6rem; font-weight: 800; color: var(--red); margin-bottom: 4px; }
-  .plan-amount sub { font-size: 0.9rem; font-weight: 400; color: var(--dim); }
-  .plan-per { font-size: 0.75rem; color: var(--dim); }
+/* ── PLANS ── */
+.plans-wrap { max-width: 880px; margin: 56px auto 0; padding: 0 20px; }
+.section-label {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 0.72rem; font-weight: 700; color: var(--dim);
+  text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 20px;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+.plans { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.plan-card {
+  position: relative; cursor: pointer;
+  background: var(--bg2); border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 24px 16px 20px;
+  text-align: center; transition: all .2s;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.plan-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(232,57,14,0) 0%, rgba(232,57,14,0) 100%);
+  transition: background .2s; pointer-events: none;
+}
+.plan-card:hover { border-color: rgba(232,57,14,0.35); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+.plan-card:hover::before { background: linear-gradient(135deg, rgba(232,57,14,0.04) 0%, transparent 100%); }
+.plan-card.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232,57,14,0.15), 0 12px 40px rgba(232,57,14,0.12); }
+.plan-card.selected::before { background: linear-gradient(135deg, rgba(232,57,14,0.06) 0%, transparent 100%); }
+.plan-card.popular { border-color: var(--gold); }
+.plan-card.popular.selected { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(245,158,11,0.15), 0 12px 40px rgba(245,158,11,0.12); }
+.plan-badge {
+  display: none; position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  color: #000; font-size: 0.62rem; font-weight: 800;
+  padding: 3px 12px; border-radius: 100px; white-space: nowrap;
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.plan-card.popular .plan-badge { display: block; }
+.plan-icon { font-size: 1.5rem; margin-bottom: 8px; }
+.plan-label { font-size: 0.9rem; font-weight: 700; color: var(--dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+.plan-amount {
+  font-size: 1.9rem; font-weight: 900; letter-spacing: -1px;
+  color: var(--text); line-height: 1;
+}
+.plan-amount span { font-size: 1rem; font-weight: 500; color: var(--dim); letter-spacing: 0; }
+.plan-per { font-size: 0.72rem; color: var(--dim); margin-top: 4px; }
+.plan-save {
+  display: inline-block; margin-top: 10px;
+  background: rgba(34,197,94,0.12); color: var(--green);
+  font-size: 0.68rem; font-weight: 700; padding: 3px 9px; border-radius: 6px;
+}
+.plan-divider { height: 1px; background: var(--border); margin: 12px 0; }
+.plan-features { text-align: left; display: flex; flex-direction: column; gap: 6px; }
+.plan-feat { display: flex; align-items: center; gap: 7px; font-size: 0.75rem; color: var(--dim); }
+.plan-feat i { color: var(--green); font-size: 0.7rem; width: 12px; flex-shrink: 0; }
+.plan-card.selected .plan-feat { color: var(--text); }
 
-  .buyer-form { max-width: 480px; margin: 32px auto 0; padding: 0 20px; }
-  .form-row { margin-bottom: 14px; }
-  .form-label { font-size: 0.8rem; color: var(--dim); margin-bottom: 6px; display: block; }
-  .form-input { width: 100%; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.9rem; outline: none; }
-  .form-input:focus { border-color: rgba(255,61,0,0.5); }
-  .form-note { font-size: 0.75rem; color: var(--dim); margin-top: 5px; }
+/* ── BUYER FORM ── */
+.checkout-section { max-width: 560px; margin: 48px auto 0; padding: 0 20px; }
+.form-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; }
+.form-card-title { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+.form-card-title i { color: var(--accent); }
+.form-row { margin-bottom: 14px; }
+.form-label { font-size: 0.75rem; color: var(--dim); margin-bottom: 6px; display: block; font-weight: 500; }
+.form-input {
+  width: 100%; padding: 11px 14px;
+  background: var(--bg3); border: 1.5px solid var(--border);
+  border-radius: 10px; color: var(--text); font-size: 0.9rem;
+  outline: none; font-family: inherit; transition: border-color .15s;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--dim2); }
+.form-note { font-size: 0.72rem; color: var(--dim); margin-top: 5px; display: flex; align-items: center; gap: 5px; }
+.form-note i { color: var(--blue); font-size: 0.7rem; }
 
-  .cta-wrap { text-align: center; padding: 28px 24px 0; }
-  .btn-pay {
-    display: inline-flex; align-items: center; gap: 10px;
-    background: linear-gradient(135deg, var(--red), #ff6a3d); color: #fff; border: none;
-    border-radius: 12px; padding: 14px 36px; font-size: 1.05rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s;
-  }
-  .btn-pay:hover { opacity: 0.9; }
-  .btn-pay:disabled { opacity: 0.5; cursor: not-allowed; }
-  .cta-note { font-size: 0.75rem; color: var(--dim); margin-top: 10px; }
+/* ── ORDER SUMMARY ── */
+.order-summary {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px; margin-bottom: 18px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.order-summary-left { font-size: 0.82rem; color: var(--dim); }
+.order-summary-left strong { display: block; font-size: 0.95rem; color: var(--text); font-weight: 700; margin-bottom: 2px; }
+.order-summary-price { font-size: 1.3rem; font-weight: 800; color: var(--accent); }
 
-  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-bg.show { display: flex; }
-  .modal { background: var(--bg2); border: 1px solid var(--border); border-radius: 20px; padding: 32px 28px; max-width: 420px; width: 90%; text-align: center; animation: fadeIn 0.25s ease; }
-  @keyframes fadeIn { from { opacity:0; transform:scale(0.94) } to { opacity:1; transform:scale(1) } }
-  .modal-icon { font-size: 3rem; margin-bottom: 14px; }
-  .modal-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
-  .modal-sub { font-size: 0.85rem; color: var(--dim); line-height: 1.6; margin-bottom: 20px; }
+/* ── CTA ── */
+.cta-wrap { margin-top: 18px; }
+.btn-pay {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; border: none; border-radius: 12px;
+  padding: 16px 24px; font-size: 1rem; font-weight: 700;
+  cursor: pointer; transition: all .2s;
+  font-family: inherit; letter-spacing: 0.01em;
+  box-shadow: 0 4px 20px rgba(232,57,14,0.3);
+}
+.btn-pay:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(232,57,14,0.4); }
+.btn-pay:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none; }
+.cta-note { text-align: center; font-size: 0.73rem; color: var(--dim); margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.cta-note i { color: var(--green); }
 
-  .checkout-url { display: inline-flex; align-items: center; gap: 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 10px; padding: 12px 18px; color: var(--blue); text-decoration: none; font-size: 0.88rem; margin-bottom: 12px; word-break: break-all; }
-  .checkout-url:hover { border-color: var(--blue); }
+/* ── BANK LOGOS ── */
+.banks-section { max-width: 560px; margin: 28px auto 0; padding: 0 20px; }
+.banks-label { font-size: 0.72rem; color: var(--dim); text-align: center; margin-bottom: 12px; }
+.banks-grid {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+}
+.bank-tag {
+  padding: 5px 12px; border-radius: 8px;
+  background: var(--bg2); border: 1px solid var(--border);
+  font-size: 0.72rem; font-weight: 600; color: var(--dim);
+}
 
-  .code-box { background: var(--bg3); border: 2px solid var(--green); border-radius: 12px; padding: 16px 24px; font-size: 2rem; font-weight: 800; font-family: monospace; letter-spacing: 6px; color: var(--green); margin: 16px 0; }
-  .btn-copy { display: inline-flex; align-items: center; gap: 6px; background: var(--green); color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 0.9rem; font-weight: 600; cursor: pointer; margin-bottom: 10px; }
-  .btn-activate { display: inline-flex; align-items: center; gap: 6px; background: var(--red); color: #fff; border: none; border-radius: 8px; padding: 10px 22px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
-  .btn-close { background: none; border: 1px solid var(--border); color: var(--dim); border-radius: 8px; padding: 10px 22px; font-size: 0.85rem; cursor: pointer; margin-top: 8px; }
-  .btn-close:hover { color: var(--text); }
+/* ── TRUST BAR ── */
+.trust-bar {
+  display: flex; justify-content: center; align-items: center;
+  gap: 32px; flex-wrap: wrap;
+  padding: 48px 24px 64px;
+  border-top: 1px solid var(--border); margin-top: 56px;
+}
+.trust-item { display: flex; align-items: center; gap: 10px; }
+.trust-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--bg2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+}
+.trust-icon.green { background: rgba(34,197,94,0.08); border-color: rgba(34,197,94,0.2); color: var(--green); }
+.trust-icon.blue { background: rgba(56,189,248,0.08); border-color: rgba(56,189,248,0.2); color: var(--blue); }
+.trust-icon.gold { background: rgba(245,158,11,0.08); border-color: rgba(245,158,11,0.2); color: var(--gold); }
+.trust-icon.purple { background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.2); color: var(--purple); }
+.trust-text strong { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 1px; }
+.trust-text span { font-size: 0.72rem; color: var(--dim); }
 
-  .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1); border-top: 3px solid var(--red); border-radius: 50%; animation: spin 0.9s linear infinite; margin: 0 auto 16px; }
-  @keyframes spin { to { transform: rotate(360deg) } }
+/* ── MODAL ── */
+.modal-bg {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 9999;
+  align-items: center; justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.modal-bg.show { display: flex; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border2);
+  border-radius: 24px; padding: 40px 32px;
+  max-width: 440px; width: calc(100% - 32px);
+  text-align: center; animation: fadeUp .25s ease;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+}
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px) scale(0.97) } to { opacity:1; transform:translateY(0) scale(1) } }
+.modal-icon { font-size: 3rem; margin-bottom: 16px; line-height: 1; }
+.modal-title { font-size: 1.25rem; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.3px; }
+.modal-sub { font-size: 0.85rem; color: var(--dim); line-height: 1.65; margin-bottom: 24px; }
 
-  .secure-row { display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap; padding: 32px 24px 48px; }
-  .secure-badge { display: flex; align-items: center; gap: 6px; font-size: 0.75rem; color: var(--dim); }
-  .secure-badge i { color: var(--green); font-size: 0.95rem; }
+.checkout-btn {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; text-decoration: none;
+  border-radius: 12px; padding: 15px 24px;
+  font-size: 0.95rem; font-weight: 700; margin-bottom: 10px;
+  transition: opacity .15s; border: none; cursor: pointer; font-family: inherit;
+  box-shadow: 0 4px 20px rgba(232,57,14,0.25);
+}
+.checkout-btn:hover { opacity: 0.9; }
+.order-id-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 14px;
+  font-size: 0.78rem; color: var(--dim); margin: 10px 0;
+}
+.order-id-tag code { color: var(--blue); font-family: monospace; font-size: 0.85rem; }
 
-  .maint { text-align: center; padding: 80px 24px; }
-  .maint i { font-size: 3rem; color: var(--dim); margin-bottom: 16px; display: block; }
-  .maint h2 { font-size: 1.3rem; margin-bottom: 8px; }
-  .maint p { color: var(--dim); font-size: 0.9rem; }
+.code-box {
+  background: rgba(34,197,94,0.06); border: 2px solid rgba(34,197,94,0.3);
+  border-radius: 14px; padding: 20px 24px;
+  font-size: 2.2rem; font-weight: 900; font-family: 'Courier New', monospace;
+  letter-spacing: 10px; color: var(--green); margin: 18px 0;
+  text-shadow: 0 0 20px rgba(34,197,94,0.3);
+}
+.modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.btn-primary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 13px 20px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; border: none; border-radius: 10px;
+  font-size: 0.9rem; font-weight: 700; cursor: pointer; font-family: inherit;
+  box-shadow: 0 3px 14px rgba(232,57,14,0.25); transition: opacity .15s;
+}
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 12px 20px;
+  background: rgba(34,197,94,0.1); color: var(--green);
+  border: 1.5px solid rgba(34,197,94,0.25); border-radius: 10px;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.btn-secondary:hover { background: rgba(34,197,94,0.15); }
+.btn-ghost {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 11px 20px;
+  background: none; color: var(--dim);
+  border: 1px solid var(--border); border-radius: 10px;
+  font-size: 0.85rem; cursor: pointer; font-family: inherit; transition: all .15s;
+}
+.btn-ghost:hover { color: var(--text); border-color: var(--border2); background: var(--bg3); }
 
-  @media (max-width: 600px) {
-    .hero h1 { font-size: 1.5rem; }
-    .plans { grid-template-columns: 1fr 1fr; }
-    .btn-pay { width: 100%; justify-content: center; }
-  }
+/* Spinner */
+.spinner {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 3px solid var(--border2); border-top-color: var(--accent);
+  animation: spin .8s linear infinite; margin: 0 auto 18px;
+}
+@keyframes spin { to { transform: rotate(360deg) } }
+
+/* Polling dots */
+.poll-dots::after {
+  content: ''; animation: dots 1.4s infinite;
+}
+@keyframes dots { 0%,20%{content:'.'} 40%{content:'..'} 60%,100%{content:'...'} }
+
+/* Maint */
+.maint {
+  text-align: center; padding: 100px 24px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+}
+.maint-icon {
+  width: 72px; height: 72px; border-radius: 20px;
+  background: var(--bg2); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; color: var(--dim);
+}
+.maint h2 { font-size: 1.3rem; font-weight: 700; }
+.maint p { color: var(--dim); font-size: 0.9rem; max-width: 380px; }
+
+@media (max-width: 700px) {
+  .hero h1 { font-size: 1.9rem; }
+  .plans { grid-template-columns: 1fr 1fr; }
+  .trust-bar { gap: 20px; }
+  .step-line { max-width: 30px; }
+}
+@media (max-width: 440px) {
+  .plans { grid-template-columns: 1fr 1fr; }
+  .nav { padding: 0 16px; }
+  .modal { padding: 28px 20px; }
+  .code-box { font-size: 1.7rem; letter-spacing: 6px; }
+}
 </style>
 </head>
 <body>
 
 <nav class="nav">
   <a href="/" class="nav-logo">XemTV<span>.vn</span></a>
-  <a href="/" class="nav-back"><i class="fas fa-arrow-left"></i> Quay lại xem TV</a>
+  <div class="nav-divider"></div>
+  <span class="nav-tagline">Thanh toán an toàn</span>
+  <a href="/" class="nav-back"><i class="fas fa-arrow-left"></i> Quay lại</a>
 </nav>
 
 <div id="main-content"></div>
@@ -153,59 +396,108 @@ async function init() {
 function renderMaint(msg) {
   el('main-content').innerHTML = `
     <div class="maint">
-      <i class="fas fa-tools"></i>
+      <div class="maint-icon"><i class="fas fa-tools"></i></div>
       <h2>Thanh toán chưa khả dụng</h2>
       <p>${msg || 'Tính năng mua gói đang được cập nhật. Vui lòng liên hệ admin để nhận mã kích hoạt.'}</p>
     </div>`;
 }
 
+const PLAN_ICONS = ['🗓️','🔥','💎','👑'];
+const PLAN_SAVES = [null, 'Tiết kiệm 21%', 'Tiết kiệm 32%', 'Tiết kiệm 43%'];
+const PLAN_FEATURES = [
+  ['200+ kênh HD/FHD', 'Xem lại 7 ngày', 'Kích hoạt ngay'],
+  ['200+ kênh HD/FHD', 'Xem lại 7 ngày', 'Kích hoạt ngay'],
+  ['200+ kênh HD/FHD', 'Xem lại 7 ngày', 'Ưu tiên hỗ trợ'],
+  ['200+ kênh HD/FHD', 'Xem lại 7 ngày', 'Ưu tiên cao nhất'],
+];
+
 function renderMain(plans) {
   plans = plans || [];
   el('main-content').innerHTML = `
     <div class="hero">
-      <h1>Mua gói <span>XemTV.vn</span></h1>
-      <p>Xem hàng trăm kênh truyền hình trực tuyến chất lượng HD — mọi lúc, mọi nơi.</p>
+      <div class="hero-eyebrow"><i class="fas fa-tv"></i> XemTV Premium</div>
+      <h1>Truyền hình không giới hạn<br>với <em>XemTV.vn</em></h1>
+      <p class="hero-sub">200+ kênh HD trực tuyến, xem lại 7 ngày, không quảng cáo — mọi thiết bị, mọi lúc.</p>
+      <div class="steps">
+        <div class="step active" id="step-1"><div class="step-num">1</div><div class="step-label">Chọn gói</div></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-2"><div class="step-num">2</div><div class="step-label">Thanh toán</div></div>
+        <div class="step-line"></div>
+        <div class="step" id="step-3"><div class="step-num">3</div><div class="step-label">Kích hoạt</div></div>
+      </div>
     </div>
-    <div class="features">
-      <div class="feature"><i class="fas fa-check-circle"></i> 200+ kênh HD</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> Xem lại 7 ngày</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> Không quảng cáo</div>
-      <div class="feature"><i class="fas fa-check-circle"></i> Kích hoạt ngay</div>
-    </div>
+
     <div class="plans-wrap">
-      <div class="plans-title">Chọn gói dịch vụ</div>
+      <div class="section-label">Chọn gói phù hợp</div>
       <div class="plans" id="plans-grid">
         ${plans.map((p, i) => `
-          <div class="plan-card${i === 1 ? ' popular' : ''}" data-id="${p.id}" onclick="selectPlan('${p.id}')">
-            ${i === 1 ? '<div class="plan-badge">⭐ Phổ biến nhất</div>' : ''}
+          <div class="plan-card${i === 1 ? ' popular' : ''}" data-id="${p.id}" data-amount="${p.amount}" data-label="${p.label}" onclick="selectPlan('${p.id}')">
+            ${i === 1 ? '<div class="plan-badge">✦ Phổ biến nhất</div>' : ''}
+            <div class="plan-icon">${PLAN_ICONS[i] || '📺'}</div>
             <div class="plan-label">${p.label}</div>
-            <div class="plan-amount">${fmtMoney(p.amount)}<sub>/gói</sub></div>
-            <div class="plan-per">${fmtMoney(Math.round(p.amount / p.days))}/ngày</div>
+            <div class="plan-amount">${fmtMoney(p.amount)}<span>/gói</span></div>
+            <div class="plan-per">${fmtMoney(Math.round(p.amount / p.days))} / ngày</div>
+            ${PLAN_SAVES[i] ? `<div class="plan-save">${PLAN_SAVES[i]}</div>` : '<div style="height:22px"></div>'}
+            <div class="plan-divider"></div>
+            <div class="plan-features">
+              ${(PLAN_FEATURES[i]||[]).map(f => `<div class="plan-feat"><i class="fas fa-check"></i>${f}</div>`).join('')}
+            </div>
           </div>`).join('')}
       </div>
     </div>
-    <div class="buyer-form">
-      <div class="form-row">
-        <label class="form-label" for="buyer-name">Họ tên (tuỳ chọn)</label>
-        <input class="form-input" id="buyer-name" type="text" placeholder="Nguyễn Văn A">
-      </div>
-      <div class="form-row">
-        <label class="form-label" for="buyer-email">Email (tuỳ chọn)</label>
-        <input class="form-input" id="buyer-email" type="email" placeholder="email@example.com">
-        <div class="form-note">Mã kích hoạt sẽ hiển thị ngay sau khi thanh toán thành công.</div>
+
+    <div class="checkout-section">
+      <div class="form-card">
+        <div class="form-card-title"><i class="fas fa-receipt"></i> Thông tin đơn hàng</div>
+        <div class="order-summary" id="order-summary" style="display:none;">
+          <div class="order-summary-left">
+            <strong id="summary-label">—</strong>
+            Gói dịch vụ XemTV Premium
+          </div>
+          <div class="order-summary-price" id="summary-price">—</div>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="buyer-name">Họ tên</label>
+          <input class="form-input" id="buyer-name" type="text" placeholder="Nguyễn Văn A (tuỳ chọn)">
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="buyer-email">Email</label>
+          <input class="form-input" id="buyer-email" type="email" placeholder="email@example.com (tuỳ chọn)">
+          <div class="form-note"><i class="fas fa-info-circle"></i> Mã kích hoạt hiển thị ngay sau khi thanh toán.</div>
+        </div>
+        <div class="cta-wrap">
+          <button class="btn-pay" id="btn-pay" onclick="startPayment()" disabled>
+            <i class="fas fa-lock"></i> Chọn gói để tiếp tục
+          </button>
+          <div class="cta-note"><i class="fas fa-shield-halved"></i> Thanh toán mã hoá SSL · Napas 247 · Hoàn tiền 24h</div>
+        </div>
       </div>
     </div>
-    <div class="cta-wrap">
-      <button class="btn-pay" id="btn-pay" onclick="startPayment()" disabled>
-        <i class="fas fa-qrcode"></i> Chọn gói để tiếp tục
-      </button>
-      <div class="cta-note">Thanh toán qua QR chuyển khoản — hỗ trợ tất cả ngân hàng Việt Nam</div>
+
+    <div class="banks-section">
+      <div class="banks-label">Hỗ trợ tất cả ngân hàng Việt Nam qua VietQR</div>
+      <div class="banks-grid">
+        ${['Vietcombank','BIDV','Techcombank','MB Bank','ACB','VPBank','TPBank','Agribank','VietinBank','SHB','HDBank','OCB'].map(b=>`<div class="bank-tag">${b}</div>`).join('')}
+      </div>
     </div>
-    <div class="secure-row">
-      <div class="secure-badge"><i class="fas fa-shield-alt"></i> Bảo mật SSL</div>
-      <div class="secure-badge"><i class="fas fa-university"></i> Napas 247</div>
-      <div class="secure-badge"><i class="fas fa-bolt"></i> Kích hoạt tức thì</div>
-      <div class="secure-badge"><i class="fas fa-headset"></i> Hỗ trợ 24/7</div>
+
+    <div class="trust-bar">
+      <div class="trust-item">
+        <div class="trust-icon green"><i class="fas fa-shield-halved"></i></div>
+        <div class="trust-text"><strong>Bảo mật SSL 256-bit</strong><span>Dữ liệu mã hoá tuyệt đối</span></div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon blue"><i class="fas fa-bolt"></i></div>
+        <div class="trust-text"><strong>Kích hoạt tức thì</strong><span>Nhận mã ngay sau thanh toán</span></div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon gold"><i class="fas fa-rotate-left"></i></div>
+        <div class="trust-text"><strong>Hoàn tiền 24h</strong><span>Nếu có sự cố kỹ thuật</span></div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon purple"><i class="fas fa-headset"></i></div>
+        <div class="trust-text"><strong>Hỗ trợ 24/7</strong><span>info@xemtv.vn</span></div>
+      </div>
     </div>`;
   if (plans.length >= 2) selectPlan(plans[1].id);
 }
@@ -213,12 +505,20 @@ function renderMain(plans) {
 function selectPlan(planId) {
   selectedPlan = planId;
   document.querySelectorAll('.plan-card').forEach(c => c.classList.toggle('selected', c.dataset.id === planId));
+  const card = [...document.querySelectorAll('.plan-card')].find(c => c.dataset.id === planId);
   const btn = el('btn-pay');
+  const summary = el('order-summary');
+  if (card && summary) {
+    const label = card.dataset.label || planId;
+    const amount = parseInt(card.dataset.amount) || 0;
+    el('summary-label').textContent = 'Gói ' + label;
+    el('summary-price').textContent = fmtMoney(amount);
+    summary.style.display = 'flex';
+  }
   if (btn) {
     btn.disabled = false;
-    const card = [...document.querySelectorAll('.plan-card')].find(c => c.dataset.id === planId);
-    const amount = card?.querySelector('.plan-amount')?.textContent || '';
-    btn.innerHTML = `<i class="fas fa-qrcode"></i> Thanh toán ${amount}`;
+    const amount = card ? fmtMoney(parseInt(card.dataset.amount)||0) : '';
+    btn.innerHTML = `<i class="fas fa-lock"></i> Thanh toán ${amount} — An toàn`;
   }
 }
 
@@ -239,24 +539,33 @@ async function startPayment() {
     });
     const data = await r.json();
     if (!data.ok) throw new Error(data.error || 'Lỗi tạo link thanh toán');
+    setStep(2);
     showCheckout(data.checkoutUrl, data.orderCode);
   } catch(e) {
     alert('Lỗi: ' + e.message);
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-qrcode"></i> Thử lại'; }
+    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-lock"></i> Thử lại'; }
   }
 }
 
 function showCheckout(checkoutUrl, orderCode) {
+  // Set step 2 active
+  ['step-1','step-2','step-3'].forEach((id,i) => {
+    const s = el(id); if (!s) return;
+    s.classList.toggle('done', i < 1);
+    s.classList.toggle('active', i === 1);
+  });
   showModal(`
-    <div class="modal-icon">💳</div>
-    <div class="modal-title">Quét mã để thanh toán</div>
-    <div class="modal-sub">Nhấn nút bên dưới để mở trang thanh toán PayOS.</div>
-    <a href="${escHtml(checkoutUrl)}" target="_blank" class="checkout-url">
-      <i class="fas fa-external-link-alt"></i> Mở trang thanh toán PayOS
-    </a><br>
-    <div class="modal-sub" style="font-size:0.78rem;margin-top:8px;">Mã đơn hàng: <b>#${orderCode}</b></div>
-    <div class="modal-sub" style="margin-top:12px;font-size:0.8rem;">Sau khi thanh toán xong, mã kích hoạt sẽ hiện tự động.</div>
-    <button class="btn-close" onclick="closeModal()">Huỷ</button>
+    <div class="modal-icon" style="font-size:2.5rem;">📱</div>
+    <div class="modal-title">Quét mã QR để thanh toán</div>
+    <div class="modal-sub">Mở app ngân hàng → Chuyển khoản → Quét QR<br>Hoặc nhấn nút bên dưới để mở trang PayOS.</div>
+    <a href="${escHtml(checkoutUrl)}" target="_blank" class="checkout-btn">
+      <i class="fas fa-qrcode"></i> Mở trang thanh toán PayOS
+    </a>
+    <div class="order-id-tag"><i class="fas fa-receipt"></i> Mã đơn: <code>#${orderCode}</code></div>
+    <div class="modal-sub" style="font-size:0.78rem;margin-top:14px;margin-bottom:0;">Trang này tự cập nhật sau khi thanh toán thành công <span class="poll-dots"></span></div>
+    <div class="modal-actions" style="margin-top:16px;">
+      <button class="btn-ghost" onclick="closeModal()"><i class="fas fa-xmark"></i> Huỷ đơn hàng</button>
+    </div>
   `);
   setTimeout(() => { window.open(checkoutUrl, '_blank'); }, 400);
   startPolling(orderCode);
@@ -265,8 +574,8 @@ function showCheckout(checkoutUrl, orderCode) {
 function showWaiting(orderCode) {
   showModal(`
     <div class="spinner"></div>
-    <div class="modal-title">Đang xác nhận thanh toán...</div>
-    <div class="modal-sub">Hệ thống đang kiểm tra giao dịch #${orderCode}.<br>Vui lòng chờ trong giây lát.</div>
+    <div class="modal-title">Đang xác nhận thanh toán<span class="poll-dots"></span></div>
+    <div class="modal-sub">Hệ thống đang kiểm tra giao dịch <code style="color:var(--blue);">#${orderCode}</code><br>Vui lòng chờ trong giây lát.</div>
   `);
   startPolling(orderCode);
 }
@@ -289,22 +598,30 @@ function showCodeResult(code, label) {
   showModal(`
     <div class="modal-icon">🎉</div>
     <div class="modal-title">Thanh toán thành công!</div>
-    <div class="modal-sub">Gói <b>${label}</b> đã được kích hoạt. Đây là mã của bạn:</div>
-    <div class="code-box">${escHtml(code)}</div>
-    <div class="modal-sub" style="font-size:0.78rem;margin-bottom:14px;">Lưu mã này lại — mỗi mã chỉ dùng được 1 lần trên 1 thiết bị.</div>
-    <button class="btn-copy" onclick="copyCode('${escHtml(code)}', this)"><i class="fas fa-copy"></i> Sao chép mã</button><br>
-    <button class="btn-activate" onclick="activateNow('${escHtml(code)}')"><i class="fas fa-check-circle"></i> Kích hoạt ngay</button><br>
-    <button class="btn-close" onclick="closeModal(); location.href='/'">Đi đến xem TV</button>
+    <div class="modal-sub">Gói <b>${escHtml(label)}</b> đã được mua. Đây là mã kích hoạt của bạn:</div>
+    <div class="code-box" id="result-code">${escHtml(code)}</div>
+    <div class="modal-sub" style="font-size:0.75rem;margin-top:-8px;margin-bottom:18px;">
+      <i class="fas fa-triangle-exclamation" style="color:var(--gold);"></i>
+      Lưu lại mã này — mỗi mã chỉ dùng được 1 lần / 1 thiết bị.
+    </div>
+    <div class="modal-actions">
+      <button class="btn-primary" onclick="activateNow('${escHtml(code)}')"><i class="fas fa-circle-check"></i> Kích hoạt ngay</button>
+      <button class="btn-secondary" onclick="copyCode('${escHtml(code)}', this)"><i class="fas fa-copy"></i> Sao chép mã</button>
+      <button class="btn-ghost" onclick="closeModal(); location.href='/'"><i class="fas fa-tv"></i> Đi đến xem TV</button>
+    </div>
   `);
 }
 
 function showResult(type) {
   if (type === 'cancel') {
     showModal(`
-      <div class="modal-icon">😔</div>
+      <div class="modal-icon" style="font-size:2.5rem;">🚫</div>
       <div class="modal-title">Đơn hàng đã huỷ</div>
-      <div class="modal-sub">Bạn đã huỷ thanh toán. Chọn lại gói để thử lại.</div>
-      <button class="btn-activate" onclick="closeModal()">Chọn lại gói</button>
+      <div class="modal-sub">Bạn đã huỷ thanh toán. Không có khoản nào bị trừ.</div>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="closeModal()"><i class="fas fa-rotate-left"></i> Chọn lại gói</button>
+        <button class="btn-ghost" onclick="location.href='/'"><i class="fas fa-arrow-left"></i> Về trang chủ</button>
+      </div>
     `);
   }
 }
@@ -312,6 +629,14 @@ function showResult(type) {
 async function copyCode(code, btn) {
   try { await navigator.clipboard.writeText(code); } catch(e) {}
   if (btn) { btn.innerHTML = '<i class="fas fa-check"></i> Đã sao chép!'; setTimeout(() => { btn.innerHTML = '<i class="fas fa-copy"></i> Sao chép mã'; }, 2000); }
+}
+
+function setStep(n) {
+  [1,2,3].forEach(i => {
+    const s = el('step-'+i); if (!s) return;
+    s.classList.toggle('done', i < n);
+    s.classList.toggle('active', i === n);
+  });
 }
 
 function getFingerprint() {
@@ -347,6 +672,7 @@ async function activateNow(code) {
     if (data.ok) {
       localStorage.setItem('xemtv_activated', '1');
       localStorage.removeItem('pendingActivationCode');
+      setStep(3);
       // Nếu mở từ tab xemtv.vn → báo tab gốc reload rồi đóng tab này
       if (window.opener && !window.opener.closed) {
         try {
@@ -365,26 +691,29 @@ async function activateNow(code) {
           <div class="modal-icon">✅</div>
           <div class="modal-title">Kích hoạt thành công!</div>
           <div class="modal-sub">Thiết bị đã được kích hoạt. Nhấn bên dưới để bắt đầu xem TV.</div>
-          <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Xem TV ngay</button>
+          <div class="modal-actions"><button class="btn-primary" onclick="location.href='/'"><i class="fas fa-tv"></i> Xem TV ngay</button></div>
         `);
       }
     } else {
       // Kích hoạt thất bại → để người dùng tự nhập tay
       localStorage.setItem('pendingActivationCode', code);
       showModal(`
-        <div class="modal-icon">⚠️</div>
+        <div class="modal-icon" style="font-size:2rem;">⚠️</div>
         <div class="modal-title">Kích hoạt thất bại</div>
-        <div class="modal-sub">${escHtml(data.error || 'Lỗi không xác định')}<br><br>Mã của bạn: <b style="font-family:monospace;font-size:1.1rem;color:#4caf50;">${escHtml(code)}</b><br><br>Vui lòng nhập mã thủ công trên trang TV.</div>
-        <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Đến trang TV</button>
+        <div class="modal-sub">${escHtml(data.error || 'Lỗi không xác định')}</div>
+        <div class="code-box" style="font-size:1.6rem;letter-spacing:6px;margin:14px 0;">${escHtml(code)}</div>
+        <div class="modal-sub" style="font-size:0.78rem;">Mã đã được lưu. Vào trang TV và nhập mã thủ công.</div>
+        <div class="modal-actions"><button class="btn-primary" onclick="location.href='/'"><i class="fas fa-tv"></i> Đến trang TV</button></div>
       `);
     }
   } catch(e) {
     localStorage.setItem('pendingActivationCode', code);
     showModal(`
-      <div class="modal-icon">⚠️</div>
+      <div class="modal-icon" style="font-size:2rem;">⚠️</div>
       <div class="modal-title">Lỗi kết nối</div>
-      <div class="modal-sub">Mã của bạn: <b style="font-family:monospace;font-size:1.1rem;color:#4caf50;">${escHtml(code)}</b><br><br>Vào trang TV và nhập mã thủ công.</div>
-      <button class="btn-activate" onclick="location.href='/'"><i class="fas fa-tv"></i> Đến trang TV</button>
+      <div class="code-box" style="font-size:1.6rem;letter-spacing:6px;margin:14px 0;">${escHtml(code)}</div>
+      <div class="modal-sub" style="font-size:0.78rem;">Mã đã được lưu. Vào trang TV và nhập mã thủ công.</div>
+      <div class="modal-actions"><button class="btn-primary" onclick="location.href='/'"><i class="fas fa-tv"></i> Đến trang TV</button></div>
     `);
   }
 }
