@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0a0a0a">
+<title>XemTV Remote</title>
+<link rel="manifest" href="/manifest.json">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:#0a0a0a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overscroll-behavior:none;user-select:none}
+
+/* === PAIRING SCREEN === */
+#pairing-screen{
+    position:fixed;inset:0;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:20px;padding:24px;
+    background:#0a0a0a;z-index:100;
+}
+#pairing-screen.hidden{display:none}
+.pair-logo{width:54px;height:54px;object-fit:contain;border-radius:12px;background:#1a1a1a;}
+.pair-title{font-size:1.4rem;font-weight:700;letter-spacing:0.5px}
+.pair-subtitle{font-size:0.85rem;color:rgba(255,255,255,.45);text-align:center;line-height:1.5}
+.pair-input-wrap{display:flex;gap:10px;align-items:center}
+#code-input{
+    background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);
+    border-radius:14px;padding:14px 18px;font-size:1.5rem;font-weight:700;
+    letter-spacing:8px;color:#fff;text-align:center;width:180px;
+    outline:none;-webkit-appearance:none;
+}
+#code-input:focus{border-color:#ff6b35}
+#code-input::placeholder{color:rgba(255,255,255,.2);letter-spacing:2px}
+#connect-btn{
+    background:#ff3d00;border:none;color:#fff;border-radius:14px;
+    padding:14px 22px;font-size:1rem;font-weight:600;cursor:pointer;
+    transition:background .15s,transform .1s;
+}
+#connect-btn:active{transform:scale(0.95);background:#cc3100}
+#pair-error{font-size:0.8rem;color:#ff5252;min-height:1.1em;text-align:center}
+.pair-divider{display:flex;align-items:center;gap:12px;width:100%;max-width:300px;color:rgba(255,255,255,.2)}
+.pair-divider::before,.pair-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
+.pair-qr-wrap{text-align:center}
+#qr-scan-btn{
+    background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);
+    color:rgba(255,255,255,.6);border-radius:14px;padding:12px 20px;
+    font-size:.9rem;cursor:pointer;transition:border-color .15s;
+}
+#qr-scan-btn:hover{border-color:rgba(255,255,255,.3)}
+
+/* === REMOTE SCREEN === */
+#remote-screen{
+    position:fixed;inset:0;display:flex;flex-direction:column;
+    background:#0a0a0a;overflow:hidden;
+}
+#remote-screen.hidden{display:none}
+
+.rmt-status-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 16px 8px;background:#111;border-bottom:1px solid rgba(255,255,255,.07);
+    flex-shrink:0;
+}
+.rmt-status-tv{display:flex;align-items:center;gap:8px}
+.rmt-status-logo{width:28px;height:28px;object-fit:contain;border-radius:6px;background:#1a1a1a}
+.rmt-status-name{font-size:.85rem;font-weight:600}
+.rmt-status-conn{
+    font-size:.72rem;padding:3px 8px;border-radius:10px;font-weight:600;
+    background:rgba(76,175,80,.18);color:#4caf50;
+}
+.rmt-status-conn.offline{background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)}
+#disconnect-btn{
+    background:transparent;border:1px solid rgba(255,255,255,.12);
+    color:rgba(255,255,255,.35);border-radius:8px;padding:4px 10px;font-size:.72rem;cursor:pointer;
+}
+
+.rmt-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:12px 14px 20px}
+
+/* Buttons base */
+.rmt-row{display:flex;gap:8px}
+.rmt-btn{
+    flex:1;border:none;border-radius:14px;padding:0;
+    background:rgba(255,255,255,.08);color:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:5px;font-size:.72rem;cursor:pointer;transition:background .12s,transform .08s;
+    height:60px;
+}
+.rmt-btn:active{background:rgba(255,107,53,.3);transform:scale(.94)}
+.rmt-btn i{font-size:1.1rem}
+.rmt-btn.accent{background:rgba(255,61,0,.18);color:#ff8a65}
+.rmt-btn.accent:active{background:rgba(255,61,0,.4)}
+
+/* D-pad */
+.rmt-dpad-wrap{display:flex;justify-content:center}
+.rmt-dpad-ring{
+    position:relative;width:180px;height:180px;
+    border-radius:50%;background:rgba(255,255,255,.05);
+    border:2px solid rgba(255,255,255,.1);
+}
+.rmt-dp{
+    position:absolute;border:none;background:transparent;color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:background .1s;border-radius:50%;
+}
+.rmt-dp:active{background:rgba(255,107,53,.35)}
+.rmt-dp-up{top:0;left:50%;transform:translateX(-50%);width:60px;height:60px}
+.rmt-dp-down{bottom:0;left:50%;transform:translateX(-50%);width:60px;height:60px}
+.rmt-dp-left{left:0;top:50%;transform:translateY(-50%);width:60px;height:60px}
+.rmt-dp-right{right:0;top:50%;transform:translateY(-50%);width:60px;height:60px}
+.rmt-dp-ok{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:64px;height:64px;border-radius:50%;
+    background:rgba(255,61,0,.25);border:2px solid rgba(255,61,0,.4);
+    color:#ff8a65;font-size:1rem;font-weight:700;
+}
+.rmt-dp-ok:active{background:rgba(255,61,0,.55)}
+
+/* Numpad */
+.rmt-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rmt-num-btn{
+    border:none;border-radius:14px;height:52px;
+    background:rgba(255,255,255,.07);color:#fff;
+    font-size:1.1rem;font-weight:600;cursor:pointer;
+    transition:background .1s,transform .08s;
+}
+.rmt-num-btn:active{background:rgba(255,107,53,.28);transform:scale(.94)}
+.rmt-num-btn.rmt-num-side{background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);font-size:.85rem}
+.rmt-num-btn.rmt-num-side:active{background:rgba(255,107,53,.2);color:#ff8a65}
+
+/* Section labels */
+.rmt-section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.2);padding:0 2px}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+<!-- === PAIRING SCREEN === -->
+<div id="pairing-screen">
+    <img class="pair-logo" src="https://cdn-vn.iof.vn/TV/Xemtv_cat_Toi.png" alt="XemTV" onerror="this.style.display='none'">
+    <div class="pair-title">XemTV Remote</div>
+    <div class="pair-subtitle">Nhập mã 4 số hiển thị trên TV<br>để bắt đầu điều khiển từ xa</div>
+    <div class="pair-input-wrap">
+        <input id="code-input" type="tel" inputmode="numeric" pattern="[0-9]*"
+               maxlength="4" placeholder="_ _ _ _" autocomplete="off">
+        <button id="connect-btn">Kết nối</button>
+    </div>
+    <div id="pair-error"></div>
+    <div class="pair-divider">hoặc</div>
+    <button id="qr-scan-btn"><i class="fas fa-qrcode"></i> Quét mã QR từ TV</button>
+</div>
+
+<!-- === REMOTE SCREEN === -->
+<div id="remote-screen" class="hidden">
+
+    <div class="rmt-status-bar">
+        <div class="rmt-status-tv">
+            <img class="rmt-status-logo" src="https://cdn-vn.iof.vn/TV/Xemtv_cat_Toi.png" alt="" onerror="this.style.display='none'">
+            <span class="rmt-status-name">XemTV</span>
+        </div>
+        <span id="conn-status" class="rmt-status-conn offline">Đang kết nối...</span>
+        <button id="disconnect-btn">Ngắt</button>
+    </div>
+
+    <div class="rmt-body">
+
+        <!-- CH + Back + CH- -->
+        <div class="rmt-row">
+            <button class="rmt-btn accent" data-action="ch_up">
+                <i class="fas fa-chevron-up"></i><span>CH+</span>
+            </button>
+            <button class="rmt-btn" data-action="back">
+                <i class="fas fa-arrow-left"></i><span>Quay lại</span>
+            </button>
+            <button class="rmt-btn accent" data-action="ch_down">
+                <i class="fas fa-chevron-down"></i><span>CH-</span>
+            </button>
+        </div>
+
+        <!-- D-pad -->
+        <div class="rmt-dpad-wrap">
+            <div class="rmt-dpad-ring">
+                <button class="rmt-dp rmt-dp-up" data-action="up"><i class="fas fa-chevron-up"></i></button>
+                <button class="rmt-dp rmt-dp-left" data-action="left"><i class="fas fa-chevron-left"></i></button>
+                <button class="rmt-dp rmt-dp-ok" data-action="ok">OK</button>
+                <button class="rmt-dp rmt-dp-right" data-action="right"><i class="fas fa-chevron-right"></i></button>
+                <button class="rmt-dp rmt-dp-down" data-action="down"><i class="fas fa-chevron-down"></i></button>
+            </div>
+        </div>
+
+        <!-- Menu + Info -->
+        <div class="rmt-row">
+            <button class="rmt-btn" data-action="menu">
+                <i class="fas fa-th"></i><span>Danh sách</span>
+            </button>
+            <button class="rmt-btn" data-action="guide">
+                <i class="fas fa-list-ul"></i><span>Lịch phát</span>
+            </button>
+            <button class="rmt-btn" data-action="info">
+                <i class="fas fa-info-circle"></i><span>Thông tin</span>
+            </button>
+        </div>
+
+        <!-- Numpad -->
+        <div class="rmt-section-label">Nhập số kênh</div>
+        <div class="rmt-numpad">
+            <button class="rmt-num-btn" data-num="1">1</button>
+            <button class="rmt-num-btn" data-num="2">2</button>
+            <button class="rmt-num-btn" data-num="3">3</button>
+            <button class="rmt-num-btn" data-num="4">4</button>
+            <button class="rmt-num-btn" data-num="5">5</button>
+            <button class="rmt-num-btn" data-num="6">6</button>
+            <button class="rmt-num-btn" data-num="7">7</button>
+            <button class="rmt-num-btn" data-num="8">8</button>
+            <button class="rmt-num-btn" data-num="9">9</button>
+            <button class="rmt-num-btn rmt-num-side" data-action="guide"><i class="fas fa-list"></i></button>
+            <button class="rmt-num-btn" data-num="0">0</button>
+            <button class="rmt-num-btn rmt-num-side" data-action="delete"><i class="fas fa-delete-left"></i></button>
+        </div>
+
+    </div><!-- /.rmt-body -->
+</div><!-- /#remote-screen -->
+
+<script>
+(function(){
+    'use strict';
+    const API = 'https://cdn-vn.iof.vn';
+    let _code = null;
+    let _sse  = null;
+    let _connected = false;
+    let _cmdQueue = [];
+    let _sending = false;
+
+    // Lấy code từ URL (nếu QR scan)
+    const urlCode = new URLSearchParams(location.search).get('code');
+    if (urlCode && /^\d{4}$/.test(urlCode)) {
+        document.getElementById('code-input').value = urlCode;
+    }
+
+    const showPairing = () => {
+        document.getElementById('pairing-screen').classList.remove('hidden');
+        document.getElementById('remote-screen').classList.add('hidden');
+    };
+    const showRemote = () => {
+        document.getElementById('pairing-screen').classList.add('hidden');
+        document.getElementById('remote-screen').classList.remove('hidden');
+    };
+
+    const setConnStatus = (on) => {
+        _connected = on;
+        const el = document.getElementById('conn-status');
+        if (!el) return;
+        el.textContent = on ? '● Đã kết nối' : '○ Mất kết nối';
+        el.className = 'rmt-status-conn' + (on ? '' : ' offline');
+    };
+
+    // Kết nối SSE để biết TV có online không (và nhận confirm)
+    const connectSSE = () => {
+        if (_sse) { _sse.close(); }
+        // Phone cũng "lắng nghe" để kiểm tra kết nối còn sống không
+        // TV mới là bên nhận lệnh, phone chỉ POST. SSE ở đây chỉ để xác nhận.
+        setConnStatus(false);
+        const es = new EventSource(API + '/api/remote/events?code=' + _code);
+        _sse = es;
+        es.onopen = () => setConnStatus(true);
+        es.onmessage = (e) => {
+            try {
+                const d = JSON.parse(e.data);
+                if (d.type === 'connected') setConnStatus(true);
+            } catch(err) {}
+        };
+        es.onerror = () => {
+            setConnStatus(false);
+            setTimeout(() => { if (_code) connectSSE(); }, 5000);
+        };
+    };
+
+    // Gửi lệnh (deduped queue)
+    const sendCmd = async (action, payload) => {
+        _cmdQueue.push({ action, payload });
+        if (_sending) return;
+        _sending = true;
+        while (_cmdQueue.length) {
+            const cmd = _cmdQueue.shift();
+            try {
+                await fetch(API + '/api/remote/cmd', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: _code, action: cmd.action, payload: cmd.payload })
+                });
+                setConnStatus(true);
+            } catch(e) {
+                setConnStatus(false);
+            }
+        }
+        _sending = false;
+    };
+
+    // Kết nối
+    const doConnect = async (code) => {
+        if (!/^\d{4}$/.test(code)) {
+            document.getElementById('pair-error').textContent = 'Nhập đúng 4 chữ số';
+            return;
+        }
+        document.getElementById('pair-error').textContent = '';
+        document.getElementById('connect-btn').disabled = true;
+        document.getElementById('connect-btn').textContent = 'Đang kết nối...';
+        // Kiểm tra xem code hợp lệ không (thử GET events)
+        try {
+            const r = await fetch(API + '/api/remote/events?code=' + code, { method: 'HEAD' }).catch(() => null);
+            // HEAD có thể không hỗ trợ SSE, thử GET với timeout
+            const check = await Promise.race([
+                fetch(API + '/api/remote/cmd', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, action: 'phone_connected' })
+                }),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
+            ]);
+            const d = await check.json();
+            if (!d.ok) {
+                document.getElementById('pair-error').textContent = 'Mã không đúng hoặc TV chưa bật';
+                document.getElementById('connect-btn').disabled = false;
+                document.getElementById('connect-btn').textContent = 'Kết nối';
+                return;
+            }
+        } catch(e) {
+            document.getElementById('pair-error').textContent = 'Không kết nối được server';
+            document.getElementById('connect-btn').disabled = false;
+            document.getElementById('connect-btn').textContent = 'Kết nối';
+            return;
+        }
+        _code = code;
+        localStorage.setItem('remoteCode', code);
+        document.getElementById('connect-btn').disabled = false;
+        document.getElementById('connect-btn').textContent = 'Kết nối';
+        showRemote();
+        connectSSE();
+    };
+
+    // Events
+    document.getElementById('connect-btn').addEventListener('click', () => {
+        doConnect(document.getElementById('code-input').value.trim());
+    });
+    document.getElementById('code-input').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') doConnect(e.target.value.trim());
+    });
+    document.getElementById('disconnect-btn').addEventListener('click', () => {
+        if (_sse) { _sse.close(); _sse = null; }
+        _code = null;
+        localStorage.removeItem('remoteCode');
+        showPairing();
+    });
+
+    // QR Scan (dùng camera trình duyệt nếu hỗ trợ BarcodeDetector)
+    document.getElementById('qr-scan-btn').addEventListener('click', async () => {
+        const input = document.getElementById('code-input');
+        if ('BarcodeDetector' in window) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                const video = document.createElement('video');
+                video.srcObject = stream;
+                video.play();
+                const bd = new BarcodeDetector({ formats: ['qr_code'] });
+                const scanLoop = async () => {
+                    if (!video.videoWidth) { requestAnimationFrame(scanLoop); return; }
+                    const codes = await bd.detect(video).catch(() => []);
+                    if (codes.length) {
+                        stream.getTracks().forEach(t => t.stop());
+                        const url = codes[0].rawValue;
+                        const m = url.match(/[?&]code=(\d{4})/);
+                        if (m) { input.value = m[1]; doConnect(m[1]); }
+                    } else { requestAnimationFrame(scanLoop); }
+                };
+                video.addEventListener('playing', () => requestAnimationFrame(scanLoop));
+            } catch(e) {
+                alert('Không thể truy cập camera');
+            }
+        } else {
+            // Fallback: nhắc user nhập code thủ công
+            input.focus();
+            document.getElementById('pair-error').textContent = 'Trình duyệt không hỗ trợ QR scan, hãy nhập mã tay';
+        }
+    });
+
+    // Remote buttons — event delegation
+    document.getElementById('remote-screen').addEventListener('click', (e) => {
+        if (!_code) return;
+        const btn = e.target.closest('[data-action],[data-num]');
+        if (!btn) return;
+        if (btn.dataset.num !== undefined) {
+            sendCmd('num', btn.dataset.num);
+        } else if (btn.dataset.action) {
+            sendCmd(btn.dataset.action, null);
+        }
+        // Haptic feedback
+        if (navigator.vibrate) navigator.vibrate(20);
+    });
+
+    // Touch: prevent long-press context menu
+    document.getElementById('remote-screen').addEventListener('contextmenu', e => e.preventDefault());
+
+    // Auto-restore từ localStorage
+    const saved = urlCode || localStorage.getItem('remoteCode');
+    if (saved && /^\d{4}$/.test(saved)) {
+        document.getElementById('code-input').value = saved;
+        if (urlCode) {
+            // Auto-connect khi mở từ QR link
+            setTimeout(() => doConnect(urlCode), 300);
+        }
+    }
+})();
+</script>
+</body>
+</html>
