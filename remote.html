@@ -17,7 +17,7 @@ html,body{height:100%;background:#0a0a0a;color:#fff;font-family:-apple-system,Bl
     background:#0a0a0a;z-index:100;
 }
 #pairing-screen.hidden{display:none}
-.pair-logo{width:54px;height:54px;object-fit:contain;border-radius:12px;background:#1a1a1a;}
+.pair-logo{width:54px;height:54px;object-fit:contain;border-radius:12px;background:#1a1a1a}
 .pair-title{font-size:1.4rem;font-weight:700;letter-spacing:0.5px}
 .pair-subtitle{font-size:0.85rem;color:rgba(255,255,255,.45);text-align:center;line-height:1.5}
 .pair-input-wrap{display:flex;gap:10px;align-items:center}
@@ -36,63 +36,67 @@ html,body{height:100%;background:#0a0a0a;color:#fff;font-family:-apple-system,Bl
 }
 #connect-btn:active{transform:scale(0.95);background:#cc3100}
 #pair-error{font-size:0.8rem;color:#ff5252;min-height:1.1em;text-align:center}
-.pair-divider{display:flex;align-items:center;gap:12px;width:100%;max-width:300px;color:rgba(255,255,255,.2)}
-.pair-divider::before,.pair-divider::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.1)}
-.pair-qr-wrap{text-align:center}
-#qr-scan-btn{
-    background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.12);
-    color:rgba(255,255,255,.6);border-radius:14px;padding:12px 20px;
-    font-size:.9rem;cursor:pointer;transition:border-color .15s;
-}
-#qr-scan-btn:hover{border-color:rgba(255,255,255,.3)}
 
-/* === REMOTE SCREEN === */
-#remote-screen{
-    position:fixed;inset:0;display:flex;flex-direction:column;
-    background:#0a0a0a;overflow:hidden;
-}
-#remote-screen.hidden{display:none}
+/* === MAIN APP === */
+#app-screen{position:fixed;inset:0;display:flex;flex-direction:column;background:#0a0a0a;overflow:hidden}
+#app-screen.hidden{display:none}
 
-.rmt-status-bar{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 16px 8px;background:#111;border-bottom:1px solid rgba(255,255,255,.07);
-    flex-shrink:0;
+/* Status bar */
+.status-bar{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 14px 8px;background:#111;
+    border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0;
 }
-.rmt-status-tv{display:flex;align-items:center;gap:8px}
-.rmt-status-logo{width:28px;height:28px;object-fit:contain;border-radius:6px;background:#1a1a1a}
-.rmt-status-name{font-size:.85rem;font-weight:600}
-.rmt-status-conn{
-    font-size:.72rem;padding:3px 8px;border-radius:10px;font-weight:600;
+.status-bar .now-playing{flex:1;display:flex;align-items:center;gap:10px;min-width:0;cursor:pointer}
+.status-bar .now-logo{width:32px;height:32px;border-radius:6px;object-fit:contain;background:#1a1a1a;flex-shrink:0}
+.status-bar .now-info{min-width:0}
+.status-bar .now-name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-bar .now-program{font-size:.7rem;color:rgba(255,255,255,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status-bar .conn-badge{
+    font-size:.68rem;padding:3px 8px;border-radius:10px;font-weight:600;flex-shrink:0;
     background:rgba(76,175,80,.18);color:#4caf50;
 }
-.rmt-status-conn.offline{background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)}
+.status-bar .conn-badge.offline{background:rgba(255,255,255,.07);color:rgba(255,255,255,.35)}
 #disconnect-btn{
     background:transparent;border:1px solid rgba(255,255,255,.12);
-    color:rgba(255,255,255,.35);border-radius:8px;padding:4px 10px;font-size:.72rem;cursor:pointer;
+    color:rgba(255,255,255,.35);border-radius:8px;padding:4px 10px;font-size:.72rem;cursor:pointer;flex-shrink:0;
 }
 
-.rmt-body{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:12px 14px 20px}
+/* Tab content */
+.tab-content{flex:1;overflow:hidden}
+.tab-pane{display:none;height:100%;overflow-y:auto}
+.tab-pane.active{display:flex;flex-direction:column}
 
-/* Buttons base */
+/* Bottom tab bar */
+.tab-bar{
+    display:flex;background:#111;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;
+    padding:4px 0 env(safe-area-inset-bottom,0);
+}
+.tab-btn{
+    flex:1;border:none;background:transparent;color:rgba(255,255,255,.35);
+    display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:8px 0 6px;font-size:.65rem;cursor:pointer;transition:color .15s;
+}
+.tab-btn.active{color:#ff6b35}
+.tab-btn i{font-size:1.1rem}
+
+/* ===== REMOTE TAB ===== */
+.rmt-body{padding:12px 14px 16px;display:flex;flex-direction:column;gap:12px}
 .rmt-row{display:flex;gap:8px}
 .rmt-btn{
     flex:1;border:none;border-radius:14px;padding:0;
     background:rgba(255,255,255,.08);color:#fff;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
-    gap:5px;font-size:.72rem;cursor:pointer;transition:background .12s,transform .08s;
-    height:60px;
+    gap:5px;font-size:.72rem;cursor:pointer;transition:background .12s,transform .08s;height:56px;
 }
 .rmt-btn:active{background:rgba(255,107,53,.3);transform:scale(.94)}
 .rmt-btn i{font-size:1.1rem}
 .rmt-btn.accent{background:rgba(255,61,0,.18);color:#ff8a65}
 .rmt-btn.accent:active{background:rgba(255,61,0,.4)}
-
-/* D-pad */
 .rmt-dpad-wrap{display:flex;justify-content:center}
 .rmt-dpad-ring{
-    position:relative;width:180px;height:180px;
-    border-radius:50%;background:rgba(255,255,255,.05);
-    border:2px solid rgba(255,255,255,.1);
+    position:relative;width:170px;height:170px;
+    border-radius:50%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.1);
 }
 .rmt-dp{
     position:absolute;border:none;background:transparent;color:#fff;
@@ -100,32 +104,90 @@ html,body{height:100%;background:#0a0a0a;color:#fff;font-family:-apple-system,Bl
     transition:background .1s;border-radius:50%;
 }
 .rmt-dp:active{background:rgba(255,107,53,.35)}
-.rmt-dp-up{top:0;left:50%;transform:translateX(-50%);width:60px;height:60px}
-.rmt-dp-down{bottom:0;left:50%;transform:translateX(-50%);width:60px;height:60px}
-.rmt-dp-left{left:0;top:50%;transform:translateY(-50%);width:60px;height:60px}
-.rmt-dp-right{right:0;top:50%;transform:translateY(-50%);width:60px;height:60px}
+.rmt-dp-up{top:0;left:50%;transform:translateX(-50%);width:56px;height:56px}
+.rmt-dp-down{bottom:0;left:50%;transform:translateX(-50%);width:56px;height:56px}
+.rmt-dp-left{left:0;top:50%;transform:translateY(-50%);width:56px;height:56px}
+.rmt-dp-right{right:0;top:50%;transform:translateY(-50%);width:56px;height:56px}
 .rmt-dp-ok{
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:64px;height:64px;border-radius:50%;
+    width:60px;height:60px;border-radius:50%;
     background:rgba(255,61,0,.25);border:2px solid rgba(255,61,0,.4);
     color:#ff8a65;font-size:1rem;font-weight:700;
 }
 .rmt-dp-ok:active{background:rgba(255,61,0,.55)}
-
-/* Numpad */
 .rmt-numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .rmt-num-btn{
-    border:none;border-radius:14px;height:52px;
-    background:rgba(255,255,255,.07);color:#fff;
-    font-size:1.1rem;font-weight:600;cursor:pointer;
-    transition:background .1s,transform .08s;
+    border:none;border-radius:14px;height:48px;background:rgba(255,255,255,.07);color:#fff;
+    font-size:1.1rem;font-weight:600;cursor:pointer;transition:background .1s,transform .08s;
 }
 .rmt-num-btn:active{background:rgba(255,107,53,.28);transform:scale(.94)}
-.rmt-num-btn.rmt-num-side{background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);font-size:.85rem}
-.rmt-num-btn.rmt-num-side:active{background:rgba(255,107,53,.2);color:#ff8a65}
+.rmt-num-btn.side{background:rgba(255,255,255,.04);color:rgba(255,255,255,.4);font-size:.85rem}
+.rmt-section-label{font-size:.6rem;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.2);padding:0 2px}
 
-/* Section labels */
-.rmt-section-label{font-size:.65rem;text-transform:uppercase;letter-spacing:1.5px;color:rgba(255,255,255,.2);padding:0 2px}
+/* ===== CHANNELS TAB ===== */
+.ch-search-wrap{padding:10px 12px 6px;flex-shrink:0}
+.ch-search{
+    width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+    border-radius:10px;padding:10px 14px;color:#fff;font-size:.9rem;outline:none;
+}
+.ch-search:focus{border-color:#ff6b35}
+.ch-search::placeholder{color:rgba(255,255,255,.25)}
+.ch-group-tabs{
+    display:flex;gap:6px;padding:6px 12px;overflow-x:auto;flex-shrink:0;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.ch-group-tabs::-webkit-scrollbar{display:none}
+.ch-group-btn{
+    white-space:nowrap;border:none;background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);
+    border-radius:16px;padding:6px 14px;font-size:.78rem;cursor:pointer;flex-shrink:0;
+    transition:background .15s,color .15s;
+}
+.ch-group-btn.active{background:#ff3d00;color:#fff}
+.ch-list{flex:1;overflow-y:auto;padding:4px 0}
+.ch-item{
+    display:flex;align-items:center;gap:12px;padding:10px 14px;
+    cursor:pointer;transition:background .12s;border-bottom:1px solid rgba(255,255,255,.04);
+}
+.ch-item:active{background:rgba(255,107,53,.2)}
+.ch-item.active{background:rgba(255,61,0,.12)}
+.ch-item .ch-num{min-width:24px;font-size:.72rem;color:rgba(255,255,255,.3);text-align:right}
+.ch-item .ch-logo{width:38px;height:38px;border-radius:6px;object-fit:contain;background:#1a1a1a;flex-shrink:0}
+.ch-item .ch-name{flex:1;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-item .ch-playing{color:#ff6b35;font-size:.65rem;flex-shrink:0;font-weight:600}
+
+/* ===== EPG TAB ===== */
+.epg-header{padding:14px;flex-shrink:0;border-bottom:1px solid rgba(255,255,255,.06)}
+.epg-ch-info{display:flex;align-items:center;gap:12px}
+.epg-ch-logo{width:42px;height:42px;border-radius:8px;object-fit:contain;background:#1a1a1a}
+.epg-ch-name{font-size:1rem;font-weight:600}
+.epg-ch-sub{font-size:.75rem;color:rgba(255,255,255,.4);margin-top:2px}
+.epg-dates{display:flex;gap:6px;padding:8px 14px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.epg-dates::-webkit-scrollbar{display:none}
+.epg-date-btn{
+    white-space:nowrap;border:none;background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);
+    border-radius:12px;padding:6px 12px;font-size:.75rem;cursor:pointer;flex-shrink:0;
+}
+.epg-date-btn.active{background:rgba(255,61,0,.2);color:#ff8a65}
+.epg-programs{flex:1;overflow-y:auto;padding:4px 0}
+.epg-item{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:10px}
+.epg-item.current{background:rgba(255,61,0,.08)}
+.epg-item.past{opacity:.5}
+.epg-time{font-size:.75rem;color:rgba(255,255,255,.45);min-width:50px;flex-shrink:0;padding-top:1px}
+.epg-prog-info{flex:1;min-width:0}
+.epg-prog-title{font-size:.85rem;line-height:1.3}
+.epg-prog-tag{font-size:.65rem;margin-top:3px;display:inline-block}
+.epg-prog-tag.live{color:#ff6b35}
+.epg-progress{height:2px;background:rgba(255,255,255,.08);border-radius:1px;margin-top:4px}
+.epg-progress-bar{height:100%;background:#ff3d00;border-radius:1px}
+.epg-empty{padding:40px 20px;text-align:center;color:rgba(255,255,255,.3);font-size:.85rem}
+
+/* Toast */
+.toast{
+    position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+    background:#333;color:#fff;padding:10px 20px;border-radius:20px;
+    font-size:.82rem;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
 </head>
@@ -142,136 +204,191 @@ html,body{height:100%;background:#0a0a0a;color:#fff;font-family:-apple-system,Bl
         <button id="connect-btn">Kết nối</button>
     </div>
     <div id="pair-error"></div>
-    <div class="pair-divider">hoặc</div>
-    <button id="qr-scan-btn"><i class="fas fa-qrcode"></i> Quét mã QR từ TV</button>
 </div>
 
-<!-- === REMOTE SCREEN === -->
-<div id="remote-screen" class="hidden">
-
-    <div class="rmt-status-bar">
-        <div class="rmt-status-tv">
-            <img class="rmt-status-logo" src="https://cdn-vn.iof.vn/TV/Xemtv_cat_Toi.png" alt="" onerror="this.style.display='none'">
-            <span class="rmt-status-name">XemTV</span>
+<!-- === MAIN APP === -->
+<div id="app-screen" class="hidden">
+    <div class="status-bar">
+        <div class="now-playing" id="now-playing-bar">
+            <img id="now-logo" class="now-logo" src="https://cdn-vn.iof.vn/TV/Xemtv_cat_Toi.png" alt="" onerror="this.src='https://cdn-vn.iof.vn/TV/Xemtv_cat_Toi.png'">
+            <div class="now-info">
+                <div id="now-name" class="now-name">Chưa phát kênh nào</div>
+                <div id="now-program" class="now-program"></div>
+            </div>
         </div>
-        <span id="conn-status" class="rmt-status-conn offline">Đang kết nối...</span>
+        <span id="conn-status" class="conn-badge offline">Đang kết nối...</span>
         <button id="disconnect-btn">Ngắt</button>
     </div>
 
-    <div class="rmt-body">
-
-        <!-- CH + Back + CH- -->
-        <div class="rmt-row">
-            <button class="rmt-btn accent" data-action="ch_up">
-                <i class="fas fa-chevron-up"></i><span>CH+</span>
-            </button>
-            <button class="rmt-btn" data-action="back">
-                <i class="fas fa-arrow-left"></i><span>Quay lại</span>
-            </button>
-            <button class="rmt-btn accent" data-action="ch_down">
-                <i class="fas fa-chevron-down"></i><span>CH-</span>
-            </button>
-        </div>
-
-        <!-- D-pad -->
-        <div class="rmt-dpad-wrap">
-            <div class="rmt-dpad-ring">
-                <button class="rmt-dp rmt-dp-up" data-action="up"><i class="fas fa-chevron-up"></i></button>
-                <button class="rmt-dp rmt-dp-left" data-action="left"><i class="fas fa-chevron-left"></i></button>
-                <button class="rmt-dp rmt-dp-ok" data-action="ok">OK</button>
-                <button class="rmt-dp rmt-dp-right" data-action="right"><i class="fas fa-chevron-right"></i></button>
-                <button class="rmt-dp rmt-dp-down" data-action="down"><i class="fas fa-chevron-down"></i></button>
+    <div class="tab-content">
+        <!-- Remote -->
+        <div id="tab-remote" class="tab-pane active">
+            <div class="rmt-body">
+                <div class="rmt-row">
+                    <button class="rmt-btn accent" data-action="ch_up"><i class="fas fa-chevron-up"></i><span>CH+</span></button>
+                    <button class="rmt-btn" data-action="back"><i class="fas fa-arrow-left"></i><span>Quay lại</span></button>
+                    <button class="rmt-btn accent" data-action="ch_down"><i class="fas fa-chevron-down"></i><span>CH-</span></button>
+                </div>
+                <div class="rmt-dpad-wrap">
+                    <div class="rmt-dpad-ring">
+                        <button class="rmt-dp rmt-dp-up" data-action="up"><i class="fas fa-chevron-up"></i></button>
+                        <button class="rmt-dp rmt-dp-left" data-action="left"><i class="fas fa-chevron-left"></i></button>
+                        <button class="rmt-dp rmt-dp-ok" data-action="ok">OK</button>
+                        <button class="rmt-dp rmt-dp-right" data-action="right"><i class="fas fa-chevron-right"></i></button>
+                        <button class="rmt-dp rmt-dp-down" data-action="down"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                </div>
+                <div class="rmt-row">
+                    <button class="rmt-btn" data-action="menu"><i class="fas fa-th"></i><span>Danh sách</span></button>
+                    <button class="rmt-btn" data-action="guide"><i class="fas fa-list-ul"></i><span>Lịch phát</span></button>
+                    <button class="rmt-btn" data-action="info"><i class="fas fa-info-circle"></i><span>Thông tin</span></button>
+                </div>
+                <div class="rmt-section-label">Nhập số kênh</div>
+                <div class="rmt-numpad">
+                    <button class="rmt-num-btn" data-num="1">1</button>
+                    <button class="rmt-num-btn" data-num="2">2</button>
+                    <button class="rmt-num-btn" data-num="3">3</button>
+                    <button class="rmt-num-btn" data-num="4">4</button>
+                    <button class="rmt-num-btn" data-num="5">5</button>
+                    <button class="rmt-num-btn" data-num="6">6</button>
+                    <button class="rmt-num-btn" data-num="7">7</button>
+                    <button class="rmt-num-btn" data-num="8">8</button>
+                    <button class="rmt-num-btn" data-num="9">9</button>
+                    <button class="rmt-num-btn side" data-action="guide"><i class="fas fa-list"></i></button>
+                    <button class="rmt-num-btn" data-num="0">0</button>
+                    <button class="rmt-num-btn side" data-action="delete"><i class="fas fa-delete-left"></i></button>
+                </div>
             </div>
         </div>
 
-        <!-- Menu + Info -->
-        <div class="rmt-row">
-            <button class="rmt-btn" data-action="menu">
-                <i class="fas fa-th"></i><span>Danh sách</span>
-            </button>
-            <button class="rmt-btn" data-action="guide">
-                <i class="fas fa-list-ul"></i><span>Lịch phát</span>
-            </button>
-            <button class="rmt-btn" data-action="info">
-                <i class="fas fa-info-circle"></i><span>Thông tin</span>
-            </button>
+        <!-- Channels -->
+        <div id="tab-channels" class="tab-pane">
+            <div class="ch-search-wrap"><input class="ch-search" id="ch-search" type="search" placeholder="Tìm kênh..." autocomplete="off"></div>
+            <div class="ch-group-tabs" id="ch-group-tabs"></div>
+            <div class="ch-list" id="ch-list"></div>
         </div>
 
-        <!-- Numpad -->
-        <div class="rmt-section-label">Nhập số kênh</div>
-        <div class="rmt-numpad">
-            <button class="rmt-num-btn" data-num="1">1</button>
-            <button class="rmt-num-btn" data-num="2">2</button>
-            <button class="rmt-num-btn" data-num="3">3</button>
-            <button class="rmt-num-btn" data-num="4">4</button>
-            <button class="rmt-num-btn" data-num="5">5</button>
-            <button class="rmt-num-btn" data-num="6">6</button>
-            <button class="rmt-num-btn" data-num="7">7</button>
-            <button class="rmt-num-btn" data-num="8">8</button>
-            <button class="rmt-num-btn" data-num="9">9</button>
-            <button class="rmt-num-btn rmt-num-side" data-action="guide"><i class="fas fa-list"></i></button>
-            <button class="rmt-num-btn" data-num="0">0</button>
-            <button class="rmt-num-btn rmt-num-side" data-action="delete"><i class="fas fa-delete-left"></i></button>
+        <!-- EPG -->
+        <div id="tab-epg" class="tab-pane">
+            <div class="epg-header">
+                <div class="epg-ch-info">
+                    <img id="epg-ch-logo" class="epg-ch-logo" src="" alt="">
+                    <div><div id="epg-ch-name" class="epg-ch-name">Chọn kênh để xem lịch</div><div id="epg-ch-sub" class="epg-ch-sub"></div></div>
+                </div>
+            </div>
+            <div class="epg-dates" id="epg-dates"></div>
+            <div class="epg-programs" id="epg-programs"><div class="epg-empty">Chọn kênh trên TV để xem lịch phát sóng</div></div>
         </div>
+    </div>
 
-    </div><!-- /.rmt-body -->
-</div><!-- /#remote-screen -->
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tab-remote"><i class="fas fa-gamepad"></i><span>Điều khiển</span></button>
+        <button class="tab-btn" data-tab="tab-channels"><i class="fas fa-tv"></i><span>Kênh</span></button>
+        <button class="tab-btn" data-tab="tab-epg"><i class="fas fa-calendar-alt"></i><span>Lịch phát</span></button>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 (function(){
     'use strict';
     const API = 'https://cdn-vn.iof.vn';
     let _code = null;
-    let _sse  = null;
+    let _sse = null;
+    let _phoneSse = null;
     let _connected = false;
     let _cmdQueue = [];
     let _sending = false;
 
-    // Lấy code từ URL (nếu QR scan)
-    const urlCode = new URLSearchParams(location.search).get('code');
-    if (urlCode && /^\d{4}$/.test(urlCode)) {
-        document.getElementById('code-input').value = urlCode;
-    }
+    let _allChannels = [];
+    let _groups = {};
+    let _activeGroup = '';
+    let _tvChannel = null;
+    let _epgData = [];
+    let _epgChannelId = null;
+    let _epgActiveDate = null;
 
-    const showPairing = () => {
-        document.getElementById('pairing-screen').classList.remove('hidden');
-        document.getElementById('remote-screen').classList.add('hidden');
+    const $ = (s) => document.getElementById(s);
+    const esc = (s) => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+    const fmtTime = (unix) => {
+        const d = new Date(unix * 1000);
+        return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
     };
-    const showRemote = () => {
-        document.getElementById('pairing-screen').classList.add('hidden');
-        document.getElementById('remote-screen').classList.remove('hidden');
+    const showToast = (msg, ms) => {
+        const t = $('toast'); t.textContent = msg; t.classList.add('show');
+        clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), ms || 2000);
     };
+
+    // URL code
+    const urlCode = new URLSearchParams(location.search).get('code');
+    if (urlCode && /^\d{4}$/.test(urlCode)) $('code-input').value = urlCode;
+
+    // === Tab switching ===
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            const pane = $(btn.dataset.tab);
+            if (pane) pane.classList.add('active');
+            if (btn.dataset.tab === 'tab-channels' && !_allChannels.length) fetchChannels();
+            if (btn.dataset.tab === 'tab-epg' && _tvChannel) fetchEpg(_tvChannel.channelId);
+        });
+    });
+
+    // === Pairing ===
+    const showPairing = () => { $('pairing-screen').classList.remove('hidden'); $('app-screen').classList.add('hidden'); };
+    const showApp = () => { $('pairing-screen').classList.add('hidden'); $('app-screen').classList.remove('hidden'); };
 
     const setConnStatus = (on) => {
         _connected = on;
-        const el = document.getElementById('conn-status');
-        if (!el) return;
+        const el = $('conn-status'); if (!el) return;
         el.textContent = on ? '● Đã kết nối' : '○ Mất kết nối';
-        el.className = 'rmt-status-conn' + (on ? '' : ' offline');
+        el.className = 'conn-badge' + (on ? '' : ' offline');
     };
 
-    // Kết nối SSE để biết TV có online không (và nhận confirm)
+    // TV command SSE
     const connectSSE = () => {
-        if (_sse) { _sse.close(); }
-        // Phone cũng "lắng nghe" để kiểm tra kết nối còn sống không
-        // TV mới là bên nhận lệnh, phone chỉ POST. SSE ở đây chỉ để xác nhận.
+        if (_sse) _sse.close();
         setConnStatus(false);
         const es = new EventSource(API + '/api/remote/events?code=' + _code);
         _sse = es;
         es.onopen = () => setConnStatus(true);
+        es.onmessage = (e) => { try { if (JSON.parse(e.data).type === 'connected') setConnStatus(true); } catch(err) {} };
+        es.onerror = () => { setConnStatus(false); setTimeout(() => { if (_code) connectSSE(); }, 5000); };
+    };
+
+    // Phone events SSE — receives TV state
+    const connectPhoneSSE = () => {
+        if (_phoneSse) _phoneSse.close();
+        const es = new EventSource(API + '/api/remote/phone-events?code=' + _code);
+        _phoneSse = es;
         es.onmessage = (e) => {
             try {
                 const d = JSON.parse(e.data);
-                if (d.type === 'connected') setConnStatus(true);
+                if (d.type === 'connected' && d.tvState) updateTvState(d.tvState);
+                else if (d.action === 'tv_channel_changed') updateTvState(d.channel);
             } catch(err) {}
         };
-        es.onerror = () => {
-            setConnStatus(false);
-            setTimeout(() => { if (_code) connectSSE(); }, 5000);
-        };
+        es.onerror = () => { setTimeout(() => { if (_code) connectPhoneSSE(); }, 5000); };
     };
 
-    // Gửi lệnh (deduped queue)
+    const updateTvState = (ch) => {
+        _tvChannel = ch;
+        if (ch) {
+            $('now-logo').src = ch.logo || 'https://cdn-vn.iof.vn/TV/Xemtv_cat_Toi.png';
+            $('now-name').textContent = ch.TV || ch.name || '';
+            const epgPane = $('tab-epg');
+            if (epgPane && epgPane.classList.contains('active') && ch.channelId) fetchEpg(ch.channelId);
+            highlightActiveChannel();
+        } else {
+            $('now-name').textContent = 'Chưa phát kênh nào';
+            $('now-logo').src = 'https://cdn-vn.iof.vn/TV/Xemtv_cat_Toi.png';
+        }
+    };
+
+    // === Send command ===
     const sendCmd = async (action, payload) => {
         _cmdQueue.push({ action, payload });
         if (_sending) return;
@@ -280,130 +397,239 @@ html,body{height:100%;background:#0a0a0a;color:#fff;font-family:-apple-system,Bl
             const cmd = _cmdQueue.shift();
             try {
                 await fetch(API + '/api/remote/cmd', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code: _code, action: cmd.action, payload: cmd.payload })
                 });
                 setConnStatus(true);
-            } catch(e) {
-                setConnStatus(false);
-            }
+            } catch(e) { setConnStatus(false); }
         }
         _sending = false;
     };
 
-    // Kết nối
+    // === Connect ===
     const doConnect = async (code) => {
-        if (!/^\d{4}$/.test(code)) {
-            document.getElementById('pair-error').textContent = 'Nhập đúng 4 chữ số';
-            return;
-        }
-        document.getElementById('pair-error').textContent = '';
-        document.getElementById('connect-btn').disabled = true;
-        document.getElementById('connect-btn').textContent = 'Đang kết nối...';
-        // Kiểm tra xem code hợp lệ không (thử GET events)
+        if (!/^\d{4}$/.test(code)) { $('pair-error').textContent = 'Nhập đúng 4 chữ số'; return; }
+        $('pair-error').textContent = '';
+        $('connect-btn').disabled = true;
+        $('connect-btn').textContent = 'Đang kết nối...';
         try {
-            const r = await fetch(API + '/api/remote/events?code=' + code, { method: 'HEAD' }).catch(() => null);
-            // HEAD có thể không hỗ trợ SSE, thử GET với timeout
             const check = await Promise.race([
                 fetch(API + '/api/remote/cmd', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ code, action: 'phone_connected' })
                 }),
                 new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
             ]);
             const d = await check.json();
-            if (!d.ok) {
-                document.getElementById('pair-error').textContent = 'Mã không đúng hoặc TV chưa bật';
-                document.getElementById('connect-btn').disabled = false;
-                document.getElementById('connect-btn').textContent = 'Kết nối';
-                return;
-            }
-        } catch(e) {
-            document.getElementById('pair-error').textContent = 'Không kết nối được server';
-            document.getElementById('connect-btn').disabled = false;
-            document.getElementById('connect-btn').textContent = 'Kết nối';
-            return;
-        }
+            if (!d.ok) { $('pair-error').textContent = 'Mã không đúng hoặc TV chưa bật'; $('connect-btn').disabled = false; $('connect-btn').textContent = 'Kết nối'; return; }
+        } catch(e) { $('pair-error').textContent = 'Không kết nối được server'; $('connect-btn').disabled = false; $('connect-btn').textContent = 'Kết nối'; return; }
         _code = code;
         localStorage.setItem('remoteCode', code);
-        document.getElementById('connect-btn').disabled = false;
-        document.getElementById('connect-btn').textContent = 'Kết nối';
-        showRemote();
+        $('connect-btn').disabled = false;
+        $('connect-btn').textContent = 'Kết nối';
+        showApp();
         connectSSE();
+        connectPhoneSSE();
+        fetchChannels();
     };
 
-    // Events
-    document.getElementById('connect-btn').addEventListener('click', () => {
-        doConnect(document.getElementById('code-input').value.trim());
-    });
-    document.getElementById('code-input').addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') doConnect(e.target.value.trim());
-    });
-    document.getElementById('disconnect-btn').addEventListener('click', () => {
+    $('connect-btn').addEventListener('click', () => doConnect($('code-input').value.trim()));
+    $('code-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') doConnect(e.target.value.trim()); });
+    $('disconnect-btn').addEventListener('click', () => {
         if (_sse) { _sse.close(); _sse = null; }
-        _code = null;
-        localStorage.removeItem('remoteCode');
-        showPairing();
+        if (_phoneSse) { _phoneSse.close(); _phoneSse = null; }
+        _code = null; localStorage.removeItem('remoteCode'); showPairing();
     });
 
-    // QR Scan (dùng camera trình duyệt nếu hỗ trợ BarcodeDetector)
-    document.getElementById('qr-scan-btn').addEventListener('click', async () => {
-        const input = document.getElementById('code-input');
-        if ('BarcodeDetector' in window) {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.play();
-                const bd = new BarcodeDetector({ formats: ['qr_code'] });
-                const scanLoop = async () => {
-                    if (!video.videoWidth) { requestAnimationFrame(scanLoop); return; }
-                    const codes = await bd.detect(video).catch(() => []);
-                    if (codes.length) {
-                        stream.getTracks().forEach(t => t.stop());
-                        const url = codes[0].rawValue;
-                        const m = url.match(/[?&]code=(\d{4})/);
-                        if (m) { input.value = m[1]; doConnect(m[1]); }
-                    } else { requestAnimationFrame(scanLoop); }
-                };
-                video.addEventListener('playing', () => requestAnimationFrame(scanLoop));
-            } catch(e) {
-                alert('Không thể truy cập camera');
-            }
-        } else {
-            // Fallback: nhắc user nhập code thủ công
-            input.focus();
-            document.getElementById('pair-error').textContent = 'Trình duyệt không hỗ trợ QR scan, hãy nhập mã tay';
-        }
-    });
-
-    // Remote buttons — event delegation
-    document.getElementById('remote-screen').addEventListener('click', (e) => {
+    // === Remote buttons ===
+    $('tab-remote').addEventListener('click', (e) => {
         if (!_code) return;
         const btn = e.target.closest('[data-action],[data-num]');
         if (!btn) return;
-        if (btn.dataset.num !== undefined) {
-            sendCmd('num', btn.dataset.num);
-        } else if (btn.dataset.action) {
-            sendCmd(btn.dataset.action, null);
-        }
-        // Haptic feedback
+        if (btn.dataset.num !== undefined) sendCmd('num', btn.dataset.num);
+        else if (btn.dataset.action) sendCmd(btn.dataset.action, null);
         if (navigator.vibrate) navigator.vibrate(20);
     });
+    $('tab-remote').addEventListener('contextmenu', e => e.preventDefault());
 
-    // Touch: prevent long-press context menu
-    document.getElementById('remote-screen').addEventListener('contextmenu', e => e.preventDefault());
+    // === Channels ===
+    const fetchChannels = async () => {
+        try {
+            const r = await fetch(API + '/api/channels/list', { signal: AbortSignal.timeout(10000) });
+            _allChannels = await r.json();
+            buildGroupTabs();
+            renderChannels();
+        } catch(e) {}
+    };
 
-    // Auto-restore từ localStorage
+    const buildGroupTabs = () => {
+        _groups = {};
+        _allChannels.forEach(ch => { const g = ch.group || 'Khác'; if (!_groups[g]) _groups[g] = []; _groups[g].push(ch); });
+        const tabs = $('ch-group-tabs');
+        tabs.innerHTML = '';
+        const keys = Object.keys(_groups);
+        if (!_activeGroup || !_groups[_activeGroup]) _activeGroup = keys[0] || '';
+        keys.forEach(g => {
+            const btn = document.createElement('button');
+            btn.className = 'ch-group-btn' + (g === _activeGroup ? ' active' : '');
+            btn.textContent = g;
+            btn.addEventListener('click', () => {
+                _activeGroup = g;
+                tabs.querySelectorAll('.ch-group-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderChannels();
+            });
+            tabs.appendChild(btn);
+        });
+    };
+
+    const renderChannels = () => {
+        const list = $('ch-list');
+        const search = ($('ch-search').value || '').trim().toLowerCase();
+        let channels = search
+            ? _allChannels.filter(ch => ((ch.TV || ch.name || '') + ' ' + (ch.channelId || '')).toLowerCase().includes(search))
+            : (_groups[_activeGroup] || []);
+        list.innerHTML = '';
+        channels.forEach(ch => {
+            const idx = _allChannels.indexOf(ch);
+            const isPlaying = _tvChannel && (_tvChannel.channelId === ch.channelId || _tvChannel.name === ch.name);
+            const item = document.createElement('div');
+            item.className = 'ch-item' + (isPlaying ? ' active' : '');
+            item.innerHTML =
+                '<span class="ch-num">' + (idx + 1) + '</span>' +
+                '<img class="ch-logo" src="' + esc(ch.logo || '') + '" alt="" loading="lazy" onerror="this.style.display=\'none\'">' +
+                '<span class="ch-name">' + esc(ch.TV || ch.name) + '</span>' +
+                (isPlaying ? '<span class="ch-playing">● LIVE</span>' : '');
+            item.addEventListener('click', () => {
+                sendCmd('select', { name: ch.name, channelId: ch.channelId });
+                showToast('▶ ' + (ch.TV || ch.name));
+                _tvChannel = { name: ch.name, TV: ch.TV || ch.name, logo: ch.logo, channelId: ch.channelId, group: ch.group };
+                updateTvState(_tvChannel);
+            });
+            list.appendChild(item);
+        });
+    };
+
+    const highlightActiveChannel = () => {
+        document.querySelectorAll('.ch-item').forEach(el => {
+            const name = el.querySelector('.ch-name')?.textContent || '';
+            const isActive = _tvChannel && (name === (_tvChannel.TV || _tvChannel.name));
+            el.classList.toggle('active', isActive);
+            let badge = el.querySelector('.ch-playing');
+            if (isActive && !badge) { badge = document.createElement('span'); badge.className = 'ch-playing'; badge.textContent = '● LIVE'; el.appendChild(badge); }
+            else if (!isActive && badge) badge.remove();
+        });
+    };
+
+    let _searchTimer = null;
+    $('ch-search').addEventListener('input', () => { clearTimeout(_searchTimer); _searchTimer = setTimeout(renderChannels, 200); });
+
+    // === EPG ===
+    const fetchEpg = async (channelId) => {
+        if (!channelId) return;
+        _epgChannelId = channelId;
+        _epgData = [];
+        const ch = _allChannels.find(c => c.channelId === channelId) || _tvChannel;
+        if (ch) {
+            $('epg-ch-logo').src = ch.logo || '';
+            $('epg-ch-name').textContent = ch.TV || ch.name || channelId;
+            $('epg-ch-sub').textContent = ch.group || '';
+        }
+        $('epg-programs').innerHTML = '<div class="epg-empty">Đang tải lịch phát sóng...</div>';
+        try {
+            const d0 = new Date(); d0.setDate(d0.getDate() - 1);
+            const ds = d0.getFullYear() + '-' + String(d0.getMonth()+1).padStart(2,'0') + '-' + String(d0.getDate()).padStart(2,'0');
+            const r = await fetch(API + '/api/epg/' + encodeURIComponent(channelId) + '?date=' + ds + '&days=3', { signal: AbortSignal.timeout(15000) });
+            const data = await r.json();
+            if (data.programs && data.programs.length) {
+                _epgData = data.programs;
+                buildEpgDates();
+                renderEpg();
+                // Update now-program in status bar
+                const now = Math.floor(Date.now() / 1000);
+                const cur = _epgData.find(p => p.startTime <= now && p.endTime > now);
+                if (cur) $('now-program').textContent = '▶ ' + cur.title;
+            } else {
+                $('epg-programs').innerHTML = '<div class="epg-empty">Không có lịch phát sóng cho kênh này</div>';
+            }
+        } catch(e) {
+            $('epg-programs').innerHTML = '<div class="epg-empty">Lỗi tải lịch phát sóng</div>';
+        }
+    };
+
+    const buildEpgDates = () => {
+        const dates = $('epg-dates'); dates.innerHTML = '';
+        const daySet = new Set();
+        _epgData.forEach(p => {
+            const d = new Date(p.startTime * 1000);
+            daySet.add(d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'));
+        });
+        const today = new Date(); today.setHours(0,0,0,0);
+        const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+        const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+        const todayStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+        if (!_epgActiveDate || !daySet.has(_epgActiveDate)) _epgActiveDate = todayStr;
+        [...daySet].sort().forEach(ds => {
+            const d = new Date(ds + 'T00:00:00+07:00');
+            const dd = new Date(d); dd.setHours(0,0,0,0);
+            let label = '';
+            if (dd.getTime() === today.getTime()) label = 'Hôm nay';
+            else if (dd.getTime() === yesterday.getTime()) label = 'Hôm qua';
+            else if (dd.getTime() === tomorrow.getTime()) label = 'Ngày mai';
+            else label = d.toLocaleDateString('vi-VN', {weekday:'short', day:'2-digit', month:'2-digit'});
+            const btn = document.createElement('button');
+            btn.className = 'epg-date-btn' + (ds === _epgActiveDate ? ' active' : '');
+            btn.textContent = label;
+            btn.addEventListener('click', () => {
+                _epgActiveDate = ds;
+                dates.querySelectorAll('.epg-date-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderEpg();
+            });
+            dates.appendChild(btn);
+        });
+    };
+
+    const renderEpg = () => {
+        const container = $('epg-programs');
+        const now = Math.floor(Date.now() / 1000);
+        const filtered = _epgData.filter(p => {
+            const d = new Date(p.startTime * 1000);
+            return (d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0')) === _epgActiveDate;
+        });
+        if (!filtered.length) { container.innerHTML = '<div class="epg-empty">Không có chương trình ngày này</div>'; return; }
+        let html = '';
+        filtered.forEach(p => {
+            const isCurrent = p.startTime <= now && p.endTime > now;
+            const isPast = p.endTime <= now;
+            const pct = isCurrent ? Math.round(((now - p.startTime) / Math.max(1, p.endTime - p.startTime)) * 100) : 0;
+            html += '<div class="epg-item' + (isCurrent ? ' current' : isPast ? ' past' : '') + '">' +
+                '<div class="epg-time">' + fmtTime(p.startTime) + '</div>' +
+                '<div class="epg-prog-info">' +
+                '<div class="epg-prog-title">' + esc(p.title) + '</div>' +
+                (isCurrent ? '<span class="epg-prog-tag live">● Đang phát</span><div class="epg-progress"><div class="epg-progress-bar" style="width:' + pct + '%"></div></div>' : '') +
+                '</div></div>';
+        });
+        container.innerHTML = html;
+        const cur = container.querySelector('.epg-item.current');
+        if (cur) setTimeout(() => cur.scrollIntoView({ block: 'center', behavior: 'instant' }), 50);
+    };
+
+    // Status bar tap → EPG
+    $('now-playing-bar').addEventListener('click', () => {
+        if (!_tvChannel) return;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+        document.querySelector('[data-tab="tab-epg"]').classList.add('active');
+        $('tab-epg').classList.add('active');
+        fetchEpg(_tvChannel.channelId);
+    });
+
+    // Auto-restore
     const saved = urlCode || localStorage.getItem('remoteCode');
     if (saved && /^\d{4}$/.test(saved)) {
-        document.getElementById('code-input').value = saved;
-        if (urlCode) {
-            // Auto-connect khi mở từ QR link
-            setTimeout(() => doConnect(urlCode), 300);
-        }
+        $('code-input').value = saved;
+        if (urlCode) setTimeout(() => doConnect(urlCode), 300);
     }
 })();
 </script>
