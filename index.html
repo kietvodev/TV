@@ -941,6 +941,27 @@
     html.is-mobile .main-left {
         padding-right: 0;
     }
+
+    /* ===== Điện thoại XOAY NGANG nhưng KHÔNG fullscreen =====
+       Giữ giao diện như màn hình DỌC: player + danh sách co thành cột hẹp
+       căn giữa, tránh video phóng to tràn kín màn hình (chỉ khi bấm
+       fullscreen video mới chiếm toàn màn hình ngang).
+       Khi fullscreen, video ở top-layer nên không bị các rule này ảnh hưởng. */
+    @media screen and (orientation: landscape) and (max-height: 600px) {
+        html.is-mobile .player-section { padding: 0; }
+        html.is-mobile .player-layout,
+        html.is-mobile #mobile-content-tabs,
+        html.is-mobile #mobile-epg-view,
+        html.is-mobile .main-layout {
+            max-width: calc(55vh * 16 / 9);
+            margin-left: auto;
+            margin-right: auto;
+        }
+        /* Sticky tab bám đúng đáy player mới (player cao 55vh) */
+        html.is-mobile #mobile-content-tabs {
+            top: calc(44px + 55vh);
+        }
+    }
     </style>
 
 <!-- Google tag (gtag.js) -->
