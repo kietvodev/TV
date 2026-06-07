@@ -3641,7 +3641,7 @@ const _buildM3uEntry = () => {
         <button class="m3u-close" id="m3u-close" title="Đóng" style="display:none">&times;</button>
         <div class="m3u-hero">
           <div class="m3u-logo-wrap">
-            <img class="m3u-logo" src="/Image_WEB/XEMTV_192X192.png" alt="XemTV" onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\'fas fa-tv\'></i>'" />
+            <img class="m3u-logo" src="/Image_WEB/xemtv_logo.png" alt="XemTV" onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\'fas fa-tv\'></i>'" />
           </div>
           <div class="m3u-brand">XemTV<span>.vn</span></div>
           <div class="m3u-tagline">Trình phát IPTV &middot; Mở mọi playlist M3U / M3U8 của bạn</div>
