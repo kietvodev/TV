@@ -1049,10 +1049,11 @@
             setTimeout(function() { csStep('cs-s3','done'); csShow(); }, 300);
           })
           .catch(function() {
+            // Player IPTV tĩnh: KHÔNG chặn khi proxy/máy chủ offline.
+            // Vẫn vào app — nếu proxy tắt thì chỉ là không phát được stream.
             stopTimer();
-            csStep('cs-s2','err'); csStep('cs-s3','err');
-            if (timerEl) timerEl.textContent = 'Không thể kết nối';
-            setTimeout(function() { window.location.replace('/404.html'); }, 800);
+            csStep('cs-s2','done'); csStep('cs-s3','done');
+            csShow();
           });
       });
   });
