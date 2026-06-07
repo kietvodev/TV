@@ -3511,7 +3511,7 @@ const clearM3uSource = () => { try { localStorage.removeItem(M3U_STORE_KEY); } c
 const M3U_PROXY_BASE = (() => {
     const q = new URLSearchParams(location.search).get('proxy');
     if (q) { try { localStorage.setItem('xemtv_m3u_proxy', q); } catch (e) {} return q.replace(/\/+$/, ''); }
-    return (localStorage.getItem('xemtv_m3u_proxy') || 'https://cdn-vn.iof.vn/m3up').replace(/\/+$/, '');
+    return (localStorage.getItem('xemtv_m3u_proxy') || 'https://cdn-vn.iof.vn/mproxy').replace(/\/+$/, '');
 })();
 const _viaProxy = (u) => M3U_PROXY_BASE ? (M3U_PROXY_BASE + '/p?url=' + encodeURIComponent(u)) : u;
 const _rawProxy = (u) => M3U_PROXY_BASE ? (M3U_PROXY_BASE + '/raw?url=' + encodeURIComponent(u)) : u;
