@@ -3506,6 +3506,16 @@ const loadM3uSource = () => {
 };
 const clearM3uSource = () => { try { localStorage.removeItem(M3U_STORE_KEY); } catch (e) {} };
 
+// Proxy quản lý M3U (tách biệt khỏi player tĩnh). Mọi playlist/stream đều đi qua đây.
+// Đổi URL proxy: thêm ?proxy=https://host vào trang, hoặc localStorage 'xemtv_m3u_proxy'.
+const M3U_PROXY_BASE = (() => {
+    const q = new URLSearchParams(location.search).get('proxy');
+    if (q) { try { localStorage.setItem('xemtv_m3u_proxy', q); } catch (e) {} return q.replace(/\/+$/, ''); }
+    return (localStorage.getItem('xemtv_m3u_proxy') || 'https://cdn-vn.iof.vn/m3up').replace(/\/+$/, '');
+})();
+const _viaProxy = (u) => M3U_PROXY_BASE ? (M3U_PROXY_BASE + '/p?url=' + encodeURIComponent(u)) : u;
+const _rawProxy = (u) => M3U_PROXY_BASE ? (M3U_PROXY_BASE + '/raw?url=' + encodeURIComponent(u)) : u;
+
 // Parse nội dung M3U/M3U8 → mảng kênh { name, TV, src, logo, group, m3uDirect }
 const parseM3U = (text, baseUrl) => {
     text = text || '';
@@ -3523,10 +3533,6 @@ const parseM3U = (text, baseUrl) => {
         if (/^[a-z][a-z0-9+.-]*:\/\//i.test(u) || /^[a-z]+:/i.test(u)) out = u;
         else if (baseUrl) { try { out = new URL(u, baseUrl).href; } catch (e) { out = u; } }
         else out = u;
-        // Web chạy HTTPS → nâng link http:// lên https:// để tránh chặn mixed-content
-        if (location.protocol === 'https:' && /^http:\/\//i.test(out)) {
-            out = out.replace(/^http:/i, 'https:');
-        }
         return out;
     };
     for (const raw of lines) {
@@ -3558,7 +3564,7 @@ const parseM3U = (text, baseUrl) => {
             let nm = base.name, k = 2;
             while (used.has(nm)) nm = base.name + ' (' + (k++) + ')';
             used.add(nm);
-            channels.push({ name: nm, TV: base.name, src: url, logo: base.logo, group: base.group, m3uDirect: true });
+            channels.push({ name: nm, TV: base.name, src: _viaProxy(url), logo: base.logo, group: base.group, m3uDirect: true });
             cur = null;
         }
     }
@@ -3609,7 +3615,7 @@ const loadM3uFromSource = async (source) => {
         if (source.type === 'text') {
             text = source.value;
         } else {
-            const res = await fetch(source.value, { cache: 'no-cache' });
+            const res = await fetch(_rawProxy(source.value), { cache: 'no-cache' });
             if (!res.ok) throw new Error('HTTP ' + res.status);
             text = await res.text();
         }
@@ -3620,10 +3626,7 @@ const loadM3uFromSource = async (source) => {
         enterM3uMode(channels);
     } catch (e) {
         _setM3uBusy(false);
-        const hint = source.type === 'url'
-            ? ' — link có thể bị chặn CORS. Hãy thử "Dán nội dung" hoặc "Tải file" thay vì link.'
-            : '';
-        _showM3uError('Không tải được playlist: ' + e.message + hint);
+        _showM3uError('Không tải được playlist: ' + e.message + (source.type === 'url' ? ' — kiểm tra link hoặc proxy M3U.' : ''));
         _revealApp();
     }
 };
