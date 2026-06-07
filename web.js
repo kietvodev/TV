@@ -3639,12 +3639,17 @@ const _buildM3uEntry = () => {
     ov.innerHTML = `
       <div class="m3u-box">
         <button class="m3u-close" id="m3u-close" title="Đóng" style="display:none">&times;</button>
-        <div class="m3u-title"><i class="fas fa-tv"></i> Xem IPTV bằng playlist M3U</div>
-        <div class="m3u-sub">Dán link M3U/M3U8, tải file, hoặc dán trực tiếp nội dung playlist.</div>
+        <div class="m3u-hero">
+          <div class="m3u-logo-wrap">
+            <img class="m3u-logo" src="/Image_WEB/XEMTV_192X192.png" alt="XemTV" onerror="this.style.display='none';this.parentNode.innerHTML='<i class=\'fas fa-tv\'></i>'" />
+          </div>
+          <div class="m3u-brand">XemTV<span>.vn</span></div>
+          <div class="m3u-tagline">Trình phát IPTV &middot; Mở mọi playlist M3U / M3U8 của bạn</div>
+        </div>
         <div class="m3u-tabs">
-          <button class="m3u-tab active" data-tab="url">Link M3U</button>
-          <button class="m3u-tab" data-tab="file">Tải file</button>
-          <button class="m3u-tab" data-tab="text">Dán nội dung</button>
+          <button class="m3u-tab active" data-tab="url"><i class="fas fa-link"></i> Link M3U</button>
+          <button class="m3u-tab" data-tab="file"><i class="fas fa-folder-open"></i> Tải file</button>
+          <button class="m3u-tab" data-tab="text"><i class="fas fa-paste"></i> Dán nội dung</button>
         </div>
         <div class="m3u-pane" data-pane="url">
           <input id="m3u-url" type="url" placeholder="https://.../playlist.m3u" autocomplete="off" />
@@ -3659,7 +3664,8 @@ const _buildM3uEntry = () => {
           <textarea id="m3u-text" rows="6" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-logo=&quot;...&quot; group-title=&quot;...&quot;,Tên kênh&#10;https://.../stream.m3u8"></textarea>
         </div>
         <div class="m3u-err" id="m3u-err"></div>
-        <button class="m3u-go" id="m3u-go">Xem ngay</button>
+        <button class="m3u-go" id="m3u-go"><i class="fas fa-play"></i> Xem ngay</button>
+        <div class="m3u-foot"><i class="fas fa-shield-halved"></i> Hỗ trợ HLS &middot; M3U8 &middot; Phát qua proxy bảo mật</div>
       </div>`;
     document.body.appendChild(ov);
 
@@ -3722,7 +3728,12 @@ const _showM3uError = (msg) => {
 };
 const _setM3uBusy = (busy, msg) => {
     const go = document.getElementById('m3u-go');
-    if (go) { go.disabled = !!busy; go.textContent = busy ? (msg || 'Đang tải...') : 'Xem ngay'; }
+    if (go) {
+        go.disabled = !!busy;
+        go.innerHTML = busy
+            ? '<i class="fas fa-spinner fa-spin"></i> ' + (msg || 'Đang tải...')
+            : '<i class="fas fa-play"></i> Xem ngay';
+    }
 };
 
 // Popup xác nhận theo theme (thay confirm mặc định của trình duyệt)
